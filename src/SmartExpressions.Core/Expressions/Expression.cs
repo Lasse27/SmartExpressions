@@ -1,14 +1,15 @@
 ﻿using System.Collections.Concurrent;
 
+using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Expressions
 {
 	/// <summary> Represents a configurable and evaluatable expression based on a textual formula. </summary>
-	public class SmartExpression
+	public class Expression : IEvaluable
 	{
 		/// <summary> Gets a value indicating whether the expression has been successfully tokenized and parsed. </summary>
-		public bool IsAssembled => _isTokenized && _isParsed;
+		public bool IsAssembled => this._isTokenized && this._isParsed;
 
 		/// <summary> Gets a value indicating whether the expression should be automatically tokenized and parsed before evaluation. </summary>
 		public bool AssembleOnEvaluation { get; private set; }
@@ -17,7 +18,7 @@ namespace SmartExpressions.Core.Expressions
 		public string Formula { get; private set; }
 
 		/// <summary> Gets the tokens produced from the formula after tokenization. </summary>
-		public SmartToken[] Tokens { get; private set; }
+		public List<IToken> Tokens { get; private set; }
 
 		/// <summary> Gets the parameter dictionary used during expression evaluation. </summary>
 		public ConcurrentDictionary<string, object> Parameters { get; private set; }
@@ -31,8 +32,8 @@ namespace SmartExpressions.Core.Expressions
 
 		#region Constructors
 
-		/// <summary> Initializes a new instance of the <see cref="SmartExpression"/> class with an empty formula. </summary>
-		public SmartExpression()
+		/// <summary> Initializes a new instance of the <see cref="Expression"/> class with an empty formula. </summary>
+		public Expression()
 		{
 			this.Formula = string.Empty;
 			this.Tokens = [];
@@ -42,10 +43,10 @@ namespace SmartExpressions.Core.Expressions
 			this._isParsed = false;
 		}
 
-		/// <summary> Initializes a new instance of the <see cref="SmartExpression"/> class with the specified formula. </summary>
+		/// <summary> Initializes a new instance of the <see cref="Expression"/> class with the specified formula. </summary>
 		/// <param name="formula">The textual formula representing the expression.</param>
 		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="formula"/> is <see langword="null"/>.  </exception>
-		public SmartExpression(string formula) : this()
+		public Expression(string formula) : this()
 		{
 			ArgumentNullException.ThrowIfNull(formula, nameof(formula));
 			this.Formula = formula;
@@ -56,9 +57,9 @@ namespace SmartExpressions.Core.Expressions
 
 		/// <summary> Sets the formula of the expression and resets tokenization and parsing state. </summary>
 		/// <param name="formula">The new formula of the expression.</param>
-		/// <returns>The current <see cref="SmartExpression"/> instance for fluent configuration.</returns>
+		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
 		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="formula"/> is <see langword="null"/>. </exception>
-		public SmartExpression SetFormula(string formula)
+		public Expression SetFormula(string formula)
 		{
 			ArgumentNullException.ThrowIfNull(formula, nameof(formula));
 
@@ -71,9 +72,9 @@ namespace SmartExpressions.Core.Expressions
 
 		/// <summary> Binds multiple parameters to the expression. Existing keys are overwritten. </summary>
 		/// <param name="parameters">A collection of parameter key-value pairs.</param>
-		/// <returns>The current <see cref="SmartExpression"/> instance for fluent configuration.</returns>
+		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
 		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="parameters"/> is <see langword="null"/>. </exception>
-		public SmartExpression BindParameters(IDictionary<string, object> parameters)
+		public Expression BindParameters(IDictionary<string, object> parameters)
 		{
 			ArgumentNullException.ThrowIfNull(parameters, nameof(parameters));
 
@@ -88,10 +89,10 @@ namespace SmartExpressions.Core.Expressions
 		/// <summary> Binds a single parameter to the expression. Existing keys are overwritten. </summary>
 		/// <param name="key">The parameter name.</param>
 		/// <param name="value">The parameter value.</param>
-		/// <returns>The current <see cref="SmartExpression"/> instance for fluent configuration.</returns>
+		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
 		/// <exception cref="ArgumentException"> Thrown if <paramref name="key"/> is null, empty, or whitespace. </exception>
 		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="value"/> is <see langword="null"/>. </exception>
-		public SmartExpression BindParameter(string key, object value)
+		public Expression BindParameter(string key, object value)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
 			ArgumentNullException.ThrowIfNull(value, nameof(value));
@@ -101,81 +102,82 @@ namespace SmartExpressions.Core.Expressions
 		}
 
 
-		/// <summary> Tokenizes the current formula into a sequence of <see cref="SmartToken"/> instances. </summary>
-		/// <returns> A <see cref="SmartResult"/> indicating whether tokenization succeeded. </returns>
-		public SmartResult Tokenize()
+		/// <summary> Tokenizes the current formula into a sequence of <see cref="Token"/> instances. </summary>
+		/// <returns> A <see cref="Operation"/> indicating whether tokenization succeeded. </returns>
+		public Operation Tokenize()
 		{
 			if (this._isTokenized)
-				return SmartResult.Ok();
+			{
+				return Operation.Success();
+			}
 
 			// Tokenize
-			return SmartResult.Ok();
+			return Operation.Success();
 		}
 
 
 		/// <summary> Parses the previously generated tokens into an internal expression representation. </summary>
-		/// <returns> A <see cref="SmartResult"/> indicating whether parsing succeeded. </returns>
-		public SmartResult Parse()
+		/// <returns> A <see cref="Operation"/> indicating whether parsing succeeded. </returns>
+		public Operation Parse()
 		{
 			if (!this._isTokenized)
-				return SmartResult.Fail("Expression wasn't tokenized. Remember to call tokenization before parsing expression.");
+			{
+				return Operation.Failure("Expression wasn't tokenized. Remember to call tokenization before parsing expression.");
+			}
 
 			if (!this._isParsed)
-				return SmartResult.Ok();
+			{
+				return Operation.Success();
+			}
 
 			// Parse
-			return SmartResult.Ok();
+			return Operation.Success();
 		}
 
 
 		/// <summary> Executes tokenization and parsing in sequence if necessary. </summary>
-		/// <returns> A <see cref="SmartResult"/> indicating whether the expression  was successfully assembled. </returns>
-		public SmartResult Assemble()
+		/// <returns> A <see cref="Operation"/> indicating whether the expression  was successfully assembled. </returns>
+		public Operation Assemble()
 		{
 			if (!this._isTokenized)
 			{
-				SmartResult smartResult = this.Tokenize();
-				if (!smartResult.Success)
+				Operation smartResult = this.Tokenize();
+				if (smartResult.Status != Status.Success)
 				{
 					return smartResult;
 				}
 			}
-				
+
 			if (!this._isParsed)
 			{
-				SmartResult smartResult = this.Parse();
-				if (!smartResult.Success)
+				Operation smartResult = this.Parse();
+				if (smartResult.Status != Status.Success)
 				{
 					return smartResult;
 				}
 			}
 
-			return SmartResult.Ok();
+			return Operation.Success();
 		}
 
-
-		/// <summary> Evaluates the assembled expression and returns the computed result. </summary>
-		/// <returns> A <see cref="SmartResult{T}"/> containing the evaluation result if successful; otherwise, failure information. </returns>
+		/// <inheritdoc/>
 		/// <remarks> If <see cref="AssembleOnEvaluation"/> is enabled, the expression is tokenized and parsed automatically before evaluation. </remarks>
-		public SmartResult<object> Evaluate()
+		public Operation<object> Evaluate()
 		{
 			if (this.AssembleOnEvaluation)
 			{
-				SmartResult preconfiguration = this.Assemble();
-				if (!preconfiguration.Success)
+				Operation preconfiguration = this.Assemble();
+				if (preconfiguration.Status != Status.Success)
 				{
-					return SmartResult<object>.Fail(preconfiguration.Message, preconfiguration.Exception);
+					return Operation<object>.Failure(preconfiguration.Message);
 				}
 			}
 
-			if (this.IsAssembled == false)
-			{
-				return SmartResult<object>.Fail(
+			return this.IsAssembled == false
+				? Operation<object>.Failure(
 					$"Expression was never assembled. " +
-					$"Remember to tokenize and parse the expression if {nameof(this.AssembleOnEvaluation)} is disabled.");
-			}
-
-			return SmartResult<object>.Ok(null);
+					$"Remember to tokenize and parse the expression if {nameof(this.AssembleOnEvaluation)} is disabled.")
+				: Operation<object>.Success(null);
 		}
 	}
 }

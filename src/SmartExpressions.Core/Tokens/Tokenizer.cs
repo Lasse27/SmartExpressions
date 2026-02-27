@@ -1,0 +1,266 @@
+﻿using System.Runtime.CompilerServices;
+
+using SmartExpressions.Core.Tokens.Arithmetic;
+using SmartExpressions.Core.Tokens.Brackets;
+using SmartExpressions.Core.Tokens.Comparison;
+using SmartExpressions.Core.Tokens.Delimiters;
+using SmartExpressions.Core.Tokens.Registered;
+using SmartExpressions.Core.Utility;
+
+namespace SmartExpressions.Core.Tokens
+{
+	public class Tokenizer
+	{
+		private readonly string _input;
+		private readonly List<IToken> _tokens;
+		private int _pointer;
+		private int _length;
+
+
+		public Tokenizer(string input)
+		{
+			ArgumentNullException.ThrowIfNull(input, nameof(input));
+
+			this._input = input;
+			this._tokens = new List<IToken>(input.Length / 2); // assume half for less copy cicles
+			this._length = input.Length;
+			this._pointer = 0;
+		}
+
+
+		#region Helpers
+
+		private void ResetTokenizer()
+		{
+			this._tokens.Clear();
+			this._length = this._input.Length;
+			this._pointer = 0;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void AdvancePointer() => this._pointer++;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool PointerIsAtEnd() => this._pointer >= this._length;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool PointerCanAdvance() => this._pointer + 1 < this._length;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private char PeakAtPointer() => this._input[this._pointer];
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private char PeakAtNext() => this._input[this._pointer + 1];
+
+		#endregion
+
+
+		#region Interface methods
+
+		public Operation<List<IToken>> Run()
+		{
+			// Guard against stupidity
+			if (string.IsNullOrWhiteSpace(this._input))
+			{
+				return Operation<List<IToken>>.Success(new List<IToken>());
+			}
+
+			this.ResetTokenizer();
+			while (!this.PointerIsAtEnd())
+			{
+				// Skip whitespace
+				if (char.IsWhiteSpace(this.PeakAtPointer()))
+				{
+					this.AdvancePointer();
+					continue;
+				}
+
+				// find and add token -> if not found return failure
+				Operation triState = this.AddTokenByPointer();
+				if (triState.Status != Status.Success)
+				{
+					return Operation<List<IToken>>.Failure(triState.Message);
+				}
+
+				this.AdvancePointer();
+			}
+
+			return Operation<List<IToken>>.Success(this._tokens);
+		}
+
+		#endregion
+
+
+		private Operation AddTokenByPointer()
+		{
+			char c = this.PeakAtPointer();
+			switch (c)
+			{
+				/* 
+				 * Delimiter tokens
+				 */
+
+				case Characters.COMMA:
+					this.AddToken(new CommaToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.DOT:
+					this.AddToken(new DotToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.COLON:
+					this.AddToken(new ColonToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.SEMICOLON:
+					this.AddToken(new SemiColonToken(this._pointer));
+					return Operation.Success();
+
+				/* 
+				* Bracket tokens
+				*/
+
+				case Characters.LPAREN:
+					this.AddToken(new LParenToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.RPAREN:
+					this.AddToken(new RParenToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.LBRACE:
+					this.AddToken(new LBraceToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.RBRACE:
+					this.AddToken(new RBraceToken(this._pointer));
+					return Operation.Success();
+
+				/* 
+				* Arithmetic tokens
+				*/
+
+				case Characters.PLUS:
+					this.AddToken(new PlusToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.MINUS:
+					this.AddToken(new MinusToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.MULTIPLY:
+					this.AddToken(new MultiplyToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.DIVIDE:
+					this.AddToken(new DivideToken(this._pointer));
+					return Operation.Success();
+
+				case Characters.MODULO:
+					this.AddToken(new ModuloToken(this._pointer));
+					return Operation.Success();
+
+				/* 
+				* Comparison tokens
+				*/
+
+				case Characters.LESS:
+					if (this.PointerCanAdvance() && this.PeakAtNext() == Characters.EQUAL)
+					{
+						this.AddToken(new LessEqualToken(this._pointer));
+						this.AdvancePointer();
+						return Operation.Success();
+					}
+					this.AddToken(new LessToken(this._pointer));
+					return Operation.Success();
+
+
+				case Characters.GREATER:
+					if (this.PointerCanAdvance() && this.PeakAtNext() == Characters.EQUAL)
+					{
+						this.AddToken(new GreaterEqualToken(this._pointer));
+						this.AdvancePointer();
+						return Operation.Success();
+					}
+					this.AddToken(new GreaterToken(this._pointer));
+					return Operation.Success();
+
+
+				case Characters.EXCLAMATION:
+					if (this.PointerCanAdvance())
+					{
+						this.AdvancePointer();
+						char advancedTo = this.PeakAtPointer();
+						if (advancedTo == Characters.EQUAL)
+						{
+							this.AddToken(new NotEqualToken(this._pointer));
+							return Operation.Success();
+						}
+						return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.EQUAL}'. Actual: '{advancedTo}'.");
+					}
+					return Operation.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.EQUAL}'.");
+
+
+				case Characters.EQUAL:
+					if (this.PointerCanAdvance())
+					{
+						this.AdvancePointer();
+						char advancedTo = this.PeakAtPointer();
+						if (advancedTo == Characters.EQUAL)
+						{
+							this.AddToken(new EqualToken(this._pointer));
+							return Operation.Success();
+						}
+						return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.EQUAL}'. Actual: '{advancedTo}'.");
+					}
+					return Operation.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.EQUAL}'.");
+
+
+				/* 
+				* Keyword and identifier tokens
+				*/
+
+				case Characters.AT:
+					return this.AddIdentifierToken();
+
+				default:
+					return Operation.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
+			}
+		}
+
+		private Operation AddIdentifierToken()
+		{
+			int entryP = this._pointer;
+
+			this.AdvancePointer(); // Skip @
+			if (this.PointerIsAtEnd() || this.PeakAtPointer() != Characters.LBRACE)
+			{
+				return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
+			}
+
+			this.AdvancePointer(); // Skip {
+			int identifierStart = this._pointer;
+
+			while (!this.PointerIsAtEnd() && this.PeakAtPointer() != Characters.RBRACE)
+			{
+				this.AdvancePointer();
+			}
+
+			if (this.PointerIsAtEnd())
+			{
+				return Operation.Failure($"Unclosed identifier starting at index {entryP}.");
+			}
+
+			string identifier = this._input.Substring(identifierStart, this._pointer - identifierStart);
+			if (string.IsNullOrWhiteSpace(identifier))
+			{
+				return Operation.Failure($"Empty identifier at index {entryP}.");
+			}
+			this.AddToken(new IdentifierToken(entryP, identifier, identifier));
+			return Operation.Success();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void AddToken(IToken token) => this._tokens.Add(token);
+	}
+}
