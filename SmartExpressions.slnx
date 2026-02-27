@@ -6,7 +6,7 @@
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="SmartExpressions.Benchmark/SmartExpressions.Benchmark.csproj" Id="0c3c88e8-f5be-4a56-b74e-706845d019c6" />
+  <Project Path="src/SmartExpressions.Benchmark/SmartExpressions.Benchmark.csproj" />
   <Project Path="src/SmartExpressions.Core/SmartExpressions.Core.csproj" />
   <Project Path="src/SmartExpressions.Test/SmartExpressions.Test.csproj" Id="a5912004-8020-46df-a340-7c0e007a15c3" />
 </Solution>
