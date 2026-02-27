@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Projektmappenelemente/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="src/SmartExpressions.Core/SmartExpressions.Core.csproj" />
+  <Project Path="src/SmartExpressions.Test/SmartExpressions.Test.csproj" Id="a5912004-8020-46df-a340-7c0e007a15c3" />
+</Solution>
