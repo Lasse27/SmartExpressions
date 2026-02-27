@@ -20,21 +20,39 @@
 
 		RParen,
 
-		KeywordIf,
-
-		KeywordElse,
-
-		EOF,
 		LBrace,
+
 		RBrace,
+
 		Modulo,
+
 		Colon,
+
 		Dot,
+
 		Less,
+
 		LessEqual,
+
 		Greater,
+
 		GreaterEqual,
+
 		NotEqual,
-		Equal
+
+		Equal,
+
+		Keyword,
+		IfKeyWord,
+		ModKeyWord,
+		MultKeyWord,
+		DivKeyWord,
+		SubKeyWord,
+		AddKeyWord,
+		NullKeyword,
+		FalseKeyword,
+		TrueKeyword,
+		PiKeyword,
+		EulerKeyword
 	}
 }

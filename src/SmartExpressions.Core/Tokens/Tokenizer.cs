@@ -11,10 +11,30 @@ namespace SmartExpressions.Core.Tokens
 {
 	public class Tokenizer
 	{
+		private static readonly Dictionary<string, TokenType> Keywords;
 		private readonly string _input;
 		private readonly List<IToken> _tokens;
 		private int _pointer;
 		private int _length;
+
+		static Tokenizer()
+		{
+			Keywords = new Dictionary<string, TokenType>();
+
+			// Constants
+			Keywords.Add("e", TokenType.EulerKeyword);
+			Keywords.Add("pi", TokenType.PiKeyword);
+			Keywords.Add("true", TokenType.TrueKeyword);
+			Keywords.Add("false", TokenType.FalseKeyword);
+			Keywords.Add("null", TokenType.NullKeyword);
+
+			Keywords.Add("if", TokenType.IfKeyWord);
+			Keywords.Add("add", TokenType.AddKeyWord);
+			Keywords.Add("sub", TokenType.SubKeyWord);
+			Keywords.Add("div", TokenType.DivKeyWord);
+			Keywords.Add("mult", TokenType.MultKeyWord);
+			Keywords.Add("mod", TokenType.ModKeyWord);
+		}
 
 
 		public Tokenizer(string input)
@@ -51,6 +71,13 @@ namespace SmartExpressions.Core.Tokens
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private char PeakAtNext() => this._input[this._pointer + 1];
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void AddToken(IToken token) => this._tokens.Add(token);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool IsValidDigitCharacter()
+			=> char.IsDigit(this.PeakAtPointer()) || this.PeakAtPointer() == Characters.DOT || this.PeakAtPointer() == Characters.COMMA;
 
 		#endregion
 
@@ -224,9 +251,49 @@ namespace SmartExpressions.Core.Tokens
 					return this.AddIdentifierToken();
 
 				default:
+					if (char.IsDigit(c))
+					{
+						return this.AddNumericToken();
+					}
+
+					if (char.IsLetter(c))
+					{
+						return this.AddKeywordToken();
+					}
+
 					return Operation.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
 			}
 		}
+
+		private Operation AddKeywordToken()
+		{
+			throw new NotImplementedException();
+		}
+
+		private Operation AddNumericToken()
+		{
+			int entryPointer = this._pointer;
+
+			while (!this.PointerIsAtEnd() && this.IsValidDigitCharacter())
+			{
+				this.AdvancePointer();
+			}
+
+			if (this.PointerIsAtEnd())
+			{
+				return Operation.Failure($"Unclosed identifier starting at index {entryPointer}.");
+			}
+
+			string number = this._input.Substring(entryPointer, this._pointer - entryPointer);
+			if (string.IsNullOrWhiteSpace(number))
+			{
+				return Operation.Failure($"Empty number at index {entryPointer}.");
+			}
+
+			this.AddToken(new IdentifierToken(entryPointer, number, number));
+			return Operation.Success();
+		}
+
 
 		private Operation AddIdentifierToken()
 		{
@@ -259,8 +326,5 @@ namespace SmartExpressions.Core.Tokens
 			this.AddToken(new IdentifierToken(entryP, identifier, identifier));
 			return Operation.Success();
 		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void AddToken(IToken token) => this._tokens.Add(token);
 	}
 }
