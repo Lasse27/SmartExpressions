@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Parsing\Constants\" />
+    <Folder Include="Nodes\Constants\" />
   </ItemGroup>
 
 </Project>

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 
 using Microsoft.VSDiagnostics;
 
+using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Tokenization;
 using SmartExpressions.Core.Utility;
 
@@ -40,30 +41,30 @@ namespace SmartExpressions.Benchmark.Tokens
 			"mult(3, pi) >= mod(7, 2) div(9, 3) null e 0.5 1000 " +
 			"@{myVar} @{otherVar} add sub mult div mod if true false";
 
-		private Tokenizer _empty = null!;
-		private Tokenizer _whitespace = null!;
-		private Tokenizer _singleNum = null!;
-		private Tokenizer _singleKw = null!;
-		private Tokenizer _singleOp = null!;
-		private Tokenizer _short = null!;
-		private Tokenizer _kwHeavy = null!;
-		private Tokenizer _numHeavy = null!;
-		private Tokenizer _mixed = null!;
-		private Tokenizer _long = null!;
+		private Lexer _empty = null!;
+		private Lexer _whitespace = null!;
+		private Lexer _singleNum = null!;
+		private Lexer _singleKw = null!;
+		private Lexer _singleOp = null!;
+		private Lexer _short = null!;
+		private Lexer _kwHeavy = null!;
+		private Lexer _numHeavy = null!;
+		private Lexer _mixed = null!;
+		private Lexer _long = null!;
 
 		[GlobalSetup]
 		public void Setup()
 		{
-			_empty = new Tokenizer(EMPTY);
-			_whitespace = new Tokenizer(WHITESPACE);
-			_singleNum = new Tokenizer(SINGLE_NUMBER);
-			_singleKw = new Tokenizer(SINGLE_KEYWORD);
-			_singleOp = new Tokenizer(SINGLE_OP);
-			_short = new Tokenizer(SHORT);
-			_kwHeavy = new Tokenizer(KEYWORD_HEAVY);
-			_numHeavy = new Tokenizer(NUMERIC_HEAVY);
-			_mixed = new Tokenizer(MIXED);
-			_long = new Tokenizer(LONG);
+			_empty = new Lexer(EMPTY);
+			_whitespace = new Lexer(WHITESPACE);
+			_singleNum = new Lexer(SINGLE_NUMBER);
+			_singleKw = new Lexer(SINGLE_KEYWORD);
+			_singleOp = new Lexer(SINGLE_OP);
+			_short = new Lexer(SHORT);
+			_kwHeavy = new Lexer(KEYWORD_HEAVY);
+			_numHeavy = new Lexer(NUMERIC_HEAVY);
+			_mixed = new Lexer(MIXED);
+			_long = new Lexer(LONG);
 		}
 
 		// ------------------------------------------------------------------

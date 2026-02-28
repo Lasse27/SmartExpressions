@@ -1,5 +1,4 @@
-﻿using SmartExpressions.Core.Parsing;
-using SmartExpressions.Core.Parsing.Nodes;
+﻿using SmartExpressions.Core.Nodes;
 
 namespace SmartExpressions.Core.Utility
 {

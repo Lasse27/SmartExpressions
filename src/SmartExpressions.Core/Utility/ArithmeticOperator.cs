@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using SmartExpressions.Core.Tokenization;
-
-namespace SmartExpressions.Core.Utility
+﻿namespace SmartExpressions.Core.Utility
 {
 	public enum ArithmeticOperator : int
 	{
@@ -18,6 +10,6 @@ namespace SmartExpressions.Core.Utility
 
 	public static class ArithmeticOperatorExtensions
 	{
-		
+
 	}
 }

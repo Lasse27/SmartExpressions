@@ -1,23 +1,23 @@
 ﻿using System.Runtime.CompilerServices;
 
-using SmartExpressions.Core.Parsing.Arithmetic;
-using SmartExpressions.Core.Parsing.Conditional;
-using SmartExpressions.Core.Parsing.Nodes;
-using SmartExpressions.Core.Parsing.Statistics;
-using SmartExpressions.Core.Tokenization;
+using SmartExpressions.Core.Nodes;
+using SmartExpressions.Core.Nodes.Arithmetic;
+using SmartExpressions.Core.Nodes.Comparison;
+using SmartExpressions.Core.Nodes.Conditional;
+using SmartExpressions.Core.Nodes.Logical;
+using SmartExpressions.Core.Nodes.Statistics;
+using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Parsing
 {
 	public class Parser
 	{
-		public readonly List<IToken> _input;
+		internal readonly List<IToken> _input;
+		internal ExpressionNode _root;
+		internal int _pointer;
+		internal int _length;
 
-		private ExpressionNode _root;
-
-		private int _pointer;
-
-		private int _length;
 
 		public Parser(List<IToken> input)
 		{
@@ -27,12 +27,14 @@ namespace SmartExpressions.Core.Parsing
 			this._pointer = 0;
 		}
 
+
 		public void Reset()
 		{
 			this._root = null;
 			this._length = this._input.Count;
 			this._pointer = 0;
 		}
+
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void AdvancePointer() => this._pointer++;
@@ -101,6 +103,10 @@ namespace SmartExpressions.Core.Parsing
 			IToken current = this.PeakAtPointer();
 			return current.Type switch
 			{
+				TokenType.Numeric => this.ParseNumber(),
+				TokenType.Identifier => this.ParseIdentifier(),
+				TokenType.Constant => this.ParseConstant(),
+
 				// Conditional keywords
 				TokenType.IfKeyWord => IfThenElseNode.Parse(this),
 
@@ -115,15 +121,31 @@ namespace SmartExpressions.Core.Parsing
 				TokenType.RootKeyWord => RootNode.Parse(this),
 				TokenType.SubKeyWord => SubtractNode.Parse(this),
 
+				// Logical keywords
+				TokenType.AndKeyWord => AndNode.Parse(this),
+				TokenType.NandKeyWord => NandNode.Parse(this),
+				TokenType.NorKeyWord => NorNode.Parse(this),
+				TokenType.NotKeyWord => NotNode.Parse(this),
+				TokenType.XnorKeyWord => XnorNode.Parse(this),
+				TokenType.XorKeyWord => XorNode.Parse(this),
+
+				// Comparison keywords
+				TokenType.EqualKeyWord => EqualNode.Parse(this),
+				TokenType.NotEqualKeyWord => NotEqualNode.Parse(this),
+				TokenType.LessThanKeyWord => LessThanNode.Parse(this),
+				TokenType.LessThanEqualKeyWord => LessThanEqualNode.Parse(this),
+				TokenType.GreaterThanKeyWord => GreaterThanNode.Parse(this),
+				TokenType.GreaterThanEqualKeyWord => GreaterThanEqualNode.Parse(this),
+
 				// Statistic keywords
+				TokenType.SumKeyWord => SumNode.Parse(this),
 				TokenType.AvgKeyWord => AverageNode.Parse(this),
 				TokenType.StDKeyWord => StandardDNode.Parse(this),
-				TokenType.SumKeyWord => AverageNode.Parse(this),
-
-				// Registered
-				TokenType.Number => this.ParseNumber(),
-				TokenType.Identifier => this.ParseIdentifier(),
-				TokenType.Constant => this.ParseConstant(),
+				TokenType.CountKeyWord => CountNode.Parse(this),
+				TokenType.MedianKeyWord => MedianNode.Parse(this),
+				TokenType.MinKeyWord => MinNode.Parse(this),
+				TokenType.MaxKeyWord => MaxNode.Parse(this),
+				TokenType.RangeKeyWord => RangeNode.Parse(this),
 			};
 		}
 
