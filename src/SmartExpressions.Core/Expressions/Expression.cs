@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-using SmartExpressions.Core.Tokens;
+using SmartExpressions.Core.Tokenization;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Expressions

@@ -1,15 +1,23 @@
-﻿using SmartExpressions.Core.Tokens;
-using SmartExpressions.Core.Tokens.Arithmetic;
-using SmartExpressions.Core.Tokens.Brackets;
-using SmartExpressions.Core.Tokens.Comparison;
-using SmartExpressions.Core.Tokens.Delimiters;
-using SmartExpressions.Core.Tokens.Registered;
+﻿using SmartExpressions.Core.Tokenization;
+using SmartExpressions.Core.Tokenization.Arithmetic;
+using SmartExpressions.Core.Tokenization.Brackets;
+using SmartExpressions.Core.Tokenization.Comparison;
+using SmartExpressions.Core.Tokenization.Delimiters;
+using SmartExpressions.Core.Tokenization.Registered;
 using SmartExpressions.Core.Utility;
+
+using Xunit.Abstractions;
 
 namespace SmartExpressions.Test.Tokens
 {
 	public class TokenizerTests
 	{
+		private readonly ITestOutputHelper outputHelper;
+
+		public TokenizerTests(ITestOutputHelper outputHelper)
+			=> this.outputHelper = outputHelper;
+
+
 		private static List<IToken> Tokenize(string input)
 		{
 			Tokenizer tokenizer = new Tokenizer(input);
@@ -261,6 +269,112 @@ namespace SmartExpressions.Test.Tokens
 			List<IToken> tokens = Tokenize("  @{ABC}");
 			IdentifierToken token = Assert.IsType<IdentifierToken>(tokens[0]);
 			Assert.Equal(2, token.Position); // '@' is at index 2
+		}
+
+		// -------------------------------------------------------------------------
+		// Custom Cases
+		// -------------------------------------------------------------------------
+
+		[Fact]
+		public void Run_Finds_Keyword_With_Number_And_Number_Correctly()
+		{
+			List<IToken> tokens = Tokenize("ADD(125,123.0)");
+			_ = Assert.IsType<KeywordToken>(tokens[0]);
+			_ = Assert.IsType<LParenToken>(tokens[1]);
+			_ = Assert.IsType<NumericToken>(tokens[2]);
+			_ = Assert.IsType<CommaToken>(tokens[3]);
+			_ = Assert.IsType<NumericToken>(tokens[4]);
+			_ = Assert.IsType<RParenToken>(tokens[5]);
+			foreach (IToken item in tokens)
+			{
+				this.outputHelper.WriteLine(item.ToString());
+			}
+		}
+
+		[Fact]
+		public void Run_Finds_Keyword_With_Identifier_And_Number_Correctly()
+		{
+			List<IToken> tokens = Tokenize("ADD(@{Identifier_BE1_123},123.0)");
+			_ = Assert.IsType<KeywordToken>(tokens[0]);
+			_ = Assert.IsType<LParenToken>(tokens[1]);
+			_ = Assert.IsType<IdentifierToken>(tokens[2]);
+			_ = Assert.IsType<CommaToken>(tokens[3]);
+			_ = Assert.IsType<NumericToken>(tokens[4]);
+			_ = Assert.IsType<RParenToken>(tokens[5]);
+			foreach (IToken item in tokens)
+			{
+				this.outputHelper.WriteLine(item.ToString());
+			}
+		}
+
+		[Fact]
+		public void Run_Finds_Keyword_With_Identifier_And_Identifier_Correctly()
+		{
+			List<IToken> tokens = Tokenize("ADD(@{Identifier_BE1_123},@{Identifier_BE1_123})");
+			_ = Assert.IsType<KeywordToken>(tokens[0]);
+			_ = Assert.IsType<LParenToken>(tokens[1]);
+			_ = Assert.IsType<IdentifierToken>(tokens[2]);
+			_ = Assert.IsType<CommaToken>(tokens[3]);
+			_ = Assert.IsType<IdentifierToken>(tokens[4]);
+			_ = Assert.IsType<RParenToken>(tokens[5]);
+			foreach (IToken item in tokens)
+			{
+				this.outputHelper.WriteLine(item.ToString());
+			}
+		}
+
+		[Fact]
+		public void Run_Finds_Keyword_With_Keyword_And_Keyword_Correctly()
+		{
+			List<IToken> tokens = Tokenize("ADD(ADD(1,1),MULT(1,1))");
+			_ = Assert.IsType<KeywordToken>(tokens[0]);
+			_ = Assert.IsType<LParenToken>(tokens[1]);
+
+			_ = Assert.IsType<KeywordToken>(tokens[2]);
+			_ = Assert.IsType<LParenToken>(tokens[3]);
+			_ = Assert.IsType<NumericToken>(tokens[4]);
+			_ = Assert.IsType<CommaToken>(tokens[5]);
+			_ = Assert.IsType<NumericToken>(tokens[6]);
+			_ = Assert.IsType<RParenToken>(tokens[7]);
+
+			_ = Assert.IsType<CommaToken>(tokens[8]);
+
+			_ = Assert.IsType<KeywordToken>(tokens[9]);
+			_ = Assert.IsType<LParenToken>(tokens[10]);
+			_ = Assert.IsType<NumericToken>(tokens[11]);
+			_ = Assert.IsType<CommaToken>(tokens[12]);
+			_ = Assert.IsType<NumericToken>(tokens[13]);
+			_ = Assert.IsType<RParenToken>(tokens[14]);
+
+			_ = Assert.IsType<RParenToken>(tokens[15]);
+			foreach (IToken item in tokens)
+			{
+				this.outputHelper.WriteLine(item.ToString());
+			}
+		}
+
+		[Fact]
+		public void Run_Finds_Keyword_With_Keyword_And_Identifier_Correctly()
+		{
+			List<IToken> tokens = Tokenize("ADD(ADD(1,1),@{BAU_123_BE1})");
+			_ = Assert.IsType<KeywordToken>(tokens[0]);
+			_ = Assert.IsType<LParenToken>(tokens[1]);
+
+			_ = Assert.IsType<KeywordToken>(tokens[2]);
+			_ = Assert.IsType<LParenToken>(tokens[3]);
+			_ = Assert.IsType<NumericToken>(tokens[4]);
+			_ = Assert.IsType<CommaToken>(tokens[5]);
+			_ = Assert.IsType<NumericToken>(tokens[6]);
+			_ = Assert.IsType<RParenToken>(tokens[7]);
+
+			_ = Assert.IsType<CommaToken>(tokens[8]);
+
+			_ = Assert.IsType<IdentifierToken>(tokens[9]);
+			_ = Assert.IsType<RParenToken>(tokens[10]);
+			foreach (IToken item in tokens)
+			{
+				this.outputHelper.WriteLine(item.ToString());
+			}
 		}
 	}
 }
