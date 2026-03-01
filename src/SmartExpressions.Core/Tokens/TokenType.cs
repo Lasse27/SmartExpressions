@@ -1,14 +1,13 @@
-﻿using SmartExpressions.Core.Utility;
-
-namespace SmartExpressions.Core.Tokens
+﻿namespace SmartExpressions.Core.Tokens
 {
 	public enum TokenType : int
 	{
 		Numeric,
 		Identifier,
-		Constant,
 
 		// Delimiters and brackets
+		Colon,
+		Dot,
 		Comma,
 		LParen,
 		RParen,
@@ -32,6 +31,7 @@ namespace SmartExpressions.Core.Tokens
 
 		// Logical keywords
 		AndKeyWord,
+		OrKeyWord,
 		NandKeyWord,
 		NorKeyWord,
 		NotKeyWord,
@@ -54,6 +54,13 @@ namespace SmartExpressions.Core.Tokens
 		MedianKeyWord,
 		MinKeyWord,
 		MaxKeyWord,
-		RangeKeyWord
+		RangeKeyWord,
+
+		// Constants
+		EulerKeyword,
+		PiKeyword,
+		TrueKeyword,
+		FalseKeyword,
+		NullKeyword,
 	}
 }

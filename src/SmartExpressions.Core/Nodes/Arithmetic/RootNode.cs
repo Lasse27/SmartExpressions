@@ -5,13 +5,18 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	public record RootNode : ExpressionNode
 	{
-		private readonly ExpressionNode operand;
+		public ExpressionNode Left { get; set; }
+		public ExpressionNode Right { get; set; }
 
-		public RootNode(ExpressionNode operand) => this.operand = operand;
+		public RootNode(ExpressionNode left, ExpressionNode right)
+		{
+			this.Left = left;
+			this.Right = right;
+		}
 
 		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
-		public static Operation<ExpressionNode> Parse(Parser parser)
+		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			Operation<DualOperand> dualOperand = ParserHelpers.ParseDualOperandKeyword(parser);
 			if (dualOperand.Status == Status.Failure)

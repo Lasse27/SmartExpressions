@@ -13,7 +13,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
 
-		public static Operation<ExpressionNode> Parse(Parser parser)
+		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			Operation<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
 			if (operation.Status == Status.Failure)

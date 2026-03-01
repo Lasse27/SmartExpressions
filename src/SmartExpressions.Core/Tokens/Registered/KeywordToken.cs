@@ -1,4 +1,7 @@
-﻿namespace SmartExpressions.Core.Tokens.Registered
+﻿using SmartExpressions.Core.Lexing;
+using SmartExpressions.Core.Utility;
+
+namespace SmartExpressions.Core.Tokens.Registered
 {
 	public readonly struct KeywordToken(TokenType type, int position, string lexeme, object value) : IToken
 	{
@@ -9,5 +12,27 @@
 		public int Position => position;
 
 		public object Value => value;
+
+		public static Operation Add(Lexer lexer)
+		{
+			int entryPointer = lexer._pointer;
+
+			while (!lexer.PointerIsAtEnd() && lexer.IsValidKeywordCharacter())
+			{
+				lexer.AdvancePointer();
+			}
+
+			// No allocate for lookup
+			ReadOnlySpan<char> span = lexer._input.AsSpan(entryPointer, lexer._pointer - entryPointer);
+			if (Lexer.KeywordsLookup.TryGetValue(span, out TokenType tokentype))
+			{
+				// Substr only on found tokentype
+				string word = lexer._input.Substring(entryPointer, lexer._pointer - entryPointer);
+				lexer.AddToken(new KeywordToken(tokentype, entryPointer, word, word));
+				return Operation.Success();
+			}
+
+			return Operation.Failure($"Unknown keyword starting at index {entryPointer}.");
+		}
 	}
 }

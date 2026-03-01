@@ -20,12 +20,11 @@ namespace SmartExpressions.Core.Parsing
 			parser.AdvancePointer();
 
 			// Get operand
-			Operation<ExpressionNode> left = parser.ParseExpression();
+			Operation<ExpressionNode> left = parser.ParseExpression(); // points to next token
 			if (left.Status == Status.Failure)
 			{
 				return Operation<DualOperand>.Failure(left.Message);
 			}
-			parser.AdvancePointer();
 
 			// Check for comma
 			check = parser.CheckCurrent(TokenType.Comma);
@@ -36,12 +35,11 @@ namespace SmartExpressions.Core.Parsing
 			parser.AdvancePointer();
 
 			// Get operand
-			Operation<ExpressionNode> right = parser.ParseExpression();
+			Operation<ExpressionNode> right = parser.ParseExpression(); // points to next token
 			if (right.Status == Status.Failure)
 			{
 				return Operation<DualOperand>.Failure(right.Message);
 			}
-			parser.AdvancePointer();
 
 			// Check for right parenthesis
 			check = parser.CheckCurrent(TokenType.RParen);
@@ -67,9 +65,17 @@ namespace SmartExpressions.Core.Parsing
 			}
 			parser.AdvancePointer();
 
+			// Gather all operands separated by commas
 			List<ExpressionNode> operands = new List<ExpressionNode>(2);
 			Operation operandParsing = ParseAndAddOperands(parser, operands);
 			if (operandParsing.Status == Status.Failure)
+			{
+				return Operation<List<ExpressionNode>>.Failure(check.Message);
+			}
+
+			// Check right parenthesis
+			check = parser.CheckCurrent(TokenType.RParen);
+			if (check.Status == Status.Failure)
 			{
 				return Operation<List<ExpressionNode>>.Failure(check.Message);
 			}
@@ -86,7 +92,7 @@ namespace SmartExpressions.Core.Parsing
 			operands.Add(expr.Value); // Parse value
 
 			// Recurse if comma
-			Operation check = parser.CheckCurrent(TokenType.LParen);
+			Operation check = parser.CheckCurrent(TokenType.Comma);
 			if (check.Status == Status.Success)
 			{
 				parser.AdvancePointer(); // Skip comma 

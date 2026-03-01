@@ -2,9 +2,7 @@
 
 namespace SmartExpressions.Core.Utility
 {
-	public readonly struct DualOperand(ExpressionNode left, ExpressionNode right)
+	public readonly record struct DualOperand(ExpressionNode Left, ExpressionNode Right)
 	{
-		public ExpressionNode Left { get; } = left;
-		public ExpressionNode Right { get; } = right;
 	}
 }

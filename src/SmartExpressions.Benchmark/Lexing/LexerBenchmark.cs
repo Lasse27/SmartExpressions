@@ -5,14 +5,14 @@ using BenchmarkDotNet.Attributes;
 using Microsoft.VSDiagnostics;
 
 using SmartExpressions.Core.Lexing;
-using SmartExpressions.Core.Tokenization;
+using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
-namespace SmartExpressions.Benchmark.Tokens
+namespace SmartExpressions.Benchmark.Lexing
 {
 	[CPUUsageDiagnoser]
 	[MemoryDiagnoser]
-	public class TokenizerBenchmark
+	public class LexerBenchmark
 	{
 		// Trivial
 		private const string EMPTY = "";
@@ -21,7 +21,6 @@ namespace SmartExpressions.Benchmark.Tokens
 		// Single token per category
 		private const string SINGLE_NUMBER = "42";
 		private const string SINGLE_KEYWORD = "true";
-		private const string SINGLE_OP = "+";
 
 		// Short (~5-10 tokens)
 		private const string SHORT = "add(3, 5)";
@@ -33,19 +32,18 @@ namespace SmartExpressions.Benchmark.Tokens
 		private const string NUMERIC_HEAVY = "1 2 3 42 3.14 99 1000 0.5 7 8";
 
 		// Mixed / realistic – used as baseline
-		private const string MIXED = "if add(3.14, pi) >= true != false";
+		private const string MIXED = "if(and(gte(add(3.14, pi), 5), true))";
 
 		// Long (~40+ tokens, all token-type branches hit)
 		private const string LONG =
-			"if add(1, 2) == true != false && sub(10, 5) <= 6 " +
-			"mult(3, pi) >= mod(7, 2) div(9, 3) null e 0.5 1000 " +
+			"if add(1, 2) true false sub(10, 5) 6 and(@{myVar0},@{otherVar0})" +
+			"mult(3, pi) mod(7, 2) div(9, 3) null e 0.5 1000 " +
 			"@{myVar} @{otherVar} add sub mult div mod if true false";
 
 		private Lexer _empty = null!;
 		private Lexer _whitespace = null!;
 		private Lexer _singleNum = null!;
 		private Lexer _singleKw = null!;
-		private Lexer _singleOp = null!;
 		private Lexer _short = null!;
 		private Lexer _kwHeavy = null!;
 		private Lexer _numHeavy = null!;
@@ -59,7 +57,6 @@ namespace SmartExpressions.Benchmark.Tokens
 			_whitespace = new Lexer(WHITESPACE);
 			_singleNum = new Lexer(SINGLE_NUMBER);
 			_singleKw = new Lexer(SINGLE_KEYWORD);
-			_singleOp = new Lexer(SINGLE_OP);
 			_short = new Lexer(SHORT);
 			_kwHeavy = new Lexer(KEYWORD_HEAVY);
 			_numHeavy = new Lexer(NUMERIC_HEAVY);
@@ -82,9 +79,6 @@ namespace SmartExpressions.Benchmark.Tokens
 
 		[Benchmark]
 		public Operation<List<IToken>> Run_Single_Keyword() => _singleKw.Run();
-
-		[Benchmark]
-		public Operation<List<IToken>> Run_Single_Operator() => _singleOp.Run();
 
 		[Benchmark]
 		public Operation<List<IToken>> Run_Short_Input() => _short.Run();

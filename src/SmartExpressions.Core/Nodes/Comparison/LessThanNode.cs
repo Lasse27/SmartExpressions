@@ -5,19 +5,19 @@ namespace SmartExpressions.Core.Nodes.Comparison
 {
 	public record LessThanNode : ExpressionNode
 	{
-		private readonly ExpressionNode _left;
-		private readonly ExpressionNode _right;
+		public ExpressionNode Left { get; set; }
+		public ExpressionNode Right { get; set; }
 
 		public LessThanNode(ExpressionNode left, ExpressionNode right)
 		{
-			this._left = left;
-			this._right = right;
+			this.Left = left;
+			this.Right = right;
 		}
 
 		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
 
-		public static Operation<ExpressionNode> Parse(Parser parser)
+		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			Operation<DualOperand> dualOperand = ParserHelpers.ParseDualOperandKeyword(parser);
 			if (dualOperand.Status == Status.Failure)

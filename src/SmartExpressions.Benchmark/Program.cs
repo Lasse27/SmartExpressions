@@ -1,14 +1,18 @@
 ﻿using System;
 
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace SmartExpressions.Benchmark
 {
-	internal class Program
+	public class Program
 	{
 		private static void Main(string[] args)
 		{
-			_ = BenchmarkRunner.Run(typeof(Program).Assembly);
+			BenchmarkSwitcher
+				.FromAssembly(typeof(Program).Assembly)
+				.Run(args);
+
 			_ = Console.ReadKey();
 		}
 	}

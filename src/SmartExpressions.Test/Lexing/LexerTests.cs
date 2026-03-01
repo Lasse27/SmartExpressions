@@ -1,15 +1,13 @@
 ﻿using SmartExpressions.Core.Lexing;
-using SmartExpressions.Core.Tokenization;
-using SmartExpressions.Core.Tokenization.Arithmetic;
-using SmartExpressions.Core.Tokenization.Brackets;
-using SmartExpressions.Core.Tokenization.Comparison;
-using SmartExpressions.Core.Tokenization.Delimiters;
-using SmartExpressions.Core.Tokenization.Registered;
+using SmartExpressions.Core.Tokens;
+using SmartExpressions.Core.Tokens.Brackets;
+using SmartExpressions.Core.Tokens.Delimiters;
+using SmartExpressions.Core.Tokens.Registered;
 using SmartExpressions.Core.Utility;
 
 using Xunit.Abstractions;
 
-namespace SmartExpressions.Test.Tokens
+namespace SmartExpressions.Test.Lexing
 {
 	public class LexerTests
 	{
@@ -93,69 +91,6 @@ namespace SmartExpressions.Test.Tokens
 		}
 
 		// -------------------------------------------------------------------------
-		// Arithmetic tokens
-		// -------------------------------------------------------------------------
-
-		[Theory]
-		[InlineData("+", typeof(PlusToken))]
-		[InlineData("-", typeof(MinusToken))]
-		[InlineData("*", typeof(MultiplyToken))]
-		[InlineData("/", typeof(DivideToken))]
-		[InlineData("%", typeof(ModuloToken))]
-		public void Run_SingleArithmeticOperator_ReturnsCorrectToken(string input, Type expectedType)
-		{
-			List<IToken> tokens = Tokenize(input);
-			_ = Assert.Single(tokens);
-			Assert.IsType(expectedType, tokens[0]);
-		}
-
-		// -------------------------------------------------------------------------
-		// Comparison tokens
-		// -------------------------------------------------------------------------
-
-		[Theory]
-		[InlineData("<", typeof(LessToken))]
-		[InlineData("<=", typeof(LessEqualToken))]
-		[InlineData(">", typeof(GreaterToken))]
-		[InlineData(">=", typeof(GreaterEqualToken))]
-		[InlineData("==", typeof(EqualToken))]
-		[InlineData("!=", typeof(NotEqualToken))]
-		public void Run_ComparisonOperator_ReturnsCorrectToken(string input, Type expectedType)
-		{
-			List<IToken> tokens = Tokenize(input);
-			_ = Assert.Single(tokens);
-			Assert.IsType(expectedType, tokens[0]);
-		}
-
-		[Fact]
-		public void Run_SingleEqual_ReturnsFailure()
-		{
-			string message = TokenizeFailure("=");
-			Assert.Contains("Unexpected end of input", message);
-		}
-
-		[Fact]
-		public void Run_EqualFollowedByNonEqual_ReturnsFailure()
-		{
-			string message = TokenizeFailure("=+");
-			Assert.Contains("Unexpected character", message);
-		}
-
-		[Fact]
-		public void Run_ExclamationOnly_ReturnsFailure()
-		{
-			string message = TokenizeFailure("!");
-			Assert.Contains("Unexpected end of input", message);
-		}
-
-		[Fact]
-		public void Run_ExclamationFollowedByNonEqual_ReturnsFailure()
-		{
-			string message = TokenizeFailure("!+");
-			Assert.Contains("Unexpected character", message);
-		}
-
-		// -------------------------------------------------------------------------
 		// Identifier tokens
 		// -------------------------------------------------------------------------
 
@@ -209,40 +144,34 @@ namespace SmartExpressions.Test.Tokens
 		// -------------------------------------------------------------------------
 
 		[Fact]
-		public void Run_IdentifierEqualIdentifier_ReturnsThreeTokens()
+		public void Run_IdentifierCommaIdentifier_ReturnsThreeTokens()
 		{
 			// @{TEMP_1}==@{TEMP_2}  — no spaces
-			List<IToken> tokens = Tokenize("@{TEMP_1}==@{TEMP_2}");
+			List<IToken> tokens = Tokenize("@{TEMP_1},@{TEMP_2}");
 			Assert.Equal(3, tokens.Count);
 			_ = Assert.IsType<IdentifierToken>(tokens[0]);
-			_ = Assert.IsType<EqualToken>(tokens[1]);
+			_ = Assert.IsType<CommaToken>(tokens[1]);
 			_ = Assert.IsType<IdentifierToken>(tokens[2]);
 		}
 
 		[Fact]
-		public void Run_IdentifierEqualLiteral_ReturnsThreeTokens()
+		public void Run_And_Keyword_With_Params_Returns_Six_Tokens()
 		{
-			List<IToken> tokens = Tokenize("@{TEMP_1}==@{TRUE}");
-			Assert.Equal(3, tokens.Count);
-			IdentifierToken left = Assert.IsType<IdentifierToken>(tokens[0]);
-			IdentifierToken right = Assert.IsType<IdentifierToken>(tokens[2]);
-			Assert.Equal("TEMP_1", left.Value);
-			Assert.Equal("TRUE", right.Value);
+			List<IToken> tokens = Tokenize(" AND( @{TEMP_1} , @{TRUE} ) ");
+			Assert.Equal(6, tokens.Count);
 		}
 
 		[Fact]
-		public void Run_ComplexExpression_ReturnsCorrectTokenSequence()
+		public void Run_And_Keyword_With_Params_Returns_Correct_Sequence()
 		{
-			// (@{A} + @{B}) * @{C}
-			List<IToken> tokens = Tokenize("(@{A} + @{B}) * @{C}");
-			Assert.Equal(7, tokens.Count);
-			_ = Assert.IsType<LParenToken>(tokens[0]);
-			_ = Assert.IsType<IdentifierToken>(tokens[1]);
-			_ = Assert.IsType<PlusToken>(tokens[2]);
-			_ = Assert.IsType<IdentifierToken>(tokens[3]);
-			_ = Assert.IsType<RParenToken>(tokens[4]);
-			_ = Assert.IsType<MultiplyToken>(tokens[5]);
-			_ = Assert.IsType<IdentifierToken>(tokens[6]);
+			List<IToken> tokens = Tokenize(" OR( @{TEMP_1} , @{TRUE} ) ");
+			Assert.Equal(6, tokens.Count);
+			_ = Assert.IsType<KeywordToken>(tokens[0]);
+			_ = Assert.IsType<LParenToken>(tokens[1]);
+			_ = Assert.IsType<IdentifierToken>(tokens[2]);
+			_ = Assert.IsType<CommaToken>(tokens[3]);
+			_ = Assert.IsType<IdentifierToken>(tokens[4]);
+			_ = Assert.IsType<RParenToken>(tokens[5]);
 		}
 
 		[Fact]
@@ -255,14 +184,6 @@ namespace SmartExpressions.Test.Tokens
 		// -------------------------------------------------------------------------
 		// Position tracking
 		// -------------------------------------------------------------------------
-
-		[Fact]
-		public void Run_TokenPosition_IsCorrect()
-		{
-			List<IToken> tokens = Tokenize("+ -");
-			Assert.Equal(0, tokens[0].Position);
-			Assert.Equal(2, tokens[1].Position);
-		}
 
 		[Fact]
 		public void Run_IdentifierPosition_PointsToAtSign()

@@ -1,22 +1,58 @@
 ﻿using System.Runtime.CompilerServices;
 
 using SmartExpressions.Core.Tokens;
+using SmartExpressions.Core.Tokens.Brackets;
+using SmartExpressions.Core.Tokens.Delimiters;
+using SmartExpressions.Core.Tokens.Registered;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Lexing
 {
 	public class Lexer
 	{
-		private static readonly Dictionary<string, TokenType> Keywords;
-		private static readonly Dictionary<string, TokenType>.AlternateLookup<ReadOnlySpan<char>> KeywordsLookup;
-		private readonly string _input;
-		private readonly List<IToken> _tokens;
-		private int _pointer;
-		private int _length;
+		/// <summary> Dictionary containing all constants and keywords. </summary>
+		internal static readonly Dictionary<string, TokenType> Keywords;
+		internal static readonly Dictionary<string, TokenType>.AlternateLookup<ReadOnlySpan<char>> KeywordsLookup;
+		internal readonly string _input;
+		internal readonly List<IToken> _tokens;
+		internal int _pointer;
+		internal int _length;
 
 		static Lexer()
 		{
 			Keywords = new Dictionary<string, TokenType>(StringComparer.OrdinalIgnoreCase);
+
+			// Conditional
+			Keywords.Add("if", TokenType.IfKeyWord);
+			Keywords.Add("else", TokenType.ElseKeyword);
+
+			// Arithmetic
+			Keywords.Add("abs", TokenType.AbsKeyword);
+			Keywords.Add("add", TokenType.AddKeyWord);
+			Keywords.Add("div", TokenType.DivKeyWord);
+			Keywords.Add("mod", TokenType.ModKeyWord);
+			Keywords.Add("mult", TokenType.MultKeyWord);
+			Keywords.Add("neg", TokenType.NegKeyWord);
+			Keywords.Add("pow", TokenType.PowerKeyWord);
+			Keywords.Add("root", TokenType.RootKeyWord);
+			Keywords.Add("sub", TokenType.SubKeyWord);
+
+			// Comparison
+			Keywords.Add("eq", TokenType.EqualKeyWord);
+			Keywords.Add("neq", TokenType.NotEqualKeyWord);
+			Keywords.Add("gt", TokenType.GreaterThanKeyWord);
+			Keywords.Add("gte", TokenType.GreaterThanEqualKeyWord);
+			Keywords.Add("lt", TokenType.LessThanKeyWord);
+			Keywords.Add("lte", TokenType.LessThanEqualKeyWord);
+
+			// Logical
+			Keywords.Add("and", TokenType.AndKeyWord);
+			Keywords.Add("nand", TokenType.NandKeyWord);
+			Keywords.Add("nor", TokenType.NorKeyWord);
+			Keywords.Add("not", TokenType.NotKeyWord);
+			Keywords.Add("or", TokenType.OrKeyWord);
+			Keywords.Add("xnor", TokenType.XnorKeyWord);
+			Keywords.Add("xor", TokenType.XorKeyWord);
 
 			// Constants
 			Keywords.Add("e", TokenType.EulerKeyword);
@@ -24,13 +60,6 @@ namespace SmartExpressions.Core.Lexing
 			Keywords.Add("true", TokenType.TrueKeyword);
 			Keywords.Add("false", TokenType.FalseKeyword);
 			Keywords.Add("null", TokenType.NullKeyword);
-
-			Keywords.Add("if", TokenType.IfKeyWord);
-			Keywords.Add("add", TokenType.AddKeyWord);
-			Keywords.Add("sub", TokenType.SubKeyWord);
-			Keywords.Add("div", TokenType.DivKeyWord);
-			Keywords.Add("mult", TokenType.MultKeyWord);
-			Keywords.Add("mod", TokenType.ModKeyWord);
 
 			KeywordsLookup = Keywords.GetAlternateLookup<ReadOnlySpan<char>>();
 		}
@@ -49,7 +78,7 @@ namespace SmartExpressions.Core.Lexing
 
 		#region Helpers
 
-		private void ResetTokenizer()
+		public void ResetTokenizer()
 		{
 			this._tokens.Clear();
 			this._length = this._input.Length;
@@ -57,35 +86,35 @@ namespace SmartExpressions.Core.Lexing
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void AdvancePointer() => this._pointer++;
+		public void AdvancePointer() => this._pointer++;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void RevertPointer() => this._pointer--;
+		public void RevertPointer() => this._pointer--;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool PointerIsAtEnd() => this._pointer >= this._length;
+		public bool PointerIsAtEnd() => this._pointer >= this._length;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool PointerCanAdvance() => this._pointer + 1 < this._length;
+		public bool PointerCanAdvance() => this._pointer + 1 < this._length;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private char PeakAtPointer() => this._input[this._pointer];
+		public char PeakAtPointer() => this._input[this._pointer];
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private char PeakAtNext() => this._input[this._pointer + 1];
+		public char PeakAtNext() => this._input[this._pointer + 1];
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void AddToken(IToken token) => this._tokens.Add(token);
+		public void AddToken(IToken token) => this._tokens.Add(token);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool IsValidDigitCharacter()
+		public bool IsValidDigitCharacter()
 		{
 			char c = this.PeakAtPointer();
 			return char.IsDigit(c) || c == Characters.DOT;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool IsValidKeywordCharacter()
+		public bool IsValidKeywordCharacter()
 		{
 			char c = this.PeakAtPointer();
 			return char.IsAsciiLetter(c) || c == Characters.UNDERSCORE;
@@ -120,8 +149,6 @@ namespace SmartExpressions.Core.Lexing
 				{
 					return Operation<List<IToken>>.Failure(triState.Message);
 				}
-
-				this.AdvancePointer();
 			}
 
 			return Operation<List<IToken>>.Success(this._tokens);
@@ -133,220 +160,48 @@ namespace SmartExpressions.Core.Lexing
 		private Operation AddTokenByPointer()
 		{
 			char c = this.PeakAtPointer();
-			switch (c)
+			return c switch
 			{
-				/* 
-				 * Delimiter tokens
-				 */
-
-				case Characters.COMMA:
-					this.AddToken(new CommaToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.DOT:
-					this.AddToken(new DotToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.COLON:
-					this.AddToken(new ColonToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.SEMICOLON:
-					this.AddToken(new SemiColonToken(this._pointer));
-					return Operation.Success();
-
 				/* 
 				* Bracket tokens
 				*/
-
-				case Characters.LPAREN:
-					this.AddToken(new LParenToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.RPAREN:
-					this.AddToken(new RParenToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.LBRACE:
-					this.AddToken(new LBraceToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.RBRACE:
-					this.AddToken(new RBraceToken(this._pointer));
-					return Operation.Success();
+				Characters.LPAREN => LParenToken.Add(this),
+				Characters.RPAREN => RParenToken.Add(this),
+				Characters.LBRACE => LBraceToken.Add(this),
+				Characters.RBRACE => RBraceToken.Get(this),
 
 				/* 
-				* Arithmetic tokens
+				* Delimiter tokens
 				*/
-
-				case Characters.PLUS:
-					this.AddToken(new PlusToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.MINUS:
-					this.AddToken(new MinusToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.MULTIPLY:
-					this.AddToken(new MultiplyToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.DIVIDE:
-					this.AddToken(new DivideToken(this._pointer));
-					return Operation.Success();
-
-				case Characters.MODULO:
-					this.AddToken(new ModuloToken(this._pointer));
-					return Operation.Success();
-
-				/* 
-				* Comparison tokens
-				*/
-
-				case Characters.LESS:
-					if (this.PointerCanAdvance() && this.PeakAtNext() == Characters.EQUAL)
-					{
-						this.AddToken(new LessEqualToken(this._pointer));
-						this.AdvancePointer();
-						return Operation.Success();
-					}
-					this.AddToken(new LessToken(this._pointer));
-					return Operation.Success();
-
-
-				case Characters.GREATER:
-					if (this.PointerCanAdvance() && this.PeakAtNext() == Characters.EQUAL)
-					{
-						this.AddToken(new GreaterEqualToken(this._pointer));
-						this.AdvancePointer();
-						return Operation.Success();
-					}
-					this.AddToken(new GreaterToken(this._pointer));
-					return Operation.Success();
-
-
-				case Characters.EXCLAMATION:
-					if (this.PointerCanAdvance())
-					{
-						this.AdvancePointer();
-						char advancedTo = this.PeakAtPointer();
-						if (advancedTo == Characters.EQUAL)
-						{
-							this.AddToken(new NotEqualToken(this._pointer));
-							return Operation.Success();
-						}
-						return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.EQUAL}'. Actual: '{advancedTo}'.");
-					}
-					return Operation.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.EQUAL}'.");
-
-
-				case Characters.EQUAL:
-					if (this.PointerCanAdvance())
-					{
-						this.AdvancePointer();
-						char advancedTo = this.PeakAtPointer();
-						if (advancedTo == Characters.EQUAL)
-						{
-							this.AddToken(new EqualToken(this._pointer));
-							return Operation.Success();
-						}
-						return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.EQUAL}'. Actual: '{advancedTo}'.");
-					}
-					return Operation.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.EQUAL}'.");
-
+				Characters.COMMA => CommaToken.Add(this),
+				Characters.DOT => DotToken.Add(this),
+				Characters.COLON => ColonToken.Add(this),
+				Characters.SEMICOLON => SemiColonToken.Add(this),
 
 				/* 
 				* Keyword and identifier tokens
 				*/
-
-				case Characters.AT:
-					return this.AddIdentifierToken();
-
-				default:
-					if (char.IsDigit(c))
-					{
-						return this.AddNumericToken();
-					}
-
-					if (char.IsLetter(c))
-					{
-						return this.AddKeywordToken();
-					}
-
-					return Operation.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
-			}
+				Characters.AT => IdentifierToken.Add(this),
+				_ => this.HandleNonDelimitedToken(c),
+			};
 		}
 
-		private Operation AddKeywordToken()
+		private Operation HandleNonDelimitedToken(char c)
 		{
-			int entryPointer = this._pointer;
-
-			while (!this.PointerIsAtEnd() && this.IsValidKeywordCharacter())
+			if (char.IsDigit(c))
 			{
-				this.AdvancePointer();
+				// Parse for numbers first
+				return NumericToken.Add(this);
 			}
 
-			// No allocate for lookup
-			ReadOnlySpan<char> span = this._input.AsSpan(entryPointer, this._pointer - entryPointer);
-			if (KeywordsLookup.TryGetValue(span, out TokenType tokentype))
+			if (char.IsLetter(c))
 			{
-				// Substr only on found tokentype
-				string word = this._input.Substring(entryPointer, this._pointer - entryPointer);
-				this.RevertPointer();
-				this.AddToken(new KeywordToken(tokentype, entryPointer, word, word));
-				return Operation.Success();
+				// Keywords last
+				return KeywordToken.Add(this);
 			}
 
-			return Operation.Failure($"Unknown keyword starting at index {entryPointer}.");
-		}
-
-
-		private Operation AddNumericToken()
-		{
-			int entryPointer = this._pointer;
-
-			while (!this.PointerIsAtEnd() && this.IsValidDigitCharacter())
-			{
-				this.AdvancePointer();
-			}
-
-			string number = this._input.Substring(entryPointer, this._pointer - entryPointer);
-			this.RevertPointer();
-			this.AddToken(new NumericToken(entryPointer, number, number));
-			return Operation.Success();
-		}
-
-
-		private Operation AddIdentifierToken()
-		{
-			int entryP = this._pointer;
-
-			this.AdvancePointer(); // Skip @
-			if (this.PointerIsAtEnd() || this.PeakAtPointer() != Characters.LBRACE)
-			{
-				return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
-			}
-
-			this.AdvancePointer(); // Skip {
-			int identifierStart = this._pointer;
-
-			while (!this.PointerIsAtEnd() && this.PeakAtPointer() != Characters.RBRACE)
-			{
-				this.AdvancePointer();
-			}
-
-			if (this.PointerIsAtEnd())
-			{
-				return Operation.Failure($"Unclosed identifier starting at index {entryP}.");
-			}
-
-			string identifier = this._input.Substring(identifierStart, this._pointer - identifierStart);
-			if (string.IsNullOrWhiteSpace(identifier))
-			{
-				return Operation.Failure($"Empty identifier at index {entryP}.");
-			}
-			this.AddToken(new IdentifierToken(entryP, identifier, identifier));
-			return Operation.Success();
+			// If none found, return failure
+			return Operation.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
 		}
 	}
 }

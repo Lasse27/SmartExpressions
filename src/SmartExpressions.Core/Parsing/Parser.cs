@@ -4,6 +4,7 @@ using SmartExpressions.Core.Nodes;
 using SmartExpressions.Core.Nodes.Arithmetic;
 using SmartExpressions.Core.Nodes.Comparison;
 using SmartExpressions.Core.Nodes.Conditional;
+using SmartExpressions.Core.Nodes.Constants;
 using SmartExpressions.Core.Nodes.Logical;
 using SmartExpressions.Core.Nodes.Statistics;
 using SmartExpressions.Core.Tokens;
@@ -22,6 +23,7 @@ namespace SmartExpressions.Core.Parsing
 		public Parser(List<IToken> input)
 		{
 			ArgumentNullException.ThrowIfNull(input);
+			this._input = input;
 			this._root = null;
 			this._length = this._input.Count;
 			this._pointer = 0;
@@ -103,60 +105,60 @@ namespace SmartExpressions.Core.Parsing
 			IToken current = this.PeakAtPointer();
 			return current.Type switch
 			{
-				TokenType.Numeric => this.ParseNumber(),
-				TokenType.Identifier => this.ParseIdentifier(),
-				TokenType.Constant => this.ParseConstant(),
+				TokenType.Numeric => NumericNode.Get(this),
+				TokenType.Identifier => IdentifierNode.Get(this),
 
 				// Conditional keywords
 				TokenType.IfKeyWord => IfThenElseNode.Parse(this),
 
 				// Arithmetic keywords
-				TokenType.AbsKeyword => AbsoluteNode.Parse(this),
-				TokenType.AddKeyWord => AddNode.Parse(this),
-				TokenType.DivKeyWord => DivideNode.Parse(this),
-				TokenType.ModKeyWord => ModuloNode.Parse(this),
-				TokenType.MultKeyWord => MultiplyNode.Parse(this),
-				TokenType.NegKeyWord => NegativeNode.Parse(this),
-				TokenType.PowerKeyWord => PowerNode.Parse(this),
-				TokenType.RootKeyWord => RootNode.Parse(this),
-				TokenType.SubKeyWord => SubtractNode.Parse(this),
+				TokenType.AbsKeyword => AbsoluteNode.Get(this),
+				TokenType.AddKeyWord => AddNode.Get(this),
+				TokenType.DivKeyWord => DivideNode.Get(this),
+				TokenType.ModKeyWord => ModuloNode.Get(this),
+				TokenType.MultKeyWord => MultiplyNode.Get(this),
+				TokenType.NegKeyWord => NegativeNode.Get(this),
+				TokenType.PowerKeyWord => PowerNode.Get(this),
+				TokenType.RootKeyWord => RootNode.Get(this),
+				TokenType.SubKeyWord => SubtractNode.Get(this),
 
 				// Logical keywords
-				TokenType.AndKeyWord => AndNode.Parse(this),
-				TokenType.NandKeyWord => NandNode.Parse(this),
-				TokenType.NorKeyWord => NorNode.Parse(this),
-				TokenType.NotKeyWord => NotNode.Parse(this),
-				TokenType.XnorKeyWord => XnorNode.Parse(this),
-				TokenType.XorKeyWord => XorNode.Parse(this),
+				TokenType.AndKeyWord => AndNode.Get(this),
+				TokenType.OrKeyWord => OrNode.Get(this),
+				TokenType.NandKeyWord => NandNode.Get(this),
+				TokenType.NorKeyWord => NorNode.Get(this),
+				TokenType.NotKeyWord => NotNode.Get(this),
+				TokenType.XnorKeyWord => XnorNode.Get(this),
+				TokenType.XorKeyWord => XorNode.Get(this),
 
 				// Comparison keywords
-				TokenType.EqualKeyWord => EqualNode.Parse(this),
-				TokenType.NotEqualKeyWord => NotEqualNode.Parse(this),
-				TokenType.LessThanKeyWord => LessThanNode.Parse(this),
-				TokenType.LessThanEqualKeyWord => LessThanEqualNode.Parse(this),
-				TokenType.GreaterThanKeyWord => GreaterThanNode.Parse(this),
-				TokenType.GreaterThanEqualKeyWord => GreaterThanEqualNode.Parse(this),
+				TokenType.EqualKeyWord => EqualNode.Get(this),
+				TokenType.NotEqualKeyWord => NotEqualNode.Get(this),
+				TokenType.LessThanKeyWord => LessThanNode.Get(this),
+				TokenType.LessThanEqualKeyWord => LessThanEqualNode.Get(this),
+				TokenType.GreaterThanKeyWord => GreaterThanNode.Get(this),
+				TokenType.GreaterThanEqualKeyWord => GreaterThanEqualNode.Get(this),
 
 				// Statistic keywords
-				TokenType.SumKeyWord => SumNode.Parse(this),
-				TokenType.AvgKeyWord => AverageNode.Parse(this),
-				TokenType.StDKeyWord => StandardDNode.Parse(this),
-				TokenType.CountKeyWord => CountNode.Parse(this),
-				TokenType.MedianKeyWord => MedianNode.Parse(this),
-				TokenType.MinKeyWord => MinNode.Parse(this),
-				TokenType.MaxKeyWord => MaxNode.Parse(this),
-				TokenType.RangeKeyWord => RangeNode.Parse(this),
+				TokenType.SumKeyWord => SumNode.Get(this),
+				TokenType.AvgKeyWord => AverageNode.Get(this),
+				TokenType.StDKeyWord => StandardDNode.Get(this),
+				TokenType.CountKeyWord => CountNode.Get(this),
+				TokenType.MedianKeyWord => MedianNode.Get(this),
+				TokenType.MinKeyWord => MinNode.Get(this),
+				TokenType.MaxKeyWord => MaxNode.Get(this),
+				TokenType.RangeKeyWord => RangeNode.Get(this),
+
+				// Constants
+				TokenType.NullKeyword => NullNode.Get(this),
+				TokenType.TrueKeyword => TrueNode.Get(this),
+				TokenType.FalseKeyword => FalseNode.Get(this),
+				TokenType.EulerKeyword => EulerNode.Get(this),
+				TokenType.PiKeyword => PiNode.Get(this),
+
+				// Default
+				_ => Operation<ExpressionNode>.Failure($"Unknown token at position {this._pointer}."),
 			};
 		}
-
-
-
-		private Operation<ExpressionNode> ParseNumber() => throw new NotImplementedException();
-
-		private Operation<ExpressionNode> ParseConstant() => throw new NotImplementedException();
-		private Operation<ExpressionNode> ParseIdentifier() => throw new NotImplementedException();
-
-		private static Operation<ExpressionNode> Fail(Operation op)
-			=> Operation<ExpressionNode>.Failure(op.Message);
 	}
 }

@@ -1,4 +1,7 @@
-﻿namespace SmartExpressions.Core.Tokens.Delimiters
+﻿using SmartExpressions.Core.Lexing;
+using SmartExpressions.Core.Utility;
+
+namespace SmartExpressions.Core.Tokens.Delimiters
 {
 	public readonly struct DotToken(int position) : IToken
 	{
@@ -9,5 +12,12 @@
 		public int Position => position;
 
 		public object Value => ".";
+
+		public static Operation Add(Lexer lexer)
+		{
+			lexer.AddToken(new DotToken(lexer._pointer));
+			lexer.AdvancePointer();
+			return Operation.Success();
+		}
 	}
 }

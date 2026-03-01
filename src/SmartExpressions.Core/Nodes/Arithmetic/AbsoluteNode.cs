@@ -6,13 +6,13 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	public record AbsoluteNode : ExpressionNode
 	{
-		private readonly ExpressionNode operand;
+		public ExpressionNode Operand { get; set; }
 
-		public AbsoluteNode(ExpressionNode operand) => this.operand = operand;
+		public AbsoluteNode(ExpressionNode operand) => this.Operand = operand;
 
 		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
-		public static Operation<ExpressionNode> Parse(Parser parser)
+		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			// Skip keyword ABS
 			parser.AdvancePointer();
@@ -28,7 +28,6 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			// Get operand
 			Operation<ExpressionNode> operand = parser.ParseExpression();
 			if (operand.Status == Status.Failure) { return operand; }
-			parser.AdvancePointer();
 
 			// Check for right parenthesis
 			check = parser.CheckCurrent(TokenType.RParen);

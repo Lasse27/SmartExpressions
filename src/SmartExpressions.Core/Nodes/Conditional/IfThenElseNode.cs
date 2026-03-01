@@ -6,15 +6,15 @@ namespace SmartExpressions.Core.Nodes.Conditional
 {
 	public record IfThenElseNode : ExpressionNode
 	{
-		private readonly ExpressionNode condition;
-		private readonly ExpressionNode then;
-		private readonly ExpressionNode @else;
+		public ExpressionNode Condition { get; set;  }
+		public ExpressionNode Then { get; set; }
+		public ExpressionNode Else { get; set; }
 
 		public IfThenElseNode(ExpressionNode condition, ExpressionNode @then, ExpressionNode @else)
 		{
-			this.condition = condition;
-			this.then = then;
-			this.@else = @else;
+			this.Condition = condition;
+			this.Then = then;
+			this.Else = @else;
 		}
 
 		public override Operation<object> Evaluate() => throw new NotImplementedException();
