@@ -1,4 +1,5 @@
-﻿using SmartExpressions.Core.Parsing;
+﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
@@ -9,8 +10,6 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 		public ExpressionNode Operand { get; set; }
 
 		public AbsoluteNode(ExpressionNode operand) => this.Operand = operand;
-
-		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
@@ -40,6 +39,26 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			// Build and return
 			ExpressionNode node = new AbsoluteNode(operand.Value);
 			return Operation<ExpressionNode>.Success(node);
+		}
+
+
+		/// <inheritdoc/>
+		public override Operation<object> Evaluate(Evaluator evaluator)
+		{
+			Operation<object> raw = this.Operand.Evaluate(evaluator);
+			if (raw.Status == Status.Failure)
+			{
+				return raw;
+			}
+
+			Operation<decimal> resolved = EvaluatorHelpers.ResolveDecimal(raw, "Abs");
+			if (resolved.Status == Status.Failure)
+			{
+				return Operation<object>.Failure(resolved.Message);
+			}
+
+			decimal absolute = Math.Abs(resolved.Value);
+			return Operation<object>.Success(absolute);
 		}
 	}
 }

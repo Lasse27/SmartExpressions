@@ -1,4 +1,5 @@
-﻿using SmartExpressions.Core.Parsing;
+﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
@@ -6,7 +7,7 @@ namespace SmartExpressions.Core.Nodes.Conditional
 {
 	public record IfThenElseNode : ExpressionNode
 	{
-		public ExpressionNode Condition { get; set;  }
+		public ExpressionNode Condition { get; set; }
 		public ExpressionNode Then { get; set; }
 		public ExpressionNode Else { get; set; }
 
@@ -16,8 +17,6 @@ namespace SmartExpressions.Core.Nodes.Conditional
 			this.Then = then;
 			this.Else = @else;
 		}
-
-		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
 		public static Operation<ExpressionNode> Parse(Parser parser)
 		{
@@ -96,6 +95,20 @@ namespace SmartExpressions.Core.Nodes.Conditional
 			// Build and return
 			ExpressionNode node = new IfThenElseNode(condition.Value, then.Value, @else.Value);
 			return Operation<ExpressionNode>.Success(node);
+		}
+
+
+		/// <inheritdoc/>
+		public override Operation<object> Evaluate(Evaluator evaluator)
+		{
+			Operation<object> result = this.Condition.Evaluate(evaluator);
+			Operation<bool> condition = EvaluatorHelpers.ResolveBoolean(result, "IF");
+			if (condition.Status == Status.Failure) { return Operation<object>.Failure(condition.Message); }
+
+			// Handle then else
+			return condition.Value == true 
+				? this.Then.Evaluate(evaluator) 
+				: this.Else.Evaluate(evaluator);
 		}
 	}
 }

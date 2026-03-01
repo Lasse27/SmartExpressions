@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 
+using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
@@ -12,9 +13,6 @@ namespace SmartExpressions.Core.Nodes
 
 		public NumericNode()
 			=> this.Value = 0;
-
-
-		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
 
 		public static Operation<ExpressionNode> Get(Parser parser)
@@ -47,5 +45,8 @@ namespace SmartExpressions.Core.Nodes
 			// Valid
 			return Operation.Success();
 		}
+
+		public override Operation<object> Evaluate(Evaluator evaluator) 
+			=> Operation<object>.Success(this.Value);
 	}
 }

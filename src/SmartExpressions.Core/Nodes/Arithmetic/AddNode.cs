@@ -1,4 +1,5 @@
-﻿using SmartExpressions.Core.Parsing;
+﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Arithmetic
@@ -14,8 +15,6 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			this.Right = right;
 		}
 
-		public override Operation<object> Evaluate() => throw new NotImplementedException();
-
 
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
@@ -27,6 +26,25 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 
 			ExpressionNode node = new AddNode(dualOperand.Value.Left, dualOperand.Value.Right);
 			return Operation<ExpressionNode>.Success(node);
+		}
+
+		/// <inheritdoc/>
+		public override Operation<object> Evaluate(Evaluator evaluator)
+		{
+			Operation<object> rawLeft = this.Left.Evaluate(evaluator);
+			if (rawLeft.Status == Status.Failure) { return rawLeft; }
+
+			Operation<decimal> resolvedLeft = EvaluatorHelpers.ResolveDecimal(rawLeft, "Add.1");
+			if (resolvedLeft.Status == Status.Failure) { return Operation<object>.Failure(resolvedLeft.Message); }
+
+			Operation<object> rawRight = this.Left.Evaluate(evaluator);
+			if (rawRight.Status == Status.Failure) { return rawRight; }
+
+			Operation<decimal> resolvedRight = EvaluatorHelpers.ResolveDecimal(rawRight, "Add.2");
+			if (resolvedRight.Status == Status.Failure) { return Operation<object>.Failure(resolvedRight.Message); }
+
+			// Add adn return
+			return Operation<object>.Success(resolvedLeft.Value + resolvedRight.Value);
 		}
 	}
 }

@@ -1,12 +1,16 @@
 ﻿using System.Collections.Concurrent;
 
+using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Lexing;
+using SmartExpressions.Core.Nodes;
+using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Expressions
 {
 	/// <summary> Represents a configurable and evaluatable expression based on a textual formula. </summary>
-	public class Expression : IEvaluable
+	public class Expression
 	{
 		/// <summary> Gets a value indicating whether the expression has been successfully tokenized and parsed. </summary>
 		public bool IsAssembled => this._isTokenized && this._isParsed;
@@ -18,10 +22,13 @@ namespace SmartExpressions.Core.Expressions
 		public string Formula { get; private set; }
 
 		/// <summary> Gets the tokens produced from the formula after tokenization. </summary>
-		public List<IToken> Tokens { get; private set; }
+		private List<IToken> _tokens;
+
+		/// <summary> Gets the root node obtaining after parsing the tokens. </summary>
+		private ExpressionNode _root;
 
 		/// <summary> Gets the parameter dictionary used during expression evaluation. </summary>
-		public ConcurrentDictionary<string, object> Parameters { get; private set; }
+		public ConcurrentDictionary<string, object> Bindings { get; private set; }
 
 		/// <summary> Gets a value indicating whether the expression has been successfully tokenized . </summary>
 		private bool _isTokenized = false;
@@ -36,8 +43,8 @@ namespace SmartExpressions.Core.Expressions
 		public Expression()
 		{
 			this.Formula = string.Empty;
-			this.Tokens = [];
-			this.Parameters = [];
+			this._tokens = [];
+			this.Bindings = [];
 			this.AssembleOnEvaluation = true;
 			this._isTokenized = false;
 			this._isParsed = false;
@@ -80,7 +87,7 @@ namespace SmartExpressions.Core.Expressions
 
 			foreach (KeyValuePair<string, object> parameter in parameters)
 			{
-				_ = this.Parameters.AddOrUpdate(parameter.Key, parameter.Value, (_, _) => parameter.Value);
+				_ = this.Bindings.AddOrUpdate(parameter.Key, parameter.Value, (_, _) => parameter.Value);
 			}
 			return this;
 		}
@@ -97,7 +104,7 @@ namespace SmartExpressions.Core.Expressions
 			ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
 			ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-			_ = this.Parameters.AddOrUpdate(key, value, (_, _) => value);
+			_ = this.Bindings.AddOrUpdate(key, value, (_, _) => value);
 			return this;
 		}
 
@@ -111,7 +118,15 @@ namespace SmartExpressions.Core.Expressions
 				return Operation.Success();
 			}
 
-			// Tokenize
+			Lexer lexer = new Lexer(this.Formula);
+			Operation<List<IToken>> tokenization = lexer.Run();
+			if (tokenization.Status != Status.Success)
+			{
+				return Operation.Failure(tokenization.Message);
+			}
+
+			this._tokens = tokenization.Value;
+			this._isTokenized = true;
 			return Operation.Success();
 		}
 
@@ -130,7 +145,16 @@ namespace SmartExpressions.Core.Expressions
 				return Operation.Success();
 			}
 
+			Parser parser = new Parser(this._tokens);
+			Operation<ExpressionNode> parsing = parser.Run();
+			if (parsing.Status != Status.Success)
+			{
+				return Operation.Failure(parsing.Message);
+			}
+
 			// Parse
+			this._root = parsing.Value;
+			this._isParsed = true;
 			return Operation.Success();
 		}
 
@@ -162,7 +186,7 @@ namespace SmartExpressions.Core.Expressions
 
 		/// <inheritdoc/>
 		/// <remarks> If <see cref="AssembleOnEvaluation"/> is enabled, the expression is tokenized and parsed automatically before evaluation. </remarks>
-		public Operation<object> Evaluate()
+		public Operation<object> Evaluate(EvaluatorOptions options = default)
 		{
 			if (this.AssembleOnEvaluation)
 			{
@@ -173,11 +197,17 @@ namespace SmartExpressions.Core.Expressions
 				}
 			}
 
-			return this.IsAssembled == false
-				? Operation<object>.Failure(
+			if (!this.IsAssembled)
+			{
+				return Operation<object>.Failure(
 					$"Expression was never assembled. " +
-					$"Remember to tokenize and parse the expression if {nameof(this.AssembleOnEvaluation)} is disabled.")
-				: Operation<object>.Success(null);
+					$"Remember to tokenize and parse the expression if {nameof(this.AssembleOnEvaluation)} is disabled.");
+			}
+			else
+			{
+				Evaluator evaluator = new Evaluator(options, this.Bindings);
+				return evaluator.Run(this._root);
+			}
 		}
 	}
 }

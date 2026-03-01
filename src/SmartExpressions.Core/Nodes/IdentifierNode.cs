@@ -1,4 +1,5 @@
-﻿using SmartExpressions.Core.Parsing;
+﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
@@ -8,16 +9,25 @@ namespace SmartExpressions.Core.Nodes
 	{
 		public string Key { get; set; }
 
-		public IdentifierNode(string key) 
+		public IdentifierNode(string key)
 			=> this.Key = key;
-
-		public override Operation<object> Evaluate() => throw new NotImplementedException();
 
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			IToken current = parser.PeakAtPointer();
 			parser.AdvancePointer();
 			return Operation<ExpressionNode>.Success(new IdentifierNode(current.Lexeme));
+		}
+
+		public override Operation<object> Evaluate(Evaluator evaluator)
+		{
+			if (evaluator.Bindings.TryGetValue(this.Key, out object value))
+			{
+				return Operation<object>.Success(value);
+			}
+
+			// Not registered => user error
+			return Operation<object>.Failure($"Unregistered key '{this.Key}' in expression. Make sure to bind the key before evaluating.");
 		}
 	}
 }

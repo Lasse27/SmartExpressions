@@ -6,9 +6,6 @@
 		public static Operation Success()
 			=> new Operation(Status.Success);
 
-		public static Operation Pending()
-			=> new Operation(Status.Pending);
-
 		public static Operation Failure(string message)
 			=> new Operation(Status.Failure, message);
 	}
@@ -19,9 +16,6 @@
 	{
 		public static Operation<T> Success(T value)
 			=> new Operation<T>(Status.Success, value);
-
-		public static Operation<T> Pending()
-			=> new Operation<T>(Status.Pending, default);
 
 		public static Operation<T> Failure(string message = "")
 			=> new Operation<T>(Status.Failure, default, message);
