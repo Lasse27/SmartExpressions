@@ -1,4 +1,5 @@
-﻿using SmartExpressions.Core.Parsing;
+﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Statistics
@@ -10,9 +11,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		public StandardDNode(List<ExpressionNode> operands)
 			=> this.operands = operands;
 
-		public override Operation<object> Evaluate() => throw new NotImplementedException();
-
-
+		
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			Operation<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
@@ -24,5 +23,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			ExpressionNode node = new StandardDNode(operation.Value);
 			return Operation<ExpressionNode>.Success(node);
 		}
+
+		public override Operation<object> Evaluate(Evaluator evaluator) => throw new NotImplementedException();
 	}
 }

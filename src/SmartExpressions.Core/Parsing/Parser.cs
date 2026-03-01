@@ -144,7 +144,6 @@ namespace SmartExpressions.Core.Parsing
 				TokenType.AvgKeyWord => AverageNode.Get(this),
 				TokenType.StDKeyWord => StandardDNode.Get(this),
 				TokenType.CountKeyWord => CountNode.Get(this),
-				TokenType.MedianKeyWord => MedianNode.Get(this),
 				TokenType.MinKeyWord => MinNode.Get(this),
 				TokenType.MaxKeyWord => MaxNode.Get(this),
 				TokenType.RangeKeyWord => RangeNode.Get(this),

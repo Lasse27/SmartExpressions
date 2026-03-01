@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Frozen;
+using System.Runtime.CompilerServices;
 
 using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Tokens.Brackets;
@@ -12,7 +13,9 @@ namespace SmartExpressions.Core.Lexing
 	{
 		/// <summary> Dictionary containing all constants and keywords. </summary>
 		internal static readonly Dictionary<string, TokenType> Keywords;
-		internal static readonly Dictionary<string, TokenType>.AlternateLookup<ReadOnlySpan<char>> KeywordsLookup;
+
+		/// <summary> Frozen Dictionary containing all constants and keywords for runtime lookup </summary>
+		internal static readonly FrozenDictionary<string, TokenType> KeywordsLookup;
 		internal readonly string _input;
 		internal readonly List<IToken> _tokens;
 		internal int _pointer;
@@ -60,8 +63,8 @@ namespace SmartExpressions.Core.Lexing
 			Keywords.Add("true", TokenType.TrueKeyword);
 			Keywords.Add("false", TokenType.FalseKeyword);
 			Keywords.Add("null", TokenType.NullKeyword);
-
-			KeywordsLookup = Keywords.GetAlternateLookup<ReadOnlySpan<char>>();
+			
+			KeywordsLookup = Keywords.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 		}
 
 
@@ -70,7 +73,7 @@ namespace SmartExpressions.Core.Lexing
 			ArgumentNullException.ThrowIfNull(input, nameof(input));
 
 			this._input = input;
-			this._tokens = new List<IToken>(input.Length / 3); // assume half for less copy cicles
+			this._tokens = new List<IToken>(input.Length / 3); // assume every third char for less copy cicles
 			this._length = input.Length;
 			this._pointer = 0;
 		}
@@ -87,9 +90,6 @@ namespace SmartExpressions.Core.Lexing
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void AdvancePointer() => this._pointer++;
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void RevertPointer() => this._pointer--;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool PointerIsAtEnd() => this._pointer >= this._length;

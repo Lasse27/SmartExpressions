@@ -23,11 +23,10 @@ namespace SmartExpressions.Core.Tokens.Registered
 			}
 
 			// No allocate for lookup
-			ReadOnlySpan<char> span = lexer._input.AsSpan(entryPointer, lexer._pointer - entryPointer);
-			if (Lexer.KeywordsLookup.TryGetValue(span, out TokenType tokentype))
+			string word = lexer._input.Substring(entryPointer, lexer._pointer - entryPointer);
+			if (Lexer.KeywordsLookup.TryGetValue(word, out TokenType tokentype))
 			{
 				// Substr only on found tokentype
-				string word = lexer._input.Substring(entryPointer, lexer._pointer - entryPointer);
 				lexer.AddToken(new KeywordToken(tokentype, entryPointer, word, word));
 				return Operation.Success();
 			}

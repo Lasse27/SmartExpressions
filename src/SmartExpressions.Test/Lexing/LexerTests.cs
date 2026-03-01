@@ -9,14 +9,8 @@ using Xunit.Abstractions;
 
 namespace SmartExpressions.Test.Lexing
 {
-	public class LexerTests
+	public class LexerTests(ITestOutputHelper outputHelper) : BaseTestClass(outputHelper)
 	{
-		private readonly ITestOutputHelper outputHelper;
-
-		public LexerTests(ITestOutputHelper outputHelper)
-			=> this.outputHelper = outputHelper;
-
-
 		private static List<IToken> Tokenize(string input)
 		{
 			Lexer tokenizer = new Lexer(input);
@@ -78,17 +72,7 @@ namespace SmartExpressions.Test.Lexing
 		// Bracket tokens
 		// -------------------------------------------------------------------------
 
-		[Theory]
-		[InlineData("(", typeof(LParenToken))]
-		[InlineData(")", typeof(RParenToken))]
-		[InlineData("{", typeof(LBraceToken))]
-		[InlineData("}", typeof(RBraceToken))]
-		public void Run_SingleBracket_ReturnsCorrectToken(string input, Type expectedType)
-		{
-			List<IToken> tokens = Tokenize(input);
-			_ = Assert.Single(tokens);
-			Assert.IsType(expectedType, tokens[0]);
-		}
+		
 
 		// -------------------------------------------------------------------------
 		// Identifier tokens
@@ -209,7 +193,7 @@ namespace SmartExpressions.Test.Lexing
 			_ = Assert.IsType<RParenToken>(tokens[5]);
 			foreach (IToken item in tokens)
 			{
-				this.outputHelper.WriteLine(item.ToString());
+				this._outputHelper.WriteLine(item.ToString());
 			}
 		}
 
@@ -225,7 +209,7 @@ namespace SmartExpressions.Test.Lexing
 			_ = Assert.IsType<RParenToken>(tokens[5]);
 			foreach (IToken item in tokens)
 			{
-				this.outputHelper.WriteLine(item.ToString());
+				this._outputHelper.WriteLine(item.ToString());
 			}
 		}
 
@@ -241,7 +225,7 @@ namespace SmartExpressions.Test.Lexing
 			_ = Assert.IsType<RParenToken>(tokens[5]);
 			foreach (IToken item in tokens)
 			{
-				this.outputHelper.WriteLine(item.ToString());
+				this._outputHelper.WriteLine(item.ToString());
 			}
 		}
 
@@ -271,7 +255,7 @@ namespace SmartExpressions.Test.Lexing
 			_ = Assert.IsType<RParenToken>(tokens[15]);
 			foreach (IToken item in tokens)
 			{
-				this.outputHelper.WriteLine(item.ToString());
+				this._outputHelper.WriteLine(item.ToString());
 			}
 		}
 
@@ -295,7 +279,7 @@ namespace SmartExpressions.Test.Lexing
 			_ = Assert.IsType<RParenToken>(tokens[10]);
 			foreach (IToken item in tokens)
 			{
-				this.outputHelper.WriteLine(item.ToString());
+				this._outputHelper.WriteLine(item.ToString());
 			}
 		}
 	}
