@@ -45,7 +45,7 @@ namespace SmartExpressions.Core.Nodes.Logical
 
 
 			// Right operand
-			Operation<object> rawRight = this.Left.Evaluate(evaluator);
+			Operation<object> rawRight = this.Right.Evaluate(evaluator);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
 			Operation<bool> resolvedRight = EvaluatorHelpers.ResolveBoolean(rawRight, "Or.2");

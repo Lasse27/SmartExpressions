@@ -36,7 +36,7 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			Operation<decimal> resolvedLeft = EvaluatorHelpers.ResolveDecimal(rawLeft, "Mod.1");
 			if (resolvedLeft.Status == Status.Failure) { return Operation<object>.Failure(resolvedLeft.Message); }
 
-			Operation<object> rawRight = this.Left.Evaluate(evaluator);
+			Operation<object> rawRight = this.Right.Evaluate(evaluator);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
 			Operation<decimal> resolvedRight = EvaluatorHelpers.ResolveDecimal(rawRight, "Mod.2");

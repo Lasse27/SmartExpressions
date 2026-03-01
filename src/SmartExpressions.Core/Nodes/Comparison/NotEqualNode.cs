@@ -34,7 +34,7 @@ namespace SmartExpressions.Core.Nodes.Comparison
 			Operation<object> rawLeft = this.Left.Evaluate(evaluator);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
 
-			Operation<object> rawRight = this.Left.Evaluate(evaluator);
+			Operation<object> rawRight = this.Right.Evaluate(evaluator);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
 			// Handle nulls

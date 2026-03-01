@@ -140,7 +140,7 @@ namespace SmartExpressions.Core.Expressions
 				return Operation.Failure("Expression wasn't tokenized. Remember to call tokenization before parsing expression.");
 			}
 
-			if (!this._isParsed)
+			if (this._isParsed)
 			{
 				return Operation.Success();
 			}
