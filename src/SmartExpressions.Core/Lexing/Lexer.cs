@@ -63,7 +63,7 @@ namespace SmartExpressions.Core.Lexing
 			Keywords.Add("true", TokenType.TrueKeyword);
 			Keywords.Add("false", TokenType.FalseKeyword);
 			Keywords.Add("null", TokenType.NullKeyword);
-			
+
 			KeywordsLookup = Keywords.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 		}
 
@@ -107,11 +107,8 @@ namespace SmartExpressions.Core.Lexing
 		public void AddToken(IToken token) => this._tokens.Add(token);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool IsValidDigitCharacter()
-		{
-			char c = this.PeakAtPointer();
-			return char.IsDigit(c) || c == Characters.DOT;
-		}
+		public static bool IsValidDigitCharacter(char c) 
+			=> char.IsDigit(c) || c == Characters.DOT || c == Characters.MINUS;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool IsValidKeywordCharacter()
@@ -188,7 +185,7 @@ namespace SmartExpressions.Core.Lexing
 
 		private Operation HandleNonDelimitedToken(char c)
 		{
-			if (char.IsDigit(c))
+			if (IsValidDigitCharacter(c))
 			{
 				// Parse for numbers first
 				return NumericToken.Add(this);

@@ -16,8 +16,7 @@ namespace SmartExpressions.Core.Tokens.Registered
 		public static Operation Add(Lexer lexer)
 		{
 			int entryPointer = lexer._pointer;
-
-			while (!lexer.PointerIsAtEnd() && lexer.IsValidDigitCharacter())
+			while (!lexer.PointerIsAtEnd() && Lexer.IsValidDigitCharacter(lexer.PeakAtPointer()))
 			{
 				lexer.AdvancePointer();
 			}
