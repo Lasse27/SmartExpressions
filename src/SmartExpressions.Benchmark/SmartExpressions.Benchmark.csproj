@@ -1,13 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+	<TargetFramework>net9.0</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="C:\Users\lh\.nuget\packages\microsoft.visualstudio.diagnosticshub.benchmarkdotnetdiagnosers\18.3.36812.1\contentFiles\cs\any\BenchmarkProfilerAgentConfig.g.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
@@ -15,6 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\SmartExpressions.Core\SmartExpressions.Core.csproj" />
+    <ProjectReference Include="..\SmartExpressions.Core\SmartExpressions.Core.csproj" />
   </ItemGroup>
 </Project>

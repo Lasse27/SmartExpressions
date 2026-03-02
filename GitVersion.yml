@@ -1,0 +1,22 @@
+mode: ContinuousDelivery
+tag-prefix: '[vV]'
+next-version: 1.0.0
+
+branches:
+  main:
+    regex: ^master$
+    is-main-branch: true
+    increment: Minor
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+
+  development:
+    regex: ^development$
+    increment: Minor
+    label: alpha
+    track-merge-target: true
+    source-branches:
+      - main
+
+ignore:
+  sha: []
