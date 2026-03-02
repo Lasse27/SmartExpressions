@@ -3,6 +3,10 @@
   <PropertyGroup>
 	<TargetFramework>net9.0</TargetFramework>
     <OutputType>Exe</OutputType>
+
+	<LangVersion>latest</LangVersion>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
