@@ -34,16 +34,15 @@ jobs:
     - name: Determine Version
       id: gitversion
       uses: gittools/actions/gitversion/execute@v0
+      
+    - name: Test
+      run: dotnet test
 
     - name: Build
       run: dotnet build -c Release /p:Version=${{ steps.gitversion.outputs.SemVer }}
       
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-
     - name: Pack
-      run: dotnet pack -c Release --no-build \
-           /p:PackageVersion=${{ steps.gitversion.outputs.SemVer }}
+      run: dotnet pack -c Release --no-build /p:PackageVersion=${{ steps.gitversion.outputs.SemVer }}
 
     - name: Create Tag
       run: |
