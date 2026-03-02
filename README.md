@@ -1,6 +1,11 @@
 # SmartExpressions
 [![.NET Master](https://github.com/Lasse27/SmartExpressions/actions/workflows/dotnet-master.yml/badge.svg?branch=master)](https://github.com/Lasse27/SmartExpressions/actions/workflows/dotnet-master.yml)
 
+SmartExpressions is a .NET-based framework for parsing and evaluating expressions. It provides a custom expression parser and evaluator supporting arithmetic, logical, and comparison operators, as well as variables, constants, and nested expressions. The library is designed for applications that require dynamic runtime calculation and interpretation of expressions.
+
+> The project was originally made for personal use but I decided to make it public, so anybody who wants to make use of it can do so.
+
+
 ## EBNF
 ```
 expression      ::= if_expr | logical_expr | arithmetic_expr | primary

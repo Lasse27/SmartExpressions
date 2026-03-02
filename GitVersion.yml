@@ -16,6 +16,7 @@ branches:
     source-branches: []
     tracks-release-branches: false
     is-mainline: true
+    tag: ''
 
 ignore:
   sha: []
