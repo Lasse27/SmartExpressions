@@ -61,5 +61,8 @@ namespace SmartExpressions.Core.Nodes.Comparison
 
 		/// <inheritdoc/>
 		public override string GetKeyword() => Keyword;
+
+		/// <inheritdoc/>
+		public override string ToString() => base.ToString();
 	}
 }

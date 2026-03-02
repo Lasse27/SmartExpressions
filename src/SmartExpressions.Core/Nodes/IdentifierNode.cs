@@ -9,8 +9,9 @@ namespace SmartExpressions.Core.Nodes
 	{
 		public string Key { get; set; }
 
-		public IdentifierNode(string key)
-			=> this.Key = key;
+		/// <inheritdoc/>
+		public IdentifierNode(string key) => this.Key = key;
+
 
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
@@ -19,15 +20,20 @@ namespace SmartExpressions.Core.Nodes
 			return Operation<ExpressionNode>.Success(new IdentifierNode(current.Lexeme));
 		}
 
+		/// <inheritdoc/>
 		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
 			if (evaluator.Bindings.TryGetValue(this.Key, out object value))
 			{
+				listener?.Report($"{this.Key} = {value}");
 				return Operation<object>.Success(value);
 			}
 
 			// Not registered => user error
 			return Operation<object>.Failure($"Unregistered key '{this.Key}' in expression. Make sure to bind the key before evaluating.");
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => this.Key;
 	}
 }

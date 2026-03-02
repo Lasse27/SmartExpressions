@@ -54,5 +54,8 @@ namespace SmartExpressions.Core.Nodes.Logical
 
 		/// <inheritdoc/>
 		public override string GetKeyword() => Keyword;
+
+		/// <inheritdoc/>
+		public override string ToString() => base.ToString();
 	}
 }
