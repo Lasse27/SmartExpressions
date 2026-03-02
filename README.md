@@ -1,4 +1,5 @@
 # SmartExpressions
+
 [![.NET Master](https://github.com/Lasse27/SmartExpressions/actions/workflows/dotnet-master.yml/badge.svg?branch=master)](https://github.com/Lasse27/SmartExpressions/actions/workflows/dotnet-master.yml)
 
 SmartExpressions is a .NET-based framework for parsing and evaluating expressions. It provides a custom expression parser and evaluator supporting arithmetic, logical, and comparison operators, as well as variables, constants, and nested expressions. The library is designed for applications that require dynamic runtime calculation and interpretation of expressions.
@@ -134,16 +135,58 @@ This results in the following functions:
 An example expression looks like this:
 
 ```csharp
+[Fact]
+public void Simple_Expression()
+{
+	Expression expression = new Expression("Add(1, 1)");
+	Operation<object> operation = expression.Evaluate();
+
+	// Assert
+	Assert.Equal(Status.Success, operation.Status);
+	Assert.NotNull(operation.Value);
+	Assert.Equal((decimal)2, operation.Value);
+
+	// Output
+	_outputHelper.WriteLine(operation.Value.ToString()); // 2
+}
 ```
 
 Function calls can be nested arbitrarily:
 
 ```csharp
+[Fact]
+public void Simple_Nested_Expression()
+{
+	Expression expression = new Expression("Add(1, MULT(5,5))");
+	Operation<object> operation = expression.Evaluate();
+
+	// Assert
+	Assert.Equal(Status.Success, operation.Status);
+	Assert.NotNull(operation.Value);
+	Assert.Equal((decimal)26, operation.Value);
+
+	// Output
+	_outputHelper.WriteLine(operation.Value.ToString()); // 26
+}
 ```
 
 Expressions are not affected by spaces and line breaks:
 
 ```csharp
+[Fact]
+public void Simple_Expression_With_Whitespace()
+{
+	Expression expression = new Expression("Add  (1   , MULT    (5,      5))");
+	Operation<object> operation = expression.Evaluate();
+
+	// Assert
+	Assert.Equal(Status.Success, operation.Status);
+	Assert.NotNull(operation.Value);
+	Assert.Equal((decimal)26, operation.Value);
+
+	// Output
+	_outputHelper.WriteLine(operation.Value.ToString()); // 26
+}
 ```
 
 The parsing and tokenization/lexing of the input values is first performed when the formula is evaluated for the first time. After that, it is only performed again when the formula changes, for example, by `Expression.SetFormula()`.
@@ -206,8 +249,59 @@ public void Expression_With_Rebound_Identifier()
 }
 ```
 
+Binding only supports primary types. To be precise, these are the following types:
+
+- `bool`
+- `byte`
+- `short`
+- `integer`
+- `double`
+- `decimal`
+
+
 ## Progress
 
-## Benchmarks
+The `Expression.Evaluate()` method accepts an optional parameter `IProgress<string>`. If you enter a corresponding object of this type into the method, intermediate results of the individual nodes are returned.
+
+```csharp
+[Fact]
+public void Simple_Expression_With_Progress()
+{
+	Progress<string> progress = new Progress<string>();
+	progress.ProgressChanged += (_, e) => _outputHelper.WriteLine(e);
+
+	Expression expression = new Expression("Add(SUB(2,1),MULT(5,5))");
+	Operation<object> operation = expression.Evaluate(progress);
+
+	// Assert
+	Assert.Equal(Status.Success, operation.Status);
+	Assert.NotNull(operation.Value);
+	Assert.Equal((decimal)26, operation.Value);
+
+	// Output
+	_outputHelper.WriteLine(operation.Value.ToString());
+
+	// Console output
+	// SUB(2, 1) = 1
+	// ADD(SUB(2, 1), MULT(5, 5)) = 26
+	// MULT(5, 5) = 25
+	// 26
+}
+```
+
+# Benchmarks
+
+I am continuing to work on improving the performance of the lexer, parser, and evaluator. 
+I am using `DotNetBenchmark` to analyze performance and will publish benchmark results at appropriate times.
 
 
+# Contributing
+
+If you don't like something, want to suggest ideas, or have encountered a bug, feel free to create an issue or pull request. 
+Forks are always welcome. I appreciate all feedback, whether positive or negative.
+
+The project will initially be managed exclusively by me. For serious inquiries, please contact me at lassehillen@gmx.de.
+
+# License
+
+The project is published under the MIT License. See LICENSE.txt for more infos.
