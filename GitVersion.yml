@@ -1,14 +1,21 @@
 mode: ContinuousDeployment
-tag-prefix: '[vV]'
-next-version: 1.0.0
-commit-message-incrementing: Enabled
 
+# Muster für Commit‑Message‑Inkremente
 major-version-bump-message: '\+semver:\s?(major|breaking)'
-minor-version-bump-message: '^(feat)(\(.+\))?:'
-patch-version-bump-message: '^(fix|perf|refactor)(\(.+\))?:'
+minor-version-bump-message: '\+semver:\s?(minor|feature)'
+patch-version-bump-message: '\+semver:\s?(patch|fix)'
+no-bump-message: '\+semver:\s?(none|skip)'
+commit-message-incrementing: Enabled
 
 branches:
   master:
     regex: ^master$
     increment: Patch
-    is-release-branch: true
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: []
+    tracks-release-branches: false
+    is-mainline: true
+
+ignore:
+  sha: []
