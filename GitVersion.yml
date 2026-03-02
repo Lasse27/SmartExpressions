@@ -1,4 +1,4 @@
-mode: ContinuousDelivery
+mode: ContinuousDeployment
 tag-prefix: '[vV]'
 next-version: 1.0.0
 commit-message-incrementing: Enabled
@@ -11,3 +11,4 @@ branches:
   main:
     regex: ^main$
     increment: Patch
+    is-release-branch: true
