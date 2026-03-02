@@ -13,6 +13,23 @@
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	  <PackageId />
 	  <Title>SmartExpressions</Title>
+	  <AssemblyName>SmartExpressions</AssemblyName>
+	  <Authors>Lasse27</Authors>
+	  <Company>Lasse27</Company>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <RepositoryUrl>https://github.com/Lasse27/SmartExpressions</RepositoryUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageTags>evaluation;expressions;textual-math</PackageTags>
+	  <NeutralLanguage>en</NeutralLanguage>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
