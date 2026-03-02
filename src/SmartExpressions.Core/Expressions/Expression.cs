@@ -4,7 +4,6 @@ using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Nodes;
 using SmartExpressions.Core.Parsing;
-using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Expressions
@@ -22,7 +21,7 @@ namespace SmartExpressions.Core.Expressions
 		public string Formula { get; private set; }
 
 		/// <summary> Gets the tokens produced from the formula after tokenization. </summary>
-		private List<IToken> _tokens;
+		private List<Token> _tokens;
 
 		/// <summary> Gets the root node obtaining after parsing the tokens. </summary>
 		private ExpressionNode _root;
@@ -119,7 +118,7 @@ namespace SmartExpressions.Core.Expressions
 			}
 
 			Lexer lexer = new Lexer(this.Formula);
-			Operation<List<IToken>> tokenization = lexer.Run();
+			Operation<List<Token>> tokenization = lexer.Run();
 			if (tokenization.Status != Status.Success)
 			{
 				return Operation.Failure(tokenization.Message);
@@ -186,7 +185,7 @@ namespace SmartExpressions.Core.Expressions
 
 		/// <inheritdoc/>
 		/// <remarks> If <see cref="AssembleOnEvaluation"/> is enabled, the expression is tokenized and parsed automatically before evaluation. </remarks>
-		public Operation<object> Evaluate(EvaluatorOptions options = default)
+		public Operation<object> Evaluate()
 		{
 			if (this.AssembleOnEvaluation)
 			{
@@ -205,7 +204,7 @@ namespace SmartExpressions.Core.Expressions
 			}
 			else
 			{
-				Evaluator evaluator = new Evaluator(options, this.Bindings);
+				Evaluator evaluator = new Evaluator( this.Bindings);
 				return evaluator.Run(this._root);
 			}
 		}

@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 
 using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
-using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes
@@ -17,7 +17,7 @@ namespace SmartExpressions.Core.Nodes
 
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
-			IToken current = parser.PeakAtPointer();
+			Token current = parser.PeakAtPointer();
 
 			NumericNode node = new NumericNode();
 			Operation set = node.TrySetValue(parser._pointer, current.Lexeme);

@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
+using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Nodes;
 using SmartExpressions.Core.Nodes.Arithmetic;
 using SmartExpressions.Core.Nodes.Comparison;
@@ -7,20 +8,19 @@ using SmartExpressions.Core.Nodes.Conditional;
 using SmartExpressions.Core.Nodes.Constants;
 using SmartExpressions.Core.Nodes.Logical;
 using SmartExpressions.Core.Nodes.Statistics;
-using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Parsing
 {
 	public class Parser
 	{
-		internal readonly List<IToken> _input;
+		internal readonly List<Token> _input;
 		internal ExpressionNode _root;
 		internal int _pointer;
 		internal int _length;
 
 
-		public Parser(List<IToken> input)
+		public Parser(List<Token> input)
 		{
 			ArgumentNullException.ThrowIfNull(input);
 			this._input = input;
@@ -55,11 +55,11 @@ namespace SmartExpressions.Core.Parsing
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public IToken PeakAtPointer() => this._input[this._pointer];
+		public Token PeakAtPointer() => this._input[this._pointer];
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public IToken PeakAtNext() => this._input[this._pointer + 1];
+		public Token PeakAtNext() => this._input[this._pointer + 1];
 
 
 		public Operation CheckCurrent(TokenType expected)
@@ -69,7 +69,7 @@ namespace SmartExpressions.Core.Parsing
 				return Operation.Failure($"Unexpected end of parser input. Expected: {expected}.");
 			}
 
-			IToken current = this.PeakAtPointer();
+			Token current = this.PeakAtPointer();
 			if (current.Type != expected)
 			{
 				return Operation.Failure($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
@@ -102,7 +102,7 @@ namespace SmartExpressions.Core.Parsing
 				return Operation<ExpressionNode>.Failure("Unexpected end of input.");
 			}
 
-			IToken current = this.PeakAtPointer();
+			Token current = this.PeakAtPointer();
 			return current.Type switch
 			{
 				TokenType.Numeric => NumericNode.Get(this),

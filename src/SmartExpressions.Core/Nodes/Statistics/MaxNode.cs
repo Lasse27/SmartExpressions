@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-using SmartExpressions.Core.Evaluation;
+﻿using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 

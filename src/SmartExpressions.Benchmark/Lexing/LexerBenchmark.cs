@@ -5,7 +5,6 @@ using BenchmarkDotNet.Attributes;
 using Microsoft.VSDiagnostics;
 
 using SmartExpressions.Core.Lexing;
-using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Benchmark.Lexing
@@ -69,30 +68,30 @@ namespace SmartExpressions.Benchmark.Lexing
 		// ------------------------------------------------------------------ 
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_Empty_Input() => _empty.Run();
+		public Operation<List<Token>> Run_Empty_Input() => _empty.Run();
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_Whitespace_Input() => _whitespace.Run();
+		public Operation<List<Token>> Run_Whitespace_Input() => _whitespace.Run();
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_Single_Number() => _singleNum.Run();
+		public Operation<List<Token>> Run_Single_Number() => _singleNum.Run();
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_Single_Keyword() => _singleKw.Run();
+		public Operation<List<Token>> Run_Single_Keyword() => _singleKw.Run();
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_Short_Input() => _short.Run();
+		public Operation<List<Token>> Run_Short_Input() => _short.Run();
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_KeywordHeavy_Input() => _kwHeavy.Run();
+		public Operation<List<Token>> Run_KeywordHeavy_Input() => _kwHeavy.Run();
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_NumericHeavy_Input() => _numHeavy.Run();
+		public Operation<List<Token>> Run_NumericHeavy_Input() => _numHeavy.Run();
 
 		[Benchmark(Baseline = true)]
-		public Operation<List<IToken>> Run_Mixed_Input() => _mixed.Run();
+		public Operation<List<Token>> Run_Mixed_Input() => _mixed.Run();
 
 		[Benchmark]
-		public Operation<List<IToken>> Run_Long_Input() => _long.Run();
+		public Operation<List<Token>> Run_Long_Input() => _long.Run();
 	}
 }

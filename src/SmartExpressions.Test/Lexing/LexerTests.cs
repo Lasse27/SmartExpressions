@@ -1,8 +1,4 @@
 ﻿using SmartExpressions.Core.Lexing;
-using SmartExpressions.Core.Tokens;
-using SmartExpressions.Core.Tokens.Brackets;
-using SmartExpressions.Core.Tokens.Delimiters;
-using SmartExpressions.Core.Tokens.Registered;
 using SmartExpressions.Core.Utility;
 
 using Xunit.Abstractions;
@@ -11,10 +7,10 @@ namespace SmartExpressions.Test.Lexing
 {
 	public class LexerTests(ITestOutputHelper outputHelper) : BaseTestClass(outputHelper)
 	{
-		private static List<IToken> Tokenize(string input)
+		private static List<Token> Tokenize(string input)
 		{
 			Lexer tokenizer = new Lexer(input);
-			Operation<List<IToken>> result = tokenizer.Run();
+			Operation<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 			return result.Value;
 		}
@@ -22,7 +18,7 @@ namespace SmartExpressions.Test.Lexing
 		private static string TokenizeFailure(string input)
 		{
 			Lexer tokenizer = new Lexer(input);
-			Operation<List<IToken>> result = tokenizer.Run();
+			Operation<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Failure, result.Status);
 			return result.Message;
 		}
@@ -35,7 +31,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_EmptyString_ReturnsEmptyList()
 		{
 			Lexer tokenizer = new Lexer("");
-			Operation<List<IToken>> result = tokenizer.Run();
+			Operation<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 			Assert.Empty(result.Value);
 		}
@@ -44,7 +40,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_WhitespaceOnly_ReturnsEmptyList()
 		{
 			Lexer tokenizer = new Lexer("   \t\n");
-			Operation<List<IToken>> result = tokenizer.Run();
+			Operation<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 			Assert.Empty(result.Value);
 		}
@@ -57,22 +53,15 @@ namespace SmartExpressions.Test.Lexing
 		// -------------------------------------------------------------------------
 
 		[Theory]
-		[InlineData(",", typeof(CommaToken))]
-		[InlineData(".", typeof(DotToken))]
-		[InlineData(":", typeof(ColonToken))]
-		[InlineData(";", typeof(SemiColonToken))]
-		public void Run_SingleDelimiter_ReturnsCorrectToken(string input, Type expectedType)
+		[InlineData(",", TokenType.Comma)]
+		public void Run_SingleDelimiter_ReturnsCorrectToken(string input, TokenType expectedType)
 		{
-			List<IToken> tokens = Tokenize(input);
+			List<Token> tokens = Tokenize(input);
 			_ = Assert.Single(tokens);
-			Assert.IsType(expectedType, tokens[0]);
+			Assert.Equal(expectedType, tokens[0].Type);
 		}
 
-		// -------------------------------------------------------------------------
-		// Bracket tokens
-		// -------------------------------------------------------------------------
 
-		
 
 		// -------------------------------------------------------------------------
 		// Identifier tokens
@@ -81,18 +70,19 @@ namespace SmartExpressions.Test.Lexing
 		[Fact]
 		public void Run_ValidIdentifier_ReturnsIdentifierToken()
 		{
-			List<IToken> tokens = Tokenize("@{TEMP_1}");
+			List<Token> tokens = Tokenize("@{TEMP_1}");
 			_ = Assert.Single(tokens);
-			IdentifierToken token = Assert.IsType<IdentifierToken>(tokens[0]);
-			Assert.Equal("TEMP_1", token.Value);
+			Assert.Equal(TokenType.Identifier, tokens[0].Type);
+			Assert.Equal("TEMP_1", tokens[0].Lexeme);
 		}
 
 		[Fact]
 		public void Run_IdentifierWithWhitespace_ReturnsIdentifierToken()
 		{
-			List<IToken> tokens = Tokenize("  @{MY_VAR}  ");
+			List<Token> tokens = Tokenize("  @{MY_VAR}  ");
 			_ = Assert.Single(tokens);
-			_ = Assert.IsType<IdentifierToken>(tokens[0]);
+			Assert.Equal(TokenType.Identifier, tokens[0].Type);
+			Assert.Equal("MY_VAR", tokens[0].Lexeme);
 		}
 
 		[Fact]
@@ -131,31 +121,31 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_IdentifierCommaIdentifier_ReturnsThreeTokens()
 		{
 			// @{TEMP_1}==@{TEMP_2}  — no spaces
-			List<IToken> tokens = Tokenize("@{TEMP_1},@{TEMP_2}");
+			List<Token> tokens = Tokenize("@{TEMP_1},@{TEMP_2}");
 			Assert.Equal(3, tokens.Count);
-			_ = Assert.IsType<IdentifierToken>(tokens[0]);
-			_ = Assert.IsType<CommaToken>(tokens[1]);
-			_ = Assert.IsType<IdentifierToken>(tokens[2]);
+			Assert.Equal(TokenType.Identifier, tokens[0].Type);
+			Assert.Equal(TokenType.Comma, tokens[1].Type);
+			Assert.Equal(TokenType.Identifier, tokens[2].Type);
 		}
 
 		[Fact]
 		public void Run_And_Keyword_With_Params_Returns_Six_Tokens()
 		{
-			List<IToken> tokens = Tokenize(" AND( @{TEMP_1} , @{TRUE} ) ");
+			List<Token> tokens = Tokenize(" AND( @{TEMP_1} , @{TRUE} ) ");
 			Assert.Equal(6, tokens.Count);
 		}
 
 		[Fact]
 		public void Run_And_Keyword_With_Params_Returns_Correct_Sequence()
 		{
-			List<IToken> tokens = Tokenize(" OR( @{TEMP_1} , @{TRUE} ) ");
+			List<Token> tokens = Tokenize(" OR( @{TEMP_1} , @{TRUE} ) ");
 			Assert.Equal(6, tokens.Count);
-			_ = Assert.IsType<KeywordToken>(tokens[0]);
-			_ = Assert.IsType<LParenToken>(tokens[1]);
-			_ = Assert.IsType<IdentifierToken>(tokens[2]);
-			_ = Assert.IsType<CommaToken>(tokens[3]);
-			_ = Assert.IsType<IdentifierToken>(tokens[4]);
-			_ = Assert.IsType<RParenToken>(tokens[5]);
+			Assert.Equal(TokenType.OrKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.LParen, tokens[1].Type);
+			Assert.Equal(TokenType.Identifier, tokens[2].Type);
+			Assert.Equal(TokenType.Comma, tokens[3].Type);
+			Assert.Equal(TokenType.Identifier, tokens[4].Type);
+			Assert.Equal(TokenType.RParen, tokens[5].Type);
 		}
 
 		[Fact]
@@ -172,9 +162,8 @@ namespace SmartExpressions.Test.Lexing
 		[Fact]
 		public void Run_IdentifierPosition_PointsToAtSign()
 		{
-			List<IToken> tokens = Tokenize("  @{ABC}");
-			IdentifierToken token = Assert.IsType<IdentifierToken>(tokens[0]);
-			Assert.Equal(2, token.Position); // '@' is at index 2
+			List<Token> tokens = Tokenize("  @{ABC}");
+			Assert.Equal(2, tokens[0].Position); // '@' is at index 2
 		}
 
 		// -------------------------------------------------------------------------
@@ -184,14 +173,14 @@ namespace SmartExpressions.Test.Lexing
 		[Fact]
 		public void Run_Finds_Keyword_With_Number_And_Number_Correctly()
 		{
-			List<IToken> tokens = Tokenize("ADD(125,123.0)");
-			_ = Assert.IsType<KeywordToken>(tokens[0]);
-			_ = Assert.IsType<LParenToken>(tokens[1]);
-			_ = Assert.IsType<NumericToken>(tokens[2]);
-			_ = Assert.IsType<CommaToken>(tokens[3]);
-			_ = Assert.IsType<NumericToken>(tokens[4]);
-			_ = Assert.IsType<RParenToken>(tokens[5]);
-			foreach (IToken item in tokens)
+			List<Token> tokens = Tokenize("ADD(125,123.0)");
+			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.LParen, tokens[1].Type);
+			Assert.Equal(TokenType.Numeric, tokens[2].Type);
+			Assert.Equal(TokenType.Comma, tokens[3].Type);
+			Assert.Equal(TokenType.Numeric, tokens[4].Type);
+			Assert.Equal(TokenType.RParen, tokens[5].Type);
+			foreach (Token item in tokens)
 			{
 				this._outputHelper.WriteLine(item.ToString());
 			}
@@ -200,14 +189,14 @@ namespace SmartExpressions.Test.Lexing
 		[Fact]
 		public void Run_Finds_Keyword_With_Identifier_And_Number_Correctly()
 		{
-			List<IToken> tokens = Tokenize("ADD(@{Identifier_BE1_123},123.0)");
-			_ = Assert.IsType<KeywordToken>(tokens[0]);
-			_ = Assert.IsType<LParenToken>(tokens[1]);
-			_ = Assert.IsType<IdentifierToken>(tokens[2]);
-			_ = Assert.IsType<CommaToken>(tokens[3]);
-			_ = Assert.IsType<NumericToken>(tokens[4]);
-			_ = Assert.IsType<RParenToken>(tokens[5]);
-			foreach (IToken item in tokens)
+			List<Token> tokens = Tokenize("ADD(@{Identifier_BE1_123},123.0)");
+			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.LParen, tokens[1].Type);
+			Assert.Equal(TokenType.Identifier, tokens[2].Type);
+			Assert.Equal(TokenType.Comma, tokens[3].Type);
+			Assert.Equal(TokenType.Numeric, tokens[4].Type);
+			Assert.Equal(TokenType.RParen, tokens[5].Type);
+			foreach (Token item in tokens)
 			{
 				this._outputHelper.WriteLine(item.ToString());
 			}
@@ -216,14 +205,14 @@ namespace SmartExpressions.Test.Lexing
 		[Fact]
 		public void Run_Finds_Keyword_With_Identifier_And_Identifier_Correctly()
 		{
-			List<IToken> tokens = Tokenize("ADD(@{Identifier_BE1_123},@{Identifier_BE1_123})");
-			_ = Assert.IsType<KeywordToken>(tokens[0]);
-			_ = Assert.IsType<LParenToken>(tokens[1]);
-			_ = Assert.IsType<IdentifierToken>(tokens[2]);
-			_ = Assert.IsType<CommaToken>(tokens[3]);
-			_ = Assert.IsType<IdentifierToken>(tokens[4]);
-			_ = Assert.IsType<RParenToken>(tokens[5]);
-			foreach (IToken item in tokens)
+			List<Token> tokens = Tokenize("ADD(@{Identifier_BE1_123},@{Identifier_BE1_123})");
+			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.LParen, tokens[1].Type);
+			Assert.Equal(TokenType.Identifier, tokens[2].Type);
+			Assert.Equal(TokenType.Comma, tokens[3].Type);
+			Assert.Equal(TokenType.Identifier, tokens[4].Type);
+			Assert.Equal(TokenType.RParen, tokens[5].Type);
+			foreach (Token item in tokens)
 			{
 				this._outputHelper.WriteLine(item.ToString());
 			}
@@ -232,28 +221,28 @@ namespace SmartExpressions.Test.Lexing
 		[Fact]
 		public void Run_Finds_Keyword_With_Keyword_And_Keyword_Correctly()
 		{
-			List<IToken> tokens = Tokenize("ADD(ADD(1,1),MULT(1,1))");
-			_ = Assert.IsType<KeywordToken>(tokens[0]);
-			_ = Assert.IsType<LParenToken>(tokens[1]);
+			List<Token> tokens = Tokenize("ADD(ADD(1,1),MULT(1,1))");
+			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.LParen, tokens[1].Type);
 
-			_ = Assert.IsType<KeywordToken>(tokens[2]);
-			_ = Assert.IsType<LParenToken>(tokens[3]);
-			_ = Assert.IsType<NumericToken>(tokens[4]);
-			_ = Assert.IsType<CommaToken>(tokens[5]);
-			_ = Assert.IsType<NumericToken>(tokens[6]);
-			_ = Assert.IsType<RParenToken>(tokens[7]);
+			Assert.Equal(TokenType.AddKeyWord, tokens[2].Type);
+			Assert.Equal(TokenType.LParen, tokens[3].Type);
+			Assert.Equal(TokenType.Numeric, tokens[4].Type);
+			Assert.Equal(TokenType.Comma, tokens[5].Type);
+			Assert.Equal(TokenType.Numeric, tokens[6].Type);
+			Assert.Equal(TokenType.RParen, tokens[7].Type);
 
-			_ = Assert.IsType<CommaToken>(tokens[8]);
+			Assert.Equal(TokenType.Comma, tokens[8].Type);
 
-			_ = Assert.IsType<KeywordToken>(tokens[9]);
-			_ = Assert.IsType<LParenToken>(tokens[10]);
-			_ = Assert.IsType<NumericToken>(tokens[11]);
-			_ = Assert.IsType<CommaToken>(tokens[12]);
-			_ = Assert.IsType<NumericToken>(tokens[13]);
-			_ = Assert.IsType<RParenToken>(tokens[14]);
+			Assert.Equal(TokenType.MultKeyWord, tokens[9].Type);
+			Assert.Equal(TokenType.LParen, tokens[10].Type);
+			Assert.Equal(TokenType.Numeric, tokens[11].Type);
+			Assert.Equal(TokenType.Comma, tokens[12].Type);
+			Assert.Equal(TokenType.Numeric, tokens[13].Type);
+			Assert.Equal(TokenType.RParen, tokens[14].Type);
 
-			_ = Assert.IsType<RParenToken>(tokens[15]);
-			foreach (IToken item in tokens)
+			Assert.Equal(TokenType.RParen, tokens[15].Type);
+			foreach (Token item in tokens)
 			{
 				this._outputHelper.WriteLine(item.ToString());
 			}
@@ -262,22 +251,23 @@ namespace SmartExpressions.Test.Lexing
 		[Fact]
 		public void Run_Finds_Keyword_With_Keyword_And_Identifier_Correctly()
 		{
-			List<IToken> tokens = Tokenize("ADD(ADD(1,1),@{BAU_123_BE1})");
-			_ = Assert.IsType<KeywordToken>(tokens[0]);
-			_ = Assert.IsType<LParenToken>(tokens[1]);
+			List<Token> tokens = Tokenize("ADD(ADD(1,1),@{KEY})");
+			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.LParen, tokens[1].Type);
 
-			_ = Assert.IsType<KeywordToken>(tokens[2]);
-			_ = Assert.IsType<LParenToken>(tokens[3]);
-			_ = Assert.IsType<NumericToken>(tokens[4]);
-			_ = Assert.IsType<CommaToken>(tokens[5]);
-			_ = Assert.IsType<NumericToken>(tokens[6]);
-			_ = Assert.IsType<RParenToken>(tokens[7]);
+			Assert.Equal(TokenType.AddKeyWord, tokens[2].Type);
+			Assert.Equal(TokenType.LParen, tokens[3].Type);
+			Assert.Equal(TokenType.Numeric, tokens[4].Type);
+			Assert.Equal(TokenType.Comma, tokens[5].Type);
+			Assert.Equal(TokenType.Numeric, tokens[6].Type);
+			Assert.Equal(TokenType.RParen, tokens[7].Type);
 
-			_ = Assert.IsType<CommaToken>(tokens[8]);
+			Assert.Equal(TokenType.Comma, tokens[8].Type);
 
-			_ = Assert.IsType<IdentifierToken>(tokens[9]);
-			_ = Assert.IsType<RParenToken>(tokens[10]);
-			foreach (IToken item in tokens)
+			Assert.Equal(TokenType.Identifier, tokens[9].Type);
+			Assert.Equal(TokenType.RParen, tokens[10].Type);
+
+			foreach (Token item in tokens)
 			{
 				this._outputHelper.WriteLine(item.ToString());
 			}

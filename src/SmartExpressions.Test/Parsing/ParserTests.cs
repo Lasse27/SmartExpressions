@@ -6,7 +6,6 @@ using SmartExpressions.Core.Nodes.Conditional;
 using SmartExpressions.Core.Nodes.Constants;
 using SmartExpressions.Core.Nodes.Logical;
 using SmartExpressions.Core.Parsing;
-using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Test.Parsing
@@ -20,7 +19,7 @@ namespace SmartExpressions.Test.Parsing
 		private static Operation<ExpressionNode> Parse(string input)
 		{
 			Lexer lexer = new Lexer(input);
-			Operation<List<IToken>> lexResult = lexer.Run();
+			Operation<List<Token>> lexResult = lexer.Run();
 			Assert.True(lexResult.Status == Status.Success, $"Lexer failed: {lexResult.Message}");
 
 			Parser parser = new Parser(lexResult.Value);
@@ -389,7 +388,7 @@ namespace SmartExpressions.Test.Parsing
 		public void Parse_EmptyInput_ReturnsNullNode()
 		{
 			// Empty token list → NullNode per Run() guard
-			Parser parser = new Parser(new List<IToken>());
+			Parser parser = new Parser(new List<Token>());
 			Operation<ExpressionNode> result = parser.Run();
 			Assert.True(result.Status == Status.Success);
 			_ = Assert.IsType<NullNode>(result.Value);

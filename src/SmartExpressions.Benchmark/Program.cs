@@ -1,6 +1,5 @@
 ﻿using System;
 
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace SmartExpressions.Benchmark

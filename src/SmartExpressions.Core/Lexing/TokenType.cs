@@ -1,4 +1,4 @@
-﻿namespace SmartExpressions.Core.Tokens
+﻿namespace SmartExpressions.Core.Lexing
 {
 	public enum TokenType : int
 	{

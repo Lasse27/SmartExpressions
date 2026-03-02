@@ -8,7 +8,6 @@ using Microsoft.VSDiagnostics;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Nodes;
 using SmartExpressions.Core.Parsing;
-using SmartExpressions.Core.Tokens;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Benchmark.Parsing
@@ -35,22 +34,22 @@ namespace SmartExpressions.Benchmark.Parsing
 		private const string LONG =
 			"if(and(gte(add(1, 2), 3), eq(mod(7, 2), 1))) { mult(pow(2, 8), pi) } else { div(abs(neg(100)), sub(10, 3)) }";
 
-		private List<IToken> _tokensSingleNumeric = null!;
-		private List<IToken> _tokensSingleDecimal = null!;
-		private List<IToken> _tokensSingleBool = null!;
-		private List<IToken> _tokensSingleNull = null!;
-		private List<IToken> _tokensSingleConstant = null!;
-		private List<IToken> _tokensSingleIdentifier = null!;
-		private List<IToken> _tokensArithmeticFlat = null!;
-		private List<IToken> _tokensArithmeticNested = null!;
-		private List<IToken> _tokensArithmeticDeep = null!;
-		private List<IToken> _tokensComparisonFlat = null!;
-		private List<IToken> _tokensLogicalFlat = null!;
-		private List<IToken> _tokensLogicalNested = null!;
-		private List<IToken> _tokensIfSimple = null!;
-		private List<IToken> _tokensIfNested = null!;
-		private List<IToken> _tokensMixed = null!;
-		private List<IToken> _tokensLong = null!;
+		private List<Token> _tokensSingleNumeric = null!;
+		private List<Token> _tokensSingleDecimal = null!;
+		private List<Token> _tokensSingleBool = null!;
+		private List<Token> _tokensSingleNull = null!;
+		private List<Token> _tokensSingleConstant = null!;
+		private List<Token> _tokensSingleIdentifier = null!;
+		private List<Token> _tokensArithmeticFlat = null!;
+		private List<Token> _tokensArithmeticNested = null!;
+		private List<Token> _tokensArithmeticDeep = null!;
+		private List<Token> _tokensComparisonFlat = null!;
+		private List<Token> _tokensLogicalFlat = null!;
+		private List<Token> _tokensLogicalNested = null!;
+		private List<Token> _tokensIfSimple = null!;
+		private List<Token> _tokensIfNested = null!;
+		private List<Token> _tokensMixed = null!;
+		private List<Token> _tokensLong = null!;
 
 		[GlobalSetup]
 		public void Setup()
@@ -73,9 +72,9 @@ namespace SmartExpressions.Benchmark.Parsing
 			this._tokensLong = Lex(LONG);
 		}
 
-		private static List<IToken> Lex(string input)
+		private static List<Token> Lex(string input)
 		{
-			Operation<List<IToken>> result = new Lexer(input).Run();
+			Operation<List<	Token>> result = new Lexer(input).Run();
 			return result.Status != Status.Success
 				? throw new InvalidOperationException($"Lexer failed for '{input}': {result.Message}")
 				: result.Value;

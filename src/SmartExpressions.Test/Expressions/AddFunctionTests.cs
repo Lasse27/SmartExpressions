@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Globalization;
+﻿using System.Globalization;
 
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Utility;
@@ -8,9 +7,8 @@ using Xunit.Abstractions;
 
 namespace SmartExpressions.Test.Expressions
 {
-	public class AddFunctionTests(ITestOutputHelper outputHelper) : BaseTestClass(outputHelper)
+	public partial class AddFunctionTests(ITestOutputHelper outputHelper) : BaseTestClass(outputHelper)
 	{
-		public record struct Binding(string Key, object Value);
 		private object EvaluateSuccess(string formula, params Binding[] bindings)
 		{
 			Expression expression = new Expression(formula);

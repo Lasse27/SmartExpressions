@@ -3,18 +3,9 @@ using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Evaluation
 {
-	public class Evaluator
+	public class Evaluator(IDictionary<string, object> bindings)
 	{
-		public IDictionary<string, object> Bindings { get; }
-
-		public EvaluatorOptions Options { get; }
-
-		public Evaluator(EvaluatorOptions options, IDictionary<string, object> bindings)
-		{
-			this.Options = options;
-			this.Bindings = bindings;
-		}
-
+		public IDictionary<string, object> Bindings { get; } = bindings;
 
 		public Operation<object> Run(ExpressionNode node)
 		{

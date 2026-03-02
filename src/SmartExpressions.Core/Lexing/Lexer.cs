@@ -1,10 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
 
-using SmartExpressions.Core.Tokens;
-using SmartExpressions.Core.Tokens.Brackets;
-using SmartExpressions.Core.Tokens.Delimiters;
-using SmartExpressions.Core.Tokens.Registered;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Lexing
@@ -17,7 +13,7 @@ namespace SmartExpressions.Core.Lexing
 		/// <summary> Frozen Dictionary containing all constants and keywords for runtime lookup </summary>
 		internal static readonly FrozenDictionary<string, TokenType> KeywordsLookup;
 		internal readonly string _input;
-		internal readonly List<IToken> _tokens;
+		internal readonly List<Token> _tokens;
 		internal int _pointer;
 		internal int _length;
 
@@ -73,7 +69,7 @@ namespace SmartExpressions.Core.Lexing
 			ArgumentNullException.ThrowIfNull(input, nameof(input));
 
 			this._input = input;
-			this._tokens = new List<IToken>(input.Length / 3); // assume every third char for less copy cicles
+			this._tokens = new List<Token>(input.Length / 3); // assume every third char for less copy cicles
 			this._length = input.Length;
 			this._pointer = 0;
 		}
@@ -104,10 +100,10 @@ namespace SmartExpressions.Core.Lexing
 		public char PeakAtNext() => this._input[this._pointer + 1];
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void AddToken(IToken token) => this._tokens.Add(token);
+		public void AddToken(Token token) => this._tokens.Add(token);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsValidDigitCharacter(char c) 
+		public static bool IsValidDigitCharacter(char c)
 			=> char.IsDigit(c) || c == Characters.DOT || c == Characters.MINUS;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -122,12 +118,12 @@ namespace SmartExpressions.Core.Lexing
 
 		#region Interface methods
 
-		public Operation<List<IToken>> Run()
+		public Operation<List<Token>> Run()
 		{
 			// Guard against stupidity
 			if (string.IsNullOrWhiteSpace(this._input))
 			{
-				return Operation<List<IToken>>.Success(new List<IToken>());
+				return Operation<List<Token>>.Success(new List<Token>());
 			}
 
 			this.ResetTokenizer();
@@ -144,11 +140,11 @@ namespace SmartExpressions.Core.Lexing
 				Operation triState = this.AddTokenByPointer();
 				if (triState.Status != Status.Success)
 				{
-					return Operation<List<IToken>>.Failure(triState.Message);
+					return Operation<List<Token>>.Failure(triState.Message);
 				}
 			}
 
-			return Operation<List<IToken>>.Success(this._tokens);
+			return Operation<List<Token>>.Success(this._tokens);
 		}
 
 		#endregion
@@ -157,30 +153,85 @@ namespace SmartExpressions.Core.Lexing
 		private Operation AddTokenByPointer()
 		{
 			char c = this.PeakAtPointer();
-			return c switch
+			switch (c)
 			{
 				/* 
 				* Bracket tokens
 				*/
-				Characters.LPAREN => LParenToken.Add(this),
-				Characters.RPAREN => RParenToken.Add(this),
-				Characters.LBRACE => LBraceToken.Add(this),
-				Characters.RBRACE => RBraceToken.Get(this),
+				case Characters.LPAREN:
+					this.AddToken(new Token(TokenType.LParen, this._pointer, "("));
+					this.AdvancePointer();
+					return Operation.Success();
+
+				case Characters.RPAREN:
+					this.AddToken(new Token(TokenType.RParen, this._pointer, ")"));
+					this.AdvancePointer();
+					return Operation.Success();
+
+				case Characters.LBRACE:
+					this.AddToken(new Token(TokenType.LBrace, this._pointer, "{"));
+					this.AdvancePointer();
+					return Operation.Success();
+
+				case Characters.RBRACE:
+					this.AddToken(new Token(TokenType.RBrace, this._pointer, "}"));
+					this.AdvancePointer();
+					return Operation.Success();
 
 				/* 
 				* Delimiter tokens
 				*/
-				Characters.COMMA => CommaToken.Add(this),
-				Characters.DOT => DotToken.Add(this),
-				Characters.COLON => ColonToken.Add(this),
-				Characters.SEMICOLON => SemiColonToken.Add(this),
+				case Characters.COMMA:
+					this.AddToken(new Token(TokenType.Comma, this._pointer, ","));
+					this.AdvancePointer();
+					return Operation.Success();
+
 
 				/* 
 				* Keyword and identifier tokens
 				*/
-				Characters.AT => IdentifierToken.Add(this),
-				_ => this.HandleNonDelimitedToken(c),
-			};
+				case Characters.AT:
+					return this.AddIdentifierToken();
+
+				default:
+					return this.HandleNonDelimitedToken(c);
+			}
+		}
+
+		public Operation AddIdentifierToken()
+		{
+			int entryP = this._pointer;
+
+			this.AdvancePointer(); // Skip @
+			if (this.PointerIsAtEnd() || this.PeakAtPointer() != Characters.LBRACE)
+			{
+				return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
+			}
+
+			this.AdvancePointer(); // Skip {
+			int identifierStart = this._pointer;
+
+			while (!this.PointerIsAtEnd() && this.PeakAtPointer() != Characters.RBRACE)
+			{
+				this.AdvancePointer();
+			}
+
+			if (this.PointerIsAtEnd())
+			{
+				return Operation.Failure($"Unclosed identifier starting at index {entryP}.");
+			}
+
+			string identifier = this._input.Substring(identifierStart, this._pointer - identifierStart);
+			if (string.IsNullOrWhiteSpace(identifier))
+			{
+				return Operation.Failure($"Empty identifier at index {entryP}.");
+			}
+
+			this.AdvancePointer(); // Skip }
+			this.AddToken(new Token(TokenType.Identifier, entryP, identifier));
+
+			// Added
+			return Operation.Success();
 		}
 
 		private Operation HandleNonDelimitedToken(char c)
@@ -188,17 +239,51 @@ namespace SmartExpressions.Core.Lexing
 			if (IsValidDigitCharacter(c))
 			{
 				// Parse for numbers first
-				return NumericToken.Add(this);
+				return this.AddNumericToken();
 			}
 
 			if (char.IsLetter(c))
 			{
 				// Keywords last
-				return KeywordToken.Add(this);
+				return this.AddKeyWordToken();
 			}
 
 			// If none found, return failure
 			return Operation.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
+		}
+
+		public  Operation AddKeyWordToken()
+		{
+			int entryPointer = this._pointer;
+
+			while (!this.PointerIsAtEnd() && this.IsValidKeywordCharacter())
+			{
+				this.AdvancePointer();
+			}
+
+			// No allocate for lookup
+			string word = this._input.Substring(entryPointer, this._pointer - entryPointer);
+			if (Lexer.KeywordsLookup.TryGetValue(word, out TokenType tokentype))
+			{
+				// Substr only on found tokentype
+				this.AddToken(new Token(tokentype, entryPointer, word));
+				return Operation.Success();
+			}
+
+			return Operation.Failure($"Unknown keyword starting at index {entryPointer}.");
+		}
+
+		public  Operation AddNumericToken()
+		{
+			int entryPointer = this._pointer;
+			while (!this.PointerIsAtEnd() && Lexer.IsValidDigitCharacter(this.PeakAtPointer()))
+			{
+				this.AdvancePointer();
+			}
+
+			string number = this._input.Substring(entryPointer, this._pointer - entryPointer);
+			this.AddToken(new Token(TokenType.Numeric, entryPointer, number));
+			return Operation.Success();
 		}
 	}
 }
