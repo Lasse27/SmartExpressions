@@ -1,4 +1,5 @@
 # SmartExpressions
+[![.NET Master](https://github.com/Lasse27/SmartExpressions/actions/workflows/dotnet-master.yml/badge.svg?branch=master)](https://github.com/Lasse27/SmartExpressions/actions/workflows/dotnet-master.yml)
 
 ## EBNF
 ```
