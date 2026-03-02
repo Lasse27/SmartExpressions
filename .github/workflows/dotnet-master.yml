@@ -3,8 +3,6 @@ name: .NET Master
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: ["master" ]
 
 jobs:
   release:
@@ -21,7 +19,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
         
     - name: Restore dependencies
       run: dotnet restore
@@ -35,9 +33,6 @@ jobs:
       id: gitversion
       uses: gittools/actions/gitversion/execute@v0
       
-    - name: Test
-      run: dotnet test
-
     - name: Build
       run: dotnet build -c Release /p:Version=${{ steps.gitversion.outputs.SemVer }}
       

@@ -1,10 +1,10 @@
-name: .NET Development
+name: .NET Continuous Integration
 
 on:
   push:
-    branches: [ "development" ]
+    branches: [ "master", "development" ]
   pull_request:
-    branches: ["development" ]
+    branches: [ "master", "development" ]
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
       run: dotnet build -c Release
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test
 
     - name: Pack
       run: dotnet pack -c Release --no-build
