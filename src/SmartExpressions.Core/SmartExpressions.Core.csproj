@@ -3,6 +3,12 @@
   <PropertyGroup>
 	  <TargetFramework>net9.0</TargetFramework>
 	  <ImplicitUsings>enable</ImplicitUsings>
+	  <AssemblyTitle>SmartExpressions</AssemblyTitle>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <SignAssembly>False</SignAssembly>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <PackageId />
+	  <Title>SmartExpressions</Title>
   </PropertyGroup>
 
 </Project>
