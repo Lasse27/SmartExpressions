@@ -1,4 +1,4 @@
-mode: ContinuousDelivery
+mode: ContinuousDeployment
 tag-prefix: '[vV]'
 next-version: 1.0.0
 commit-message-incrementing: Enabled
@@ -9,5 +9,6 @@ patch-version-bump-message: '^(fix|perf|refactor)(\(.+\))?:'
 
 branches:
   main:
-    regex: ^main$
+    regex: ^master$
     increment: Patch
+    is-release-branch: true
