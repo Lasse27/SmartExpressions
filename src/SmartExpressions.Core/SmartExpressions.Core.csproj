@@ -21,11 +21,21 @@
 	  <RepositoryType>git</RepositoryType>
 	  <PackageTags>evaluation;expressions;textual-math</PackageTags>
 	  <NeutralLanguage>en</NeutralLanguage>
-	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	  <PackageProjectUrl>https://www.nuget.org/packages/SmartExpressions</PackageProjectUrl>
+	  <Copyright>MIT License</Copyright>
+	  <Description>SmartExpressions is a .NET-based framework for parsing and evaluating expressions. 
+It provides a custom expression parser and evaluator supporting arithmetic, logical, and comparison operators, as well as variables, constants, and nested expressions. 
+The library is designed for applications that require dynamic runtime calculation and interpretation of expressions. 
+For more information, visit: https://github.com/Lasse27/SmartExpressions</Description>
+	  <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
