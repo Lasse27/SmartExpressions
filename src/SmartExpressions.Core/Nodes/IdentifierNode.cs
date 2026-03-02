@@ -19,7 +19,7 @@ namespace SmartExpressions.Core.Nodes
 			return Operation<ExpressionNode>.Success(new IdentifierNode(current.Lexeme));
 		}
 
-		public override Operation<object> Evaluate(Evaluator evaluator)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
 			if (evaluator.Bindings.TryGetValue(this.Key, out object value))
 			{

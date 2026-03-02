@@ -27,8 +27,8 @@ namespace SmartExpressions.Benchmark.Expressions
 			_ = this._nestedExpression.Assemble();
 
 			this._identifierExpression = new Expression(IdentifierFormula);
-			_ = this._identifierExpression.BindParameter("A", 100);
-			_ = this._identifierExpression.BindParameter("B", 200);
+			_ = this._identifierExpression.Bind("A", 100);
+			_ = this._identifierExpression.Bind("B", 200);
 			_ = this._identifierExpression.Assemble();
 		}
 
@@ -54,8 +54,8 @@ namespace SmartExpressions.Benchmark.Expressions
 		public void Assemble_With_Identifiers()
 		{
 			Expression expr = new Expression(IdentifierFormula);
-			_ = expr.BindParameter("A", 100);
-			_ = expr.BindParameter("B", 200);
+			_ = expr.Bind("A", 100);
+			_ = expr.Bind("B", 200);
 			_ = expr.Assemble();
 		}
 

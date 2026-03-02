@@ -1,15 +1,22 @@
-﻿using SmartExpressions.Core.Evaluation;
+﻿using System.Diagnostics;
+
+using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Arithmetic
 {
+	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record NegativeNode : ExpressionNode
 	{
+		private const string Keyword = "NEG";
 		public ExpressionNode Operand { get; set; }
 
-		public NegativeNode(ExpressionNode operand) => this.Operand = operand;
+
+		public NegativeNode(ExpressionNode operand)
+			=> this.Operand = operand;
+
 
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
@@ -42,22 +49,26 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
-			Operation<object> raw = this.Operand.Evaluate(evaluator);
+			Operation<object> raw = this.Operand.Evaluate(evaluator, listener);
 			if (raw.Status == Status.Failure)
 			{
 				return raw;
 			}
 
-			Operation<decimal> resolved = EvaluatorHelpers.ResolveDecimal(raw, "Neg");
+			Operation<decimal> resolved = EvaluatorHelpers.ResolveDecimal(raw, Keyword);
 			if (resolved.Status == Status.Failure)
 			{
 				return Operation<object>.Failure(resolved.Message);
 			}
 
 			decimal negatived = resolved.Value * (-1);
+			listener?.Report($"{this} = {negatived}");
 			return Operation<object>.Success(negatived);
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => $"{Keyword}({this.Operand})";
 	}
 }

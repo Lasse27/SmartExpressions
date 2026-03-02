@@ -7,6 +7,8 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	public record AbsoluteNode : ExpressionNode
 	{
+		private const string Keyword = "ABS";
+
 		public ExpressionNode Operand { get; set; }
 
 		public AbsoluteNode(ExpressionNode operand) => this.Operand = operand;
@@ -43,22 +45,26 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
-			Operation<object> raw = this.Operand.Evaluate(evaluator);
+			Operation<object> raw = this.Operand.Evaluate(evaluator, listener);
 			if (raw.Status == Status.Failure)
 			{
 				return raw;
 			}
 
-			Operation<decimal> resolved = EvaluatorHelpers.ResolveDecimal(raw, "Abs");
+			Operation<decimal> resolved = EvaluatorHelpers.ResolveDecimal(raw, Keyword);
 			if (resolved.Status == Status.Failure)
 			{
 				return Operation<object>.Failure(resolved.Message);
 			}
 
 			decimal absolute = Math.Abs(resolved.Value);
+			listener?.Report($"{this} = {absolute}");
 			return Operation<object>.Success(absolute);
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => $"{Keyword}({this.Operand})";
 	}
 }

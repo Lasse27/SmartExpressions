@@ -11,7 +11,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		public SumNode(List<ExpressionNode> operands)
 			=> this.operands = operands;
 
-		
+
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			Operation<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
@@ -25,7 +25,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
 			decimal sum = 0;
 			for (int i = 0; i < this.operands.Count; i++)

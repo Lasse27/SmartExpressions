@@ -1,24 +1,25 @@
-﻿using SmartExpressions.Core.Evaluation;
+﻿using System.Diagnostics;
+
+using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Arithmetic
 {
-	public record SubtractNode : ExpressionNode
+	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
+	public record SubtractNode : TwoOperandFunction
 	{
-		public ExpressionNode Left { get; set; }
-		public ExpressionNode Right { get; set; }
+		private const string Keyword = "SUB";
 
-		public SubtractNode(ExpressionNode left, ExpressionNode right)
-		{
-			this.Left = left;
-			this.Right = right;
-		}
+		/// <inheritdoc/>
+		public SubtractNode(ExpressionNode left, ExpressionNode right) : base(left, right) { }
 
-		
+		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
+		/// <param name="parser"> The parser that is checked for the node. </param>
+		/// <returns> A <see cref="Operation{T}"/> object containing the parsed node or an error. </returns>
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
-			Operation<DualOperand> dualOperand = ParserHelpers.ParseDualOperandKeyword(parser);
+			Operation<DoubleOperand> dualOperand = ParserHelpers.ParseDualOperandKeyword(parser);
 			if (dualOperand.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(dualOperand.Message);
@@ -29,22 +30,27 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
-			Operation<object> rawLeft = this.Left.Evaluate(evaluator);
+			Operation<object> rawLeft = this.Left.Evaluate(evaluator, listener);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
 
-			Operation<decimal> resolvedLeft = EvaluatorHelpers.ResolveDecimal(rawLeft, "Sub.1");
+			Operation<decimal> resolvedLeft = EvaluatorHelpers.ResolveDecimal(rawLeft, Keyword);
 			if (resolvedLeft.Status == Status.Failure) { return Operation<object>.Failure(resolvedLeft.Message); }
 
-			Operation<object> rawRight = this.Right.Evaluate(evaluator);
+			Operation<object> rawRight = this.Right.Evaluate(evaluator, listener);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
-			Operation<decimal> resolvedRight = EvaluatorHelpers.ResolveDecimal(rawRight, "Sub.2");
+			Operation<decimal> resolvedRight = EvaluatorHelpers.ResolveDecimal(rawRight, Keyword);
 			if (resolvedRight.Status == Status.Failure) { return Operation<object>.Failure(resolvedRight.Message); }
 
-			// Add adn return
+			// Subtract and return
+			decimal sub = resolvedLeft.Value - resolvedRight.Value;
+			listener?.Report($"{this} = {sub}");
 			return Operation<object>.Success(resolvedLeft.Value - resolvedRight.Value);
 		}
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

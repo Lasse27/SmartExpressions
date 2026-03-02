@@ -6,7 +6,7 @@ namespace SmartExpressions.Core.Parsing
 {
 	public static partial class ParserHelpers
 	{
-		public static Operation<DualOperand> ParseDualOperandKeyword(Parser parser)
+		public static Operation<DoubleOperand> ParseDualOperandKeyword(Parser parser)
 		{
 			// Skip keyword
 			parser.AdvancePointer();
@@ -15,7 +15,7 @@ namespace SmartExpressions.Core.Parsing
 			Operation check = parser.CheckCurrent(TokenType.LParen);
 			if (check.Status == Status.Failure)
 			{
-				return Operation<DualOperand>.Failure(check.Message);
+				return Operation<DoubleOperand>.Failure(check.Message);
 			}
 			parser.AdvancePointer();
 
@@ -23,14 +23,14 @@ namespace SmartExpressions.Core.Parsing
 			Operation<ExpressionNode> left = parser.ParseExpression(); // points to next token
 			if (left.Status == Status.Failure)
 			{
-				return Operation<DualOperand>.Failure(left.Message);
+				return Operation<DoubleOperand>.Failure(left.Message);
 			}
 
 			// Check for comma
 			check = parser.CheckCurrent(TokenType.Comma);
 			if (check.Status == Status.Failure)
 			{
-				return Operation<DualOperand>.Failure(check.Message);
+				return Operation<DoubleOperand>.Failure(check.Message);
 			}
 			parser.AdvancePointer();
 
@@ -38,18 +38,18 @@ namespace SmartExpressions.Core.Parsing
 			Operation<ExpressionNode> right = parser.ParseExpression(); // points to next token
 			if (right.Status == Status.Failure)
 			{
-				return Operation<DualOperand>.Failure(right.Message);
+				return Operation<DoubleOperand>.Failure(right.Message);
 			}
 
 			// Check for right parenthesis
 			check = parser.CheckCurrent(TokenType.RParen);
 			if (check.Status == Status.Failure)
 			{
-				return Operation<DualOperand>.Failure(check.Message);
+				return Operation<DoubleOperand>.Failure(check.Message);
 			}
 			parser.AdvancePointer();
 
-			return Operation<DualOperand>.Success(new(left.Value, right.Value));
+			return Operation<DoubleOperand>.Success(new(left.Value, right.Value));
 		}
 
 		public static Operation<List<ExpressionNode>> ParseNCountOperandKeyword(Parser parser)

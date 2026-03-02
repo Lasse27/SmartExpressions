@@ -7,10 +7,10 @@ namespace SmartExpressions.Core.Evaluation
 	{
 		public IDictionary<string, object> Bindings { get; } = bindings;
 
-		public Operation<object> Run(ExpressionNode node)
+		public Operation<object> Run(ExpressionNode node, IProgress<string> listener = default)
 		{
 			ArgumentNullException.ThrowIfNull(node);
-			return node.Evaluate(this);
+			return node.Evaluate(this, listener);
 		}
 	}
 }

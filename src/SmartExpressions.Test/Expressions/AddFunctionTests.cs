@@ -14,10 +14,13 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(formula);
 			foreach (Binding binding in bindings)
 			{
-				_ = expression.BindParameter(binding.Key, binding.Value);
+				_ = expression.Bind(binding.Key, binding.Value);
 			}
 			_ = expression.Assemble();
-			Operation<object> result = expression.Evaluate();
+
+			Progress<string> progress = new Progress<string>();
+			progress.ProgressChanged += (s, e) => this._outputHelper.WriteLine(e);
+			Operation<object> result = expression.Evaluate(progress);
 			if (result.Status == Status.Failure)
 			{
 				this._outputHelper.WriteLine("Input: " + formula);
@@ -28,6 +31,7 @@ namespace SmartExpressions.Test.Expressions
 			_ = Assert.IsType<decimal>(result.Value);
 			return result.Value;
 		}
+
 
 		[Fact]
 		public void Add_Function_Evaluate_Is_Deterministic()
@@ -166,7 +170,7 @@ namespace SmartExpressions.Test.Expressions
 		}
 
 		// -----------------------------------------------
-		// Recursive add node type
+		// Recursive node type
 		// -----------------------------------------------
 
 		[Fact]
@@ -177,29 +181,80 @@ namespace SmartExpressions.Test.Expressions
 			Assert.Equal(left, right);
 		}
 
-		[Fact]
-		public void Add_Function_Adds_Integer_And_Add_Function()
+		public static IEnumerable<object[]> Get_Integer_And_Function()
 		{
-			object value = this.EvaluateSuccess("ADD(1,ADD(1,99))");
-			Assert.Equal(101m, value);
+			return
+			[
+				["ADD(1,Abs(-99.9))",100.9m],
+				["ADD(1,ADD(1,99))",101m],
+				["ADD(1,DIV(4,2))",3m],
+				["ADD(1,MOD(4,2))",1m],
+				["ADD(1,MULT(4,2))",9m],
+				["ADD(1,NEG(2))",-1m],
+				["ADD(1,POW(2,3))",9m],
+				["ADD(1,ROOT(4,2))",3m],
+				["ADD(1,SUB(4,2))",3m],
+			];
+		}
+
+		[Theory]
+		[MemberData(nameof(Get_Integer_And_Function))]
+		public void Add_Function_Adds_Integer_And_Function(string formula, decimal result)
+		{
+			object value = this.EvaluateSuccess(formula);
+			Assert.Equal(result, value);
+		}
+
+		public static IEnumerable<object[]> Get_Float_And_Function()
+		{
+			return
+			[
+				["ADD(2.5,Abs(-99.9))",102.4m],
+				["ADD(2.5,ADD(1,99))", 102.5m],
+				["ADD(2.5,DIV(4,2))", 4.5m],
+				["ADD(2.5,MOD(4,2))", 2.5m],
+				["ADD(2.5,MULT(4,2))", 10.5m],
+				["ADD(2.5,NEG(2))", 0.5m],
+				["ADD(2.5,POW(2,3))", 10.5m],
+				["ADD(2.5,ROOT(4,2))", 4.5m],
+				["ADD(2.5,SUB(4,2))", 4.5m],
+			];
+		}
+
+		[Theory]
+		[MemberData(nameof(Get_Float_And_Function))]
+		public void Add_Function_Adds_Float_And_Function(string formula, decimal result)
+		{
+			object value = this.EvaluateSuccess(formula);
+			Assert.Equal(result, value);
+		}
+
+		public static IEnumerable<object[]> Get_Constant_And_Function()
+		{
+			return
+			[
+				["ADD(PI,Abs(-99.9))",99.9m + (decimal)Math.PI],
+				["ADD(PI,ADD(1,99))", 100m + (decimal)Math.PI],
+				["ADD(PI,DIV(4,2))", 2m + (decimal)Math.PI],
+				["ADD(PI,MOD(4,2))", 0m + (decimal)Math.PI],
+				["ADD(PI,MULT(4,2))", 8m + (decimal)Math.PI],
+				["ADD(PI,NEG(2))", -2m + (decimal)Math.PI],
+				["ADD(PI,POW(2,3))", 8m + (decimal)Math.PI],
+				["ADD(PI,ROOT(4,2))", 2m + (decimal)Math.PI],
+				["ADD(PI,SUB(4,2))", 2m + (decimal)Math.PI],
+			];
+		}
+
+		[Theory]
+		[MemberData(nameof(Get_Constant_And_Function))]
+		public void Add_Function_Adds_Constant_And_Function(string formula, decimal result)
+		{
+			object value = this.EvaluateSuccess(formula);
+			Assert.Equal(result, value);
 		}
 
 		[Fact]
-		public void Add_Function_Adds_Float_And_Add_Function()
-		{
-			object value = this.EvaluateSuccess("ADD(2.55,ADD(1,99))");
-			Assert.Equal(102.55m, value);
-		}
-
-		[Fact]
-		public void Add_Function_Adds_Constant_And_Add_Function()
-		{
-			object value = this.EvaluateSuccess("ADD(PI,ADD(1,99))");
-			Assert.Equal((decimal)(Math.PI + 100), (decimal)value, 10);
-		}
-
-		[Fact]
-		public void Add_Function_Adds_Identifier_And_Add_Function()
+		public void Add_Function_Adds_Identifier_And_Function()
 		{
 			object value = this.EvaluateSuccess("ADD(@{Key_1},ADD(1,99))", new Binding("Key_1", 1));
 			Assert.Equal(101, (decimal)value, 10);
@@ -243,8 +298,8 @@ namespace SmartExpressions.Test.Expressions
 			string formula = "ADD(@{A},@{B})";
 
 			Expression expression = new Expression(formula);
-			_ = expression.BindParameter("A", left);
-			_ = expression.BindParameter("B", right);
+			_ = expression.Bind("A", left);
+			_ = expression.Bind("B", right);
 
 			_ = expression.Assemble();
 			Operation<object> result = expression.Evaluate();
@@ -263,7 +318,7 @@ namespace SmartExpressions.Test.Expressions
 		{
 			Random random = new Random(42);
 
-			for (int i = 0; i < 1000; i++)
+			for (int i = 0; i < 100_000; i++)
 			{
 				decimal a = (decimal)((random.NextDouble() * 1000) - 500);
 				decimal b = (decimal)((random.NextDouble() * 1000) - 500);

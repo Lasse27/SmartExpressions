@@ -26,7 +26,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator) 
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 			=> Operation<object>.Success(this.operands.Count);
 	}
 }

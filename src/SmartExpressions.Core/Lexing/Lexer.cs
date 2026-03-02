@@ -252,7 +252,7 @@ namespace SmartExpressions.Core.Lexing
 			return Operation.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
 		}
 
-		public  Operation AddKeyWordToken()
+		public Operation AddKeyWordToken()
 		{
 			int entryPointer = this._pointer;
 
@@ -273,7 +273,7 @@ namespace SmartExpressions.Core.Lexing
 			return Operation.Failure($"Unknown keyword starting at index {entryPointer}.");
 		}
 
-		public  Operation AddNumericToken()
+		public Operation AddNumericToken()
 		{
 			int entryPointer = this._pointer;
 			while (!this.PointerIsAtEnd() && Lexer.IsValidDigitCharacter(this.PeakAtPointer()))

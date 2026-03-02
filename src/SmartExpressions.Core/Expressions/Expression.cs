@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-using SmartExpressions.Core.Evaluation;
+﻿using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Nodes;
 using SmartExpressions.Core.Parsing;
@@ -20,14 +18,15 @@ namespace SmartExpressions.Core.Expressions
 		/// <summary> Gets the textual formula of the expression. </summary>
 		public string Formula { get; private set; }
 
+
+		/// <summary> Gets the parameter dictionary used during expression evaluation. </summary>
+		public Dictionary<string, object> Bindings { get; private set; }
+
 		/// <summary> Gets the tokens produced from the formula after tokenization. </summary>
 		private List<Token> _tokens;
 
 		/// <summary> Gets the root node obtaining after parsing the tokens. </summary>
 		private ExpressionNode _root;
-
-		/// <summary> Gets the parameter dictionary used during expression evaluation. </summary>
-		public ConcurrentDictionary<string, object> Bindings { get; private set; }
 
 		/// <summary> Gets a value indicating whether the expression has been successfully tokenized . </summary>
 		private bool _isTokenized = false;
@@ -77,16 +76,22 @@ namespace SmartExpressions.Core.Expressions
 
 
 		/// <summary> Binds multiple parameters to the expression. Existing keys are overwritten. </summary>
-		/// <param name="parameters">A collection of parameter key-value pairs.</param>
+		/// <param name="bindings">A collection of parameter key-value pairs.</param>
 		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
-		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="parameters"/> is <see langword="null"/>. </exception>
-		public Expression BindParameters(IDictionary<string, object> parameters)
+		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="bindings"/> is <see langword="null"/>. </exception>
+		public Expression Bind(IDictionary<string, object> bindings)
 		{
-			ArgumentNullException.ThrowIfNull(parameters, nameof(parameters));
-
-			foreach (KeyValuePair<string, object> parameter in parameters)
+			ArgumentNullException.ThrowIfNull(bindings, nameof(bindings));
+			foreach (KeyValuePair<string, object> parameter in bindings)
 			{
-				_ = this.Bindings.AddOrUpdate(parameter.Key, parameter.Value, (_, _) => parameter.Value);
+				if (this.Bindings.TryGetValue(parameter.Key, out object _))
+				{
+					this.Bindings[parameter.Key] = parameter.Value;
+				}
+				else
+				{
+					this.Bindings.Add(parameter.Key, parameter.Value);
+				}
 			}
 			return this;
 		}
@@ -98,12 +103,19 @@ namespace SmartExpressions.Core.Expressions
 		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
 		/// <exception cref="ArgumentException"> Thrown if <paramref name="key"/> is null, empty, or whitespace. </exception>
 		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="value"/> is <see langword="null"/>. </exception>
-		public Expression BindParameter(string key, object value)
+		public Expression Bind(string key, object value)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
 			ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-			_ = this.Bindings.AddOrUpdate(key, value, (_, _) => value);
+			if (this.Bindings.TryGetValue(key, out object _))
+			{
+				this.Bindings[key] = value;
+			}
+			else
+			{
+				this.Bindings.Add(key, value);
+			}
 			return this;
 		}
 
@@ -184,8 +196,8 @@ namespace SmartExpressions.Core.Expressions
 		}
 
 		/// <inheritdoc/>
-		/// <remarks> If <see cref="AssembleOnEvaluation"/> is enabled, the expression is tokenized and parsed automatically before evaluation. </remarks>
-		public Operation<object> Evaluate()
+		/// <remarks> If <see cref="AssembleOnEvaluation"/> is enabled, the expression is tokenized and parsed automatically if nedded before evaluation. </remarks>
+		public Operation<object> Evaluate(IProgress<string> listener = default)
 		{
 			if (this.AssembleOnEvaluation)
 			{
@@ -204,8 +216,8 @@ namespace SmartExpressions.Core.Expressions
 			}
 			else
 			{
-				Evaluator evaluator = new Evaluator( this.Bindings);
-				return evaluator.Run(this._root);
+				Evaluator evaluator = new Evaluator(this.Bindings);
+				return evaluator.Run(this._root, listener);
 			}
 		}
 	}

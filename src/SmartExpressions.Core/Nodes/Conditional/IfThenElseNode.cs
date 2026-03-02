@@ -99,16 +99,16 @@ namespace SmartExpressions.Core.Nodes.Conditional
 
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
-			Operation<object> result = this.Condition.Evaluate(evaluator);
+			Operation<object> result = this.Condition.Evaluate(evaluator, listener);
 			Operation<bool> condition = EvaluatorHelpers.ResolveBoolean(result, "IF");
 			if (condition.Status == Status.Failure) { return Operation<object>.Failure(condition.Message); }
 
 			// Handle then else
-			return condition.Value == true 
-				? this.Then.Evaluate(evaluator) 
-				: this.Else.Evaluate(evaluator);
+			return condition.Value == true
+				? this.Then.Evaluate(evaluator, listener)
+				: this.Else.Evaluate(evaluator, listener);
 		}
 	}
 }

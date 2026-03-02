@@ -6,6 +6,6 @@ namespace SmartExpressions.Core.Utility
 	{
 		/// <summary> Evaluates the object and returns the computed result. </summary>
 		/// <returns> A <see cref="Operation{T}"/> containing the evaluation result if successful; otherwise, failure information. </returns>
-		Operation<object> Evaluate(Evaluator evaluator);
+		Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default);
 	}
 }

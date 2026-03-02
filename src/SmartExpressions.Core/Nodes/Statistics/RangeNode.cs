@@ -25,7 +25,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
 			decimal min = decimal.MinValue;
 			decimal max = decimal.MaxValue;
