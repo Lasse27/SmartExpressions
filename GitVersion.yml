@@ -1,21 +1,13 @@
 mode: ContinuousDelivery
 tag-prefix: '[vV]'
 next-version: 1.0.0
+commit-message-incrementing: Enabled
+
+major-version-bump-message: '\+semver:\s?(major|breaking)'
+minor-version-bump-message: '^(feat)(\(.+\))?:'
+patch-version-bump-message: '^(fix|perf|refactor)(\(.+\))?:'
 
 branches:
-  master:
-    regex: ^master$
-    increment: Minor
-    prevent-increment-of-merged-branch-version: true
-    track-merge-target: false
-
-  development:
-    regex: ^development$
-    increment: Minor
-    tag: alpha
-    track-merge-target: true
-    source-branches:
-      - master
-
-ignore:
-  sha: []
+  main:
+    regex: ^main$
+    increment: Patch
