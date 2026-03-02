@@ -1,4 +1,4 @@
-name: .NET Development
+name: .NET Continuous Integration
 
 on:
   push:
