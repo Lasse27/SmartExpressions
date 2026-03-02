@@ -3,7 +3,7 @@ tag-prefix: '[vV]'
 next-version: 1.0.0
 
 branches:
-  main:
+  master:
     regex: ^master$
     increment: Minor
     prevent-increment-of-merged-branch-version: true
@@ -12,7 +12,7 @@ branches:
   development:
     regex: ^development$
     increment: Minor
-    label: alpha
+    tag: alpha
     track-merge-target: true
     source-branches:
       - master
