@@ -28,6 +28,7 @@
 		RootKeyWord,
 		NegKeyWord,
 		PowerKeyWord,
+		RandKeyWord,
 
 		// Logical keywords
 		AndKeyWord,

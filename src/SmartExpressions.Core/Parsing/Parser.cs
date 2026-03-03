@@ -62,7 +62,7 @@ namespace SmartExpressions.Core.Parsing
 		public Token PeakAtNext() => this._input[this._pointer + 1];
 
 
-		public Operation CheckCurrent(TokenType expected)
+		public Operation Check(TokenType expected)
 		{
 			if (this.PointerIsAtEnd())
 			{
@@ -74,6 +74,8 @@ namespace SmartExpressions.Core.Parsing
 			{
 				return Operation.Failure($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
 			}
+
+			this.AdvancePointer();
 
 			// Valid check
 			return Operation.Success();
@@ -121,6 +123,7 @@ namespace SmartExpressions.Core.Parsing
 				TokenType.PowerKeyWord => PowerNode.Get(this),
 				TokenType.RootKeyWord => RootNode.Get(this),
 				TokenType.SubKeyWord => SubtractNode.Get(this),
+				TokenType.RandKeyWord => RandomNode.Get(this),
 
 				// Logical keywords
 				TokenType.AndKeyWord => AndNode.Get(this),

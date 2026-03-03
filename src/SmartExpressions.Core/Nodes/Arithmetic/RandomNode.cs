@@ -4,15 +4,15 @@ using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
-namespace SmartExpressions.Core.Nodes.Logical
+namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record AndNode : TwoOperandFunction
+	public record RandomNode : TwoOperandFunction
 	{
-		private const string Keyword = "AND";
+		private const string Keyword = "RAND";
 
 		/// <inheritdoc/>
-		public AndNode(ExpressionNode left, ExpressionNode right) : base(left, right) { }
+		public RandomNode(ExpressionNode left, ExpressionNode right) : base(left, right) { }
 
 		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
 		/// <param name="parser"> The parser that is checked for the node. </param>
@@ -25,35 +25,32 @@ namespace SmartExpressions.Core.Nodes.Logical
 				return Operation<ExpressionNode>.Failure(dualOperand.Message);
 			}
 
-			ExpressionNode node = new AndNode(dualOperand.Value.Left, dualOperand.Value.Right);
+			ExpressionNode node = new RandomNode(dualOperand.Value.Left, dualOperand.Value.Right);
 			return Operation<ExpressionNode>.Success(node);
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = null)
 		{
-			// Left operand
 			Operation<object> rawLeft = this.Left.Evaluate(evaluator, listener);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
 
-			Operation<bool> resolvedLeft = EvaluatorHelpers.ResolveBoolean(rawLeft, Keyword);
+			Operation<decimal> resolvedLeft = EvaluatorHelpers.ResolveDecimal(rawLeft, Keyword);
 			if (resolvedLeft.Status == Status.Failure) { return Operation<object>.Failure(resolvedLeft.Message); }
 
-			// Short circuit
-			if (resolvedLeft.Value == false)
-			{
-				return Operation<object>.Success(false);
-			}
-
-			// Right operand
 			Operation<object> rawRight = this.Right.Evaluate(evaluator, listener);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
-			Operation<bool> resolvedRight = EvaluatorHelpers.ResolveBoolean(rawRight, Keyword);
+			Operation<decimal> resolvedRight = EvaluatorHelpers.ResolveDecimal(rawRight, Keyword);
 			if (resolvedRight.Status == Status.Failure) { return Operation<object>.Failure(resolvedRight.Message); }
 
-			// AND and return
-			bool value = resolvedLeft.Value && resolvedRight.Value;
+			decimal min = resolvedLeft.Value;
+			decimal max = resolvedRight.Value;
+
+
+			// Rand and return
+			Random random = new Random();
+			decimal value = min + ((decimal)random.NextDouble() * (max - min));
 			listener?.Report($"{this} = {value}");
 			return Operation<object>.Success(value);
 		}

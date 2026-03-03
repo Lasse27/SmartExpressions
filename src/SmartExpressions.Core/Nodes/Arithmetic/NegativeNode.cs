@@ -24,24 +24,22 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			parser.AdvancePointer();
 
 			// Check for left parenthesis
-			Operation check = parser.CheckCurrent(TokenType.LParen);
+			Operation check = parser.Check(TokenType.LParen);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer();
 
 			// Get operand
 			Operation<ExpressionNode> operand = parser.ParseExpression();
 			if (operand.Status == Status.Failure) { return operand; }
 
 			// Check for right parenthesis
-			check = parser.CheckCurrent(TokenType.RParen);
+			check = parser.Check(TokenType.RParen);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer();
 
 			// Build and return
 			ExpressionNode node = new NegativeNode(operand.Value);
