@@ -35,6 +35,7 @@ namespace SmartExpressions.Core.Lexing
 			Keywords.Add("pow", TokenType.PowerKeyWord);
 			Keywords.Add("root", TokenType.RootKeyWord);
 			Keywords.Add("sub", TokenType.SubKeyWord);
+			Keywords.Add("rand", TokenType.RandKeyWord);
 
 			// Comparison
 			Keywords.Add("eq", TokenType.EqualKeyWord);

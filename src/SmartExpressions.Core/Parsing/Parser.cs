@@ -123,6 +123,7 @@ namespace SmartExpressions.Core.Parsing
 				TokenType.PowerKeyWord => PowerNode.Get(this),
 				TokenType.RootKeyWord => RootNode.Get(this),
 				TokenType.SubKeyWord => SubtractNode.Get(this),
+				TokenType.RandKeyWord => RandomNode.Get(this),
 
 				// Logical keywords
 				TokenType.AndKeyWord => AndNode.Get(this),
