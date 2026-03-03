@@ -26,12 +26,12 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		/// <inheritdoc/>
 		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
-			decimal min = decimal.MaxValue;
+			double min = double.MaxValue;
 			for (int i = 0; i < this.operands.Count; i++)
 			{
 				ExpressionNode operand = this.operands[i];
 				Operation<object> raw = operand.Evaluate(evaluator);
-				Operation<decimal> dec = EvaluatorHelpers.ResolveDecimal(raw, "Min" + i);
+				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Min" + i);
 				if (dec.Status == Status.Failure)
 				{
 					return Operation<object>.Failure(dec.Message);

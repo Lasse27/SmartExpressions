@@ -30,23 +30,23 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 		{
 			Operation<object> rawLeft = this.Left.Evaluate(evaluator, listener);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
 
-			Operation<decimal> resolvedLeft = EvaluatorHelpers.ResolveDecimal(rawLeft, Keyword);
+			Operation<double> resolvedLeft = EvaluatorHelpers.ResolveDouble(rawLeft, Keyword);
 			if (resolvedLeft.Status == Status.Failure) { return Operation<object>.Failure(resolvedLeft.Message); }
 
 			Operation<object> rawRight = this.Right.Evaluate(evaluator, listener);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
-			Operation<decimal> resolvedRight = EvaluatorHelpers.ResolveDecimal(rawRight, Keyword);
+			Operation<double> resolvedRight = EvaluatorHelpers.ResolveDouble(rawRight, Keyword);
 			if (resolvedRight.Status == Status.Failure) { return Operation<object>.Failure(resolvedRight.Message); }
 
 			// map to local vars
-			decimal base_ = resolvedLeft.Value;
-			decimal degree = resolvedRight.Value;
+			double base_ = resolvedLeft.Value;
+			double degree = resolvedRight.Value;
 
 			// guards
 			if (degree == 0)
@@ -60,13 +60,15 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 					return Operation<object>.Failure("Root(base,degree) Root of a negative base is only defined for odd integer degrees.");
 				}
 
-				double result = Math.Pow((double)-base_, (double)(1m / degree));
-				listener?.Report($"{this} = {-(decimal)result}");
-				return Operation<object>.Success(-(decimal)result);
+				// Root and return
+				double vDoub = Math.Pow(-base_, 1D / degree);
+				listener?.Report($"{this} = {-vDoub}");
+				return Operation<object>.Success(-vDoub);
 			}
 
-			// Root adn return
-			decimal value = (decimal)Math.Pow((double)base_, (double)(1m / degree));
+			// Root and return
+			double value = Math.Pow(base_, 1D / degree);
+
 			listener?.Report($"{this} = {value}");
 			return Operation<object>.Success(value);
 		}

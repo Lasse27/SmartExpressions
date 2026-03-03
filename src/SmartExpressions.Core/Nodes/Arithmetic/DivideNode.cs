@@ -35,17 +35,17 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			Operation<object> rawLeft = this.Left.Evaluate(evaluator, listener);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
 
-			Operation<decimal> resolvedLeft = EvaluatorHelpers.ResolveDecimal(rawLeft, Keyword);
+			Operation<double> resolvedLeft = EvaluatorHelpers.ResolveDouble(rawLeft, Keyword);
 			if (resolvedLeft.Status == Status.Failure) { return Operation<object>.Failure(resolvedLeft.Message); }
 
 			Operation<object> rawRight = this.Right.Evaluate(evaluator, listener);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
-			Operation<decimal> resolvedRight = EvaluatorHelpers.ResolveDecimal(rawRight, Keyword);
+			Operation<double> resolvedRight = EvaluatorHelpers.ResolveDouble(rawRight, Keyword);
 			if (resolvedRight.Status == Status.Failure) { return Operation<object>.Failure(resolvedRight.Message); }
 
 			// Div and return
-			decimal divided = resolvedLeft.Value / resolvedRight.Value;
+			double divided = resolvedLeft.Value / resolvedRight.Value;
 			listener?.Report($"{this} = {divided}");
 			return Operation<object>.Success(divided);
 		}

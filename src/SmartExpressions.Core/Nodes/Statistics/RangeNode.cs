@@ -27,13 +27,13 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		/// <inheritdoc/>
 		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
 		{
-			decimal min = decimal.MinValue;
-			decimal max = decimal.MaxValue;
+			double min = double.MinValue;
+			double max = double.MaxValue;
 			for (int i = 0; i < this.operands.Count; i++)
 			{
 				ExpressionNode operand = this.operands[i];
 				Operation<object> raw = operand.Evaluate(evaluator);
-				Operation<decimal> dec = EvaluatorHelpers.ResolveDecimal(raw, "Range" + i);
+				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Range" + i);
 				if (dec.Status == Status.Failure)
 				{
 					return Operation<object>.Failure(dec.Message);

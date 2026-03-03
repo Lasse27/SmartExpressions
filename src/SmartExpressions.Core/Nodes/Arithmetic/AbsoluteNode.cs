@@ -51,13 +51,13 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 				return raw;
 			}
 
-			Operation<decimal> resolved = EvaluatorHelpers.ResolveDecimal(raw, Keyword);
+			Operation<double> resolved = EvaluatorHelpers.ResolveDouble(raw, Keyword);
 			if (resolved.Status == Status.Failure)
 			{
 				return Operation<object>.Failure(resolved.Message);
 			}
 
-			decimal absolute = Math.Abs(resolved.Value);
+			double absolute = Math.Abs(resolved.Value);
 			listener?.Report($"{this} = {absolute}");
 			return Operation<object>.Success(absolute);
 		}
