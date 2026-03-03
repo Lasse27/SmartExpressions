@@ -1,5 +1,6 @@
 ﻿using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Utility;
+using SmartExpressions.Test.Utility;
 
 using Xunit.Abstractions;
 

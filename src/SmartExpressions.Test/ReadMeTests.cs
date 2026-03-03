@@ -2,6 +2,7 @@
 
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Utility;
+using SmartExpressions.Test.Utility;
 
 using Xunit.Abstractions;
 
@@ -22,7 +23,7 @@ namespace SmartExpressions.Test
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
 			Assert.NotNull(operation.Value);
-			Assert.Equal((decimal)2, operation.Value);
+			Assert.Equal(2D, operation.Value);
 
 			// Output
 			_outputHelper.WriteLine(operation.Value.ToString());
@@ -37,7 +38,7 @@ namespace SmartExpressions.Test
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
 			Assert.NotNull(operation.Value);
-			Assert.Equal((decimal)26, operation.Value);
+			Assert.Equal(26D, operation.Value);
 
 			// Output
 			_outputHelper.WriteLine(operation.Value.ToString());
@@ -52,7 +53,7 @@ namespace SmartExpressions.Test
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
 			Assert.NotNull(operation.Value);
-			Assert.Equal((decimal)26, operation.Value);
+			Assert.Equal(26D, operation.Value);
 
 			// Output
 			_outputHelper.WriteLine(operation.Value.ToString());
@@ -68,7 +69,7 @@ namespace SmartExpressions.Test
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
 			Assert.NotNull(operation.Value);
-			Assert.Equal((decimal)91, operation.Value);
+			Assert.Equal(91D, operation.Value);
 
 			// Output
 			_outputHelper.WriteLine(operation.Value.ToString());
@@ -84,7 +85,7 @@ namespace SmartExpressions.Test
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
 			Assert.NotNull(operation.Value);
-			Assert.Equal((decimal)91, operation.Value);
+			Assert.Equal(91D, operation.Value);
 
 			// Output
 			_outputHelper.WriteLine(operation.Value.ToString());
@@ -95,7 +96,7 @@ namespace SmartExpressions.Test
 			// Assert
 			Assert.Equal(Status.Success, operation2.Status);
 			Assert.NotNull(operation.Value);
-			Assert.Equal((decimal)85, operation2.Value);
+			Assert.Equal(85D, operation2.Value);
 
 			// Output
 			_outputHelper.WriteLine(operation2.Value.ToString());
@@ -113,7 +114,7 @@ namespace SmartExpressions.Test
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
 			Assert.NotNull(operation.Value);
-			Assert.Equal((decimal)26, operation.Value);
+			Assert.Equal(26D, operation.Value);
 
 			// Output
 			_outputHelper.WriteLine(operation.Value.ToString());

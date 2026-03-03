@@ -115,6 +115,7 @@ This results in the following functions:
 | ROOT        | `ROOT(expression, expression)`                      | `ROOT(16,2)`                                 | 
 | ABS         | `ABS(expression)`                                   | `ABS(-5)`                                    | 
 | NEG         | `NEG(expression)`                                   | `NEG(7)`                                     | 
+| RAND        | `RAND(expression, expression)`                      | `RAND(2,10)`                                 | 
 
 
 ### Keys and constants
@@ -144,7 +145,7 @@ public void Simple_Expression()
 	// Assert
 	Assert.Equal(Status.Success, operation.Status);
 	Assert.NotNull(operation.Value);
-	Assert.Equal((decimal)2, operation.Value);
+	Assert.Equal(2D, operation.Value);
 
 	// Output
 	_outputHelper.WriteLine(operation.Value.ToString()); // 2
@@ -163,7 +164,7 @@ public void Simple_Nested_Expression()
 	// Assert
 	Assert.Equal(Status.Success, operation.Status);
 	Assert.NotNull(operation.Value);
-	Assert.Equal((decimal)26, operation.Value);
+	Assert.Equal(26D, operation.Value);
 
 	// Output
 	_outputHelper.WriteLine(operation.Value.ToString()); // 26
@@ -182,7 +183,7 @@ public void Simple_Expression_With_Whitespace()
 	// Assert
 	Assert.Equal(Status.Success, operation.Status);
 	Assert.NotNull(operation.Value);
-	Assert.Equal((decimal)26, operation.Value);
+	Assert.Equal(26D, operation.Value);
 
 	// Output
 	_outputHelper.WriteLine(operation.Value.ToString()); // 26
@@ -211,10 +212,10 @@ public void Expression_With_Identifier()
 	// Assert
 	Assert.Equal(Status.Success, operation.Status);
 	Assert.NotNull(operation.Value);
-	Assert.Equal((decimal)91, operation.Value);
+	Assert.Equal(91D, operation.Value);
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString()); // -> 91
+	_outputHelper.WriteLine(operation.Value.ToString()); // 91
 }
 ```
 
@@ -231,10 +232,10 @@ public void Expression_With_Rebound_Identifier()
 	// Assert
 	Assert.Equal(Status.Success, operation.Status);
 	Assert.NotNull(operation.Value);
-	Assert.Equal((decimal)91, operation.Value);
+	Assert.Equal(91D, operation.Value);
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString()); // -> 91
+	_outputHelper.WriteLine(operation.Value.ToString());
 
 	_ = expression.Bind("Key_1", 60);
 	Operation<object> operation2 = expression.Evaluate();
@@ -242,10 +243,11 @@ public void Expression_With_Rebound_Identifier()
 	// Assert
 	Assert.Equal(Status.Success, operation2.Status);
 	Assert.NotNull(operation.Value);
-	Assert.Equal((decimal)85, operation2.Value);
+	Assert.Equal(85D, operation2.Value);
 
 	// Output
-	_outputHelper.WriteLine(operation2.Value.ToString()); // -> 85
+	_outputHelper.WriteLine(operation2.Value.ToString()); // 85
+}
 }
 ```
 
@@ -276,7 +278,7 @@ public void Simple_Expression_With_Progress()
 	// Assert
 	Assert.Equal(Status.Success, operation.Status);
 	Assert.NotNull(operation.Value);
-	Assert.Equal((decimal)26, operation.Value);
+	Assert.Equal(26D, operation.Value);
 
 	// Output
 	_outputHelper.WriteLine(operation.Value.ToString());
