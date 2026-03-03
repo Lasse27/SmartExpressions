@@ -272,5 +272,12 @@ namespace SmartExpressions.Test.Lexing
 				this._outputHelper.WriteLine(item.ToString());
 			}
 		}
+
+		[Fact]
+		public void Run_Returns_Failure_On_Missing_Identifier_Bracket()
+		{
+			string str = TokenizeFailure("@{ Para1}\n@");
+			this._outputHelper.WriteLine(str);
+		}
 	}
 }

@@ -204,7 +204,11 @@ namespace SmartExpressions.Core.Lexing
 			int entryP = this._pointer;
 
 			this.AdvancePointer(); // Skip @
-			if (this.PointerIsAtEnd() || this.PeakAtPointer() != Characters.LBRACE)
+			if (this.PointerIsAtEnd())
+			{
+				return Operation.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.LBRACE}'.");
+			}
+			else if (this.PeakAtPointer() != Characters.LBRACE)
 			{
 				return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
 			}
