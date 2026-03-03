@@ -23,74 +23,70 @@ namespace SmartExpressions.Core.Nodes.Conditional
 			/*
 			 * IF
 			 */
-
-			parser.AdvancePointer(); // Skip If keyword
-
-			Operation check = parser.CheckCurrent(TokenType.LParen);
+			Operation check = parser.Check(TokenType.IfKeyWord);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer(); // Skip left paren
+
+			check = parser.Check(TokenType.LParen);
+			if (check.Status == Status.Failure)
+			{
+				return Operation<ExpressionNode>.Failure(check.Message);
+			}
 
 			Operation<ExpressionNode> condition = parser.ParseExpression();
 			if (condition.Status == Status.Failure) { return condition; }
 
-			check = parser.CheckCurrent(TokenType.RParen);
+			check = parser.Check(TokenType.RParen);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer(); // Skip right paren
 
 			/*
 			 * THEN
 			 */
 
-			check = parser.CheckCurrent(TokenType.LBrace);
+			check = parser.Check(TokenType.LBrace);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer(); // Skip left brace
 
 			Operation<ExpressionNode> @then = parser.ParseExpression();
-			if (condition.Status == Status.Failure) { return condition; }
+			if (@then.Status == Status.Failure) { return @then; }
 
-			check = parser.CheckCurrent(TokenType.RBrace);
+			check = parser.Check(TokenType.RBrace);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer(); // Skip right brace
 
 			/*
 			 * ELSE
 			 */
 
-			check = parser.CheckCurrent(TokenType.ElseKeyword);
+			check = parser.Check(TokenType.ElseKeyword);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer(); // Skip If keyword
 
-			check = parser.CheckCurrent(TokenType.LBrace);
+			check = parser.Check(TokenType.LBrace);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer(); // Skip left brace
 
 			Operation<ExpressionNode> @else = parser.ParseExpression();
-			if (condition.Status == Status.Failure) { return condition; }
+			if (@else.Status == Status.Failure) { return @else; }
 
-			check = parser.CheckCurrent(TokenType.RBrace);
+			check = parser.Check(TokenType.RBrace);
 			if (check.Status == Status.Failure)
 			{
 				return Operation<ExpressionNode>.Failure(check.Message);
 			}
-			parser.AdvancePointer(); // Skip right brace
 
 			// Build and return
 			ExpressionNode node = new IfThenElseNode(condition.Value, then.Value, @else.Value);
@@ -99,7 +95,7 @@ namespace SmartExpressions.Core.Nodes.Conditional
 
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 		{
 			Operation<object> result = this.Condition.Evaluate(evaluator, listener);
 			Operation<bool> condition = EvaluatorHelpers.ResolveBoolean(result, "IF");
@@ -110,5 +106,9 @@ namespace SmartExpressions.Core.Nodes.Conditional
 				? this.Then.Evaluate(evaluator, listener)
 				: this.Else.Evaluate(evaluator, listener);
 		}
+
+
+		/// <inheritdoc/>
+		public override string ToString() => $"IF({this.Condition}) THEN({this.Then}) ELSE({this.Else})";
 	}
 }

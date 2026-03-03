@@ -30,7 +30,7 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 		{
 			Operation<object> rawLeft = this.Left.Evaluate(evaluator, listener);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
@@ -45,7 +45,7 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			if (resolvedRight.Status == Status.Failure) { return Operation<object>.Failure(resolvedRight.Message); }
 
 			// Mult adn return
-			double value = Math.Pow((double)resolvedLeft.Value, (double)resolvedRight.Value);
+			decimal value = (decimal)Math.Pow((double)resolvedLeft.Value, (double)resolvedRight.Value);
 			listener?.Report($"{this} = {value}");
 			return Operation<object>.Success(value);
 		}
