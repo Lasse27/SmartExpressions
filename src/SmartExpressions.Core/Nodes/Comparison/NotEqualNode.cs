@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Comparison
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record NotEqualNode : TwoOperandFunction
+	public record NotEqualNode : BinaryFunction
 	{
 		private const string Keyword = "NEQ";
 

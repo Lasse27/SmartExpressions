@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record SubtractNode : TwoOperandFunction
+	public record SubtractNode : BinaryFunction
 	{
 		private const string Keyword = "SUB";
 

@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Logical
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record AndNode : TwoOperandFunction
+	public record AndNode : BinaryFunction
 	{
 		private const string Keyword = "AND";
 

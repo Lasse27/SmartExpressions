@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Logical
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record XnorNode : TwoOperandFunction
+	public record XnorNode : BinaryFunction
 	{
 		private const string Keyword = "XNOR";
 

@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record RandomNode : TwoOperandFunction
+	public record RandomNode : BinaryFunction
 	{
 		private const string Keyword = "RAND";
 

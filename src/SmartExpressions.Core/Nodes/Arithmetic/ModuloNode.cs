@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record ModuloNode : TwoOperandFunction
+	public record ModuloNode : BinaryFunction
 	{
 		private const string Keyword = "MOD";
 
