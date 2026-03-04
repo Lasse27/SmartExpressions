@@ -4,12 +4,12 @@ using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Statistics
 {
-	public record StandardDNode : ExpressionNode
+	public record StandardDNode : CompositeFunction
 	{
-		private readonly List<ExpressionNode> operands;
+		private const string Keyword = "STD";
 
-		public StandardDNode(List<ExpressionNode> operands)
-			=> this.operands = operands;
+		/// <inheritDoc/>
+		public StandardDNode(List<ExpressionNode> operands) : base(operands) { }
 
 
 		public static Operation<ExpressionNode> Get(Parser parser)
@@ -24,6 +24,12 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			return Operation<ExpressionNode>.Success(node);
 		}
 
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default) => throw new NotImplementedException();
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default) => throw new NotImplementedException();
+
+		/// <inheritdoc/>
+		public override string ToString() => base.ToString();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

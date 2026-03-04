@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Arithmetic
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record DivideNode : TwoOperandFunction
+	public record DivideNode : BinaryFunction
 	{
 		private const string Keyword = "DIV";
 

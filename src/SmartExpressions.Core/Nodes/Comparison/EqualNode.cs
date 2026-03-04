@@ -8,7 +8,7 @@ namespace SmartExpressions.Core.Nodes.Comparison
 {
 
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record EqualNode : TwoOperandFunction
+	public record EqualNode : BinaryFunction
 	{
 		private const string Keyword = "EQ";
 

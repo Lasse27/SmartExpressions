@@ -21,7 +21,7 @@ namespace SmartExpressions.Core.Nodes
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 		{
 			if (evaluator.Bindings.TryGetValue(this.Key, out object value))
 			{
@@ -35,5 +35,8 @@ namespace SmartExpressions.Core.Nodes
 
 		/// <inheritdoc/>
 		public override string ToString() => this.Key;
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => this.Key;
 	}
 }

@@ -10,6 +10,8 @@ namespace SmartExpressions.Core.Nodes.Constants
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record EulerNode : ExpressionNode
 	{
+		private const string Keyword = "E";
+
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			parser.AdvancePointer();
@@ -20,6 +22,9 @@ namespace SmartExpressions.Core.Nodes.Constants
 			=> Operation<object>.Success(Math.E);
 
 		/// <inheritdoc/>
-		public override string ToString() => Math.E.ToString(CultureInfo.InvariantCulture);
+		public override string ToString() => Keyword;
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

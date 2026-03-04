@@ -4,12 +4,12 @@ using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Statistics
 {
-	public record SumNode : ExpressionNode
+	public record SumNode : CompositeFunction
 	{
-		private readonly List<ExpressionNode> operands;
+		private const string Keyword = "SUM";
 
-		public SumNode(List<ExpressionNode> operands)
-			=> this.operands = operands;
+		/// <inheritDoc/>
+		public SumNode(List<ExpressionNode> operands) : base(operands) { }
 
 
 		public static Operation<ExpressionNode> Get(Parser parser)
@@ -25,14 +25,14 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 		{
 			double sum = 0;
-			for (int i = 0; i < this.operands.Count; i++)
+			for (int i = 0; i < this.Operands.Count; i++)
 			{
-				ExpressionNode operand = this.operands[i];
+				ExpressionNode operand = this.Operands[i];
 				Operation<object> raw = operand.Evaluate(evaluator);
-				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Sum" + i);
+				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, Keyword + i);
 				if (dec.Status == Status.Failure)
 				{
 					return Operation<object>.Failure(dec.Message);
@@ -41,5 +41,11 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			}
 			return Operation<object>.Success(sum);
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => base.ToString();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

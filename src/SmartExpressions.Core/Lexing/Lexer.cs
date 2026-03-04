@@ -54,6 +54,15 @@ namespace SmartExpressions.Core.Lexing
 			Keywords.Add("xnor", TokenType.XnorKeyWord);
 			Keywords.Add("xor", TokenType.XorKeyWord);
 
+			// Statistical
+			Keywords.Add("min", TokenType.MinKeyWord);
+			Keywords.Add("max", TokenType.MaxKeyWord);
+			Keywords.Add("avg", TokenType.AvgKeyWord);
+			Keywords.Add("std", TokenType.StDKeyWord);
+			Keywords.Add("sum", TokenType.SumKeyWord);
+			Keywords.Add("range", TokenType.RangeKeyWord);
+			Keywords.Add("count", TokenType.CountKeyWord);
+
 			// Constants
 			Keywords.Add("e", TokenType.EulerKeyword);
 			Keywords.Add("pi", TokenType.PiKeyword);

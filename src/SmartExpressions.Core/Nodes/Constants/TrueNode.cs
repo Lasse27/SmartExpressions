@@ -9,6 +9,8 @@ namespace SmartExpressions.Core.Nodes.Constants
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record TrueNode : ExpressionNode
 	{
+		private const string Keyword = "TRUE";
+
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			parser.AdvancePointer();
@@ -19,6 +21,9 @@ namespace SmartExpressions.Core.Nodes.Constants
 			=> Operation<object>.Success(true);
 
 		/// <inheritdoc/>
-		public override string ToString() => bool.TrueString;
+		public override string GetKeyword() => Keyword;
+
+		/// <inheritdoc/>
+		public override string ToString() => Keyword;
 	}
 }

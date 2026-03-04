@@ -7,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Comparison
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record LessThanEqualNode : TwoOperandFunction
+	public record LessThanEqualNode : BinaryFunction
 	{
 		private const string Keyword = "LTE";
 

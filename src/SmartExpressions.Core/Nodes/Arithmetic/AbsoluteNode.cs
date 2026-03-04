@@ -43,7 +43,7 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 		{
 			Operation<object> raw = this.Operand.Evaluate(evaluator, listener);
 			if (raw.Status == Status.Failure)
@@ -64,5 +64,8 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 
 		/// <inheritdoc/>
 		public override string ToString() => $"{Keyword}({this.Operand})";
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }
