@@ -32,7 +32,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			{
 				ExpressionNode operand = this.Operands[i];
 				Operation<object> raw = operand.Evaluate(evaluator);
-				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Sum" + i);
+				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, Keyword + i);
 				if (dec.Status == Status.Failure)
 				{
 					return Operation<object>.Failure(dec.Message);

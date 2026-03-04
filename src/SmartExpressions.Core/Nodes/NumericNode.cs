@@ -47,7 +47,7 @@ namespace SmartExpressions.Core.Nodes
 			return Operation.Success();
 		}
 
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 			=> Operation<object>.Success(this.Value);
 
 		/// <inheritdoc/>
@@ -55,5 +55,8 @@ namespace SmartExpressions.Core.Nodes
 
 		/// <inheritdoc/>
 		private new string GetDebuggerDisplay() => this.ToString();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => this.Value.ToString(CultureInfo.InvariantCulture);
 	}
 }

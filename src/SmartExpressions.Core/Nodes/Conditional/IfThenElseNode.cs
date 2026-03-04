@@ -7,6 +7,8 @@ namespace SmartExpressions.Core.Nodes.Conditional
 {
 	public record IfThenElseNode : ExpressionNode
 	{
+		private const string Keyword = "IF";
+
 		public ExpressionNode Condition { get; set; }
 		public ExpressionNode Then { get; set; }
 		public ExpressionNode Else { get; set; }
@@ -98,7 +100,7 @@ namespace SmartExpressions.Core.Nodes.Conditional
 		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default)
 		{
 			Operation<object> result = this.Condition.Evaluate(evaluator, listener);
-			Operation<bool> condition = EvaluatorHelpers.ResolveBoolean(result, "IF");
+			Operation<bool> condition = EvaluatorHelpers.ResolveBoolean(result, Keyword);
 			if (condition.Status == Status.Failure) { return Operation<object>.Failure(condition.Message); }
 
 			// Handle then else
@@ -110,5 +112,8 @@ namespace SmartExpressions.Core.Nodes.Conditional
 
 		/// <inheritdoc/>
 		public override string ToString() => $"IF({this.Condition}) THEN({this.Then}) ELSE({this.Else})";
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

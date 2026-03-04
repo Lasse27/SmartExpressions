@@ -24,12 +24,12 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			return Operation<ExpressionNode>.Success(node);
 		}
 
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default) => throw new NotImplementedException();
-	}
+		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default) => throw new NotImplementedException();
 
-	/// <inheritdoc/>
+		/// <inheritdoc/>
 		public override string ToString() => base.ToString();
 
 		/// <inheritdoc/>
 		public override string GetKeyword() => Keyword;
 	}
+}
