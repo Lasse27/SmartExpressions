@@ -9,6 +9,8 @@ namespace SmartExpressions.Core.Nodes.Constants
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record NullNode : ExpressionNode
 	{
+		private const string Keyword = "NULL";
+
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			parser.AdvancePointer();
@@ -19,6 +21,9 @@ namespace SmartExpressions.Core.Nodes.Constants
 			=> Operation<object>.Success(null);
 
 		/// <inheritdoc/>
-		public override string ToString() => "NULL";
+		public override string GetKeyword() => Keyword;
+
+		/// <inheritdoc/>
+		public override string ToString() => Keyword;
 	}
 }

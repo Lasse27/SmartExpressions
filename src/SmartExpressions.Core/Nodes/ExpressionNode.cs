@@ -10,7 +10,11 @@ namespace SmartExpressions.Core.Nodes
 	public abstract record ExpressionNode : IEvaluable
 	{
 		/// <inheritdoc/>
-		public abstract Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default);
+		public abstract Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default);
+
+		/// <summary> Gets the related keyword for the node. </summary>
+		/// <returns> A <see cref="string"/> representing the nodes keyword. </returns>
+		public abstract string GetKeyword();
 
 		/// <inheritdoc/>
 		protected string GetDebuggerDisplay() => this.ToString();

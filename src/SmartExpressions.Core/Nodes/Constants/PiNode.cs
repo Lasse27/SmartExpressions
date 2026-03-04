@@ -10,6 +10,8 @@ namespace SmartExpressions.Core.Nodes.Constants
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record PiNode : ExpressionNode
 	{
+		private const string Keyword = "PI";
+
 		public static Operation<ExpressionNode> Get(Parser parser)
 		{
 			parser.AdvancePointer();
@@ -20,6 +22,9 @@ namespace SmartExpressions.Core.Nodes.Constants
 			=> Operation<object>.Success(Math.PI);
 
 		/// <inheritdoc/>
-		public override string ToString() => Math.PI.ToString(CultureInfo.InvariantCulture);
+		public override string GetKeyword() => Keyword;
+
+		/// <inheritdoc/>
+		public override string ToString() => Keyword;
 	}
 }
