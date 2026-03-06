@@ -1,4 +1,5 @@
 ﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
@@ -12,31 +13,31 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			=> this.operands = operands;
 
 
-		public static Operation<ExpressionNode> Get(Parser parser)
+		public static Result<ExpressionNode> Get(Parser parser)
 		{
-			Operation<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
+			Result<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
 			if (operation.Status == Status.Failure)
 			{
-				return Operation<ExpressionNode>.Failure(operation.Message);
+				return Result<ExpressionNode>.Failure(operation.Message);
 			}
 
 			ExpressionNode node = new RangeNode(operation.Value);
-			return Operation<ExpressionNode>.Success(node);
+			return Result<ExpressionNode>.Success(node);
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
 			double min = double.MinValue;
 			double max = double.MaxValue;
 			for (int i = 0; i < this.operands.Count; i++)
 			{
 				ExpressionNode operand = this.operands[i];
-				Operation<object> raw = operand.Evaluate(evaluator);
-				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Range" + i);
+				Result<object> raw = operand.Evaluate(ctx);
+				Result<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Range" + i);
 				if (dec.Status == Status.Failure)
 				{
-					return Operation<object>.Failure(dec.Message);
+					return Result<object>.Failure(dec.Message);
 				}
 				if (dec.Value > max)
 				{
@@ -48,7 +49,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 					min = dec.Value;
 				}
 			}
-			return Operation<object>.Success(max - min);
+			return Result<object>.Success(max - min);
 		}
 	}
 }

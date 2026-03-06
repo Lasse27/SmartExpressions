@@ -11,7 +11,7 @@ namespace SmartExpressions.Test.Lexing
 		private static List<Token> Tokenize(string input)
 		{
 			Lexer tokenizer = new Lexer(input);
-			Operation<List<Token>> result = tokenizer.Run();
+			Result<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 			return result.Value;
 		}
@@ -19,7 +19,7 @@ namespace SmartExpressions.Test.Lexing
 		private static string TokenizeFailure(string input)
 		{
 			Lexer tokenizer = new Lexer(input);
-			Operation<List<Token>> result = tokenizer.Run();
+			Result<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Failure, result.Status);
 			return result.Message;
 		}
@@ -32,7 +32,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_EmptyString_ReturnsEmptyList()
 		{
 			Lexer tokenizer = new Lexer("");
-			Operation<List<Token>> result = tokenizer.Run();
+			Result<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 			Assert.Empty(result.Value);
 		}
@@ -41,7 +41,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_WhitespaceOnly_ReturnsEmptyList()
 		{
 			Lexer tokenizer = new Lexer("   \t\n");
-			Operation<List<Token>> result = tokenizer.Run();
+			Result<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 			Assert.Empty(result.Value);
 		}

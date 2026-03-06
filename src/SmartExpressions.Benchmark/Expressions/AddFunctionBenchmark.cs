@@ -27,8 +27,8 @@ namespace SmartExpressions.Benchmark.Expressions
 			_ = this._nestedExpression.Assemble();
 
 			this._identifierExpression = new Expression(IdentifierFormula);
-			_ = this._identifierExpression.Bind("A", 100);
-			_ = this._identifierExpression.Bind("B", 200);
+			_ = this._identifierExpression.RegisterBinding("A", 100);
+			_ = this._identifierExpression.RegisterBinding("B", 200);
 			_ = this._identifierExpression.Assemble();
 		}
 
@@ -54,8 +54,8 @@ namespace SmartExpressions.Benchmark.Expressions
 		public void Assemble_With_Identifiers()
 		{
 			Expression expr = new Expression(IdentifierFormula);
-			_ = expr.Bind("A", 100);
-			_ = expr.Bind("B", 200);
+			_ = expr.RegisterBinding("A", 100);
+			_ = expr.RegisterBinding("B", 200);
 			_ = expr.Assemble();
 		}
 
@@ -64,15 +64,15 @@ namespace SmartExpressions.Benchmark.Expressions
 		// ------------------------------------------------
 
 		[Benchmark]
-		public Operation<object> Evaluate_Simple() 
+		public Result<object> Evaluate_Simple() 
 			=> this._simpleExpression.Evaluate();
 
 		[Benchmark]
-		public Operation<object> Evaluate_Nested() 
+		public Result<object> Evaluate_Nested() 
 			=> this._nestedExpression.Evaluate();
 
 		[Benchmark]
-		public Operation<object> Evaluate_With_Identifiers() 
+		public Result<object> Evaluate_With_Identifiers() 
 			=> this._identifierExpression.Evaluate();
 
 		// ------------------------------------------------
@@ -80,7 +80,7 @@ namespace SmartExpressions.Benchmark.Expressions
 		// ------------------------------------------------
 
 		[Benchmark]
-		public Operation<object> Assemble_And_Evaluate_Simple()
+		public Result<object> Assemble_And_Evaluate_Simple()
 		{
 			Expression expr = new Expression(SimpleFormula);
 			_ = expr.Assemble();
@@ -88,7 +88,7 @@ namespace SmartExpressions.Benchmark.Expressions
 		}
 
 		[Benchmark]
-		public Operation<object> Assemble_And_Evaluate_Nested()
+		public Result<object> Assemble_And_Evaluate_Nested()
 		{
 			Expression expr = new Expression(NestedFormula);
 			_ = expr.Assemble();

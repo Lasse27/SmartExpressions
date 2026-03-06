@@ -34,13 +34,13 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(formula);
 			foreach (Binding binding in bindings)
 			{
-				_ = expression.Bind(binding.Key, binding.Value);
+				_ = expression.RegisterBinding(binding.Key, binding.Value);
 			}
 			_ = expression.Assemble();
 
 			Progress<string> progress = new Progress<string>();
 			progress.ProgressChanged += (s, e) => this._outputHelper.WriteLine(e);
-			Operation<object> result = expression.Evaluate(progress);
+			Result<object> result = expression.Evaluate(progress);
 			if (result.Status == Status.Failure)
 			{
 				this._outputHelper.WriteLine("Input: " + formula);
@@ -62,8 +62,8 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(this.Formula("2", "3"));
 			_ = expression.Assemble();
 
-			Operation<object> r1 = expression.Evaluate();
-			Operation<object> r2 = expression.Evaluate();
+			Result<object> r1 = expression.Evaluate();
+			Result<object> r2 = expression.Evaluate();
 
 			Assert.Equal(r1.Value, r2.Value);
 		}
@@ -433,11 +433,11 @@ namespace SmartExpressions.Test.Expressions
 			}
 
 			Expression expression = new Expression(this.Formula("@{A}", "@{B}"));
-			_ = expression.Bind("A", left);
-			_ = expression.Bind("B", right);
+			_ = expression.RegisterBinding("A", left);
+			_ = expression.RegisterBinding("B", right);
 			_ = expression.Assemble();
 
-			Operation<object> result = expression.Evaluate();
+			Result<object> result = expression.Evaluate();
 
 			Assert.Equal(Status.Success, result.Status);
 			_ = Assert.IsType<double>(result.Value);

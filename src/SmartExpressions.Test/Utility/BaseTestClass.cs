@@ -16,13 +16,13 @@ namespace SmartExpressions.Test.Utility
 			Expression expression = new Expression(formula);
 			foreach (Binding binding in bindings)
 			{
-				_ = expression.Bind(binding.Key, binding.Value);
+				_ = expression.RegisterBinding(binding.Key, binding.Value);
 			}
 			_ = expression.Assemble();
 
 			Progress<string> progress = new Progress<string>();
 			progress.ProgressChanged += (s, e) => this._outputHelper.WriteLine(e);
-			Operation<object> result = expression.Evaluate(progress);
+			Result<object> result = expression.Evaluate(progress);
 			if (result.Status == Status.Failure)
 			{
 				this._outputHelper.WriteLine("Input: " + formula);

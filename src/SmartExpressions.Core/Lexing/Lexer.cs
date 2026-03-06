@@ -119,12 +119,12 @@ namespace SmartExpressions.Core.Lexing
 
 		#region Interface methods
 
-		public Operation<List<Token>> Run()
+		public Result<List<Token>> Run()
 		{
 			// Guard against stupidity
 			if (string.IsNullOrWhiteSpace(this._input))
 			{
-				return Operation<List<Token>>.Success(new List<Token>());
+				return Result<List<Token>>.Success(new List<Token>());
 			}
 
 			this.ResetTokenizer();
@@ -138,20 +138,20 @@ namespace SmartExpressions.Core.Lexing
 				}
 
 				// find and add token -> if not found return failure
-				Operation triState = this.AddTokenByPointer();
+				Result triState = this.AddTokenByPointer();
 				if (triState.Status != Status.Success)
 				{
-					return Operation<List<Token>>.Failure(triState.Message);
+					return Result<List<Token>>.Failure(triState.Message);
 				}
 			}
 
-			return Operation<List<Token>>.Success(this._tokens);
+			return Result<List<Token>>.Success(this._tokens);
 		}
 
 		#endregion
 
 
-		private Operation AddTokenByPointer()
+		private Result AddTokenByPointer()
 		{
 			char c = this.PeakAtPointer();
 			switch (c)
@@ -162,22 +162,22 @@ namespace SmartExpressions.Core.Lexing
 				case Characters.LPAREN:
 					this.AddToken(new Token(TokenType.LParen, this._pointer, "("));
 					this.AdvancePointer();
-					return Operation.Success();
+					return Result.Success();
 
 				case Characters.RPAREN:
 					this.AddToken(new Token(TokenType.RParen, this._pointer, ")"));
 					this.AdvancePointer();
-					return Operation.Success();
+					return Result.Success();
 
 				case Characters.LBRACE:
 					this.AddToken(new Token(TokenType.LBrace, this._pointer, "{"));
 					this.AdvancePointer();
-					return Operation.Success();
+					return Result.Success();
 
 				case Characters.RBRACE:
 					this.AddToken(new Token(TokenType.RBrace, this._pointer, "}"));
 					this.AdvancePointer();
-					return Operation.Success();
+					return Result.Success();
 
 				/* 
 				* Delimiter tokens
@@ -185,7 +185,7 @@ namespace SmartExpressions.Core.Lexing
 				case Characters.COMMA:
 					this.AddToken(new Token(TokenType.Comma, this._pointer, ","));
 					this.AdvancePointer();
-					return Operation.Success();
+					return Result.Success();
 
 
 				/* 
@@ -199,18 +199,18 @@ namespace SmartExpressions.Core.Lexing
 			}
 		}
 
-		public Operation AddIdentifierToken()
+		public Result AddIdentifierToken()
 		{
 			int entryP = this._pointer;
 
 			this.AdvancePointer(); // Skip @
 			if (this.PointerIsAtEnd())
 			{
-				return Operation.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.LBRACE}'.");
+				return Result.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.LBRACE}'.");
 			}
 			else if (this.PeakAtPointer() != Characters.LBRACE)
 			{
-				return Operation.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
+				return Result.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
 			}
 
 			this.AdvancePointer(); // Skip {
@@ -223,23 +223,23 @@ namespace SmartExpressions.Core.Lexing
 
 			if (this.PointerIsAtEnd())
 			{
-				return Operation.Failure($"Unclosed identifier starting at index {entryP}.");
+				return Result.Failure($"Unclosed identifier starting at index {entryP}.");
 			}
 
 			string identifier = this._input.Substring(identifierStart, this._pointer - identifierStart);
 			if (string.IsNullOrWhiteSpace(identifier))
 			{
-				return Operation.Failure($"Empty identifier at index {entryP}.");
+				return Result.Failure($"Empty identifier at index {entryP}.");
 			}
 
 			this.AdvancePointer(); // Skip }
 			this.AddToken(new Token(TokenType.Identifier, entryP, identifier));
 
 			// Added
-			return Operation.Success();
+			return Result.Success();
 		}
 
-		private Operation HandleNonDelimitedToken(char c)
+		private Result HandleNonDelimitedToken(char c)
 		{
 			if (IsValidDigitCharacter(c))
 			{
@@ -254,10 +254,10 @@ namespace SmartExpressions.Core.Lexing
 			}
 
 			// If none found, return failure
-			return Operation.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
+			return Result.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
 		}
 
-		public Operation AddKeyWordToken()
+		public Result AddKeyWordToken()
 		{
 			int entryPointer = this._pointer;
 
@@ -272,13 +272,13 @@ namespace SmartExpressions.Core.Lexing
 			{
 				// Substr only on found tokentype
 				this.AddToken(new Token(tokentype, entryPointer, word));
-				return Operation.Success();
+				return Result.Success();
 			}
 
-			return Operation.Failure($"Unknown keyword starting at index {entryPointer}.");
+			return Result.Failure($"Unknown keyword starting at index {entryPointer}.");
 		}
 
-		public Operation AddNumericToken()
+		public Result AddNumericToken()
 		{
 			int entryPointer = this._pointer;
 			while (!this.PointerIsAtEnd() && Lexer.IsValidDigitCharacter(this.PeakAtPointer()))
@@ -288,7 +288,7 @@ namespace SmartExpressions.Core.Lexing
 
 			string number = this._input.Substring(entryPointer, this._pointer - entryPointer);
 			this.AddToken(new Token(TokenType.Numeric, entryPointer, number));
-			return Operation.Success();
+			return Result.Success();
 		}
 	}
 }

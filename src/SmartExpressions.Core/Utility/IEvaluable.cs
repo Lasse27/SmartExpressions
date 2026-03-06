@@ -1,11 +1,12 @@
 ﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Expressions;
 
 namespace SmartExpressions.Core.Utility
 {
-	public interface IEvaluable
+	internal interface IEvaluable
 	{
 		/// <summary> Evaluates the object and returns the computed result. </summary>
-		/// <returns> A <see cref="Operation{T}"/> containing the evaluation result if successful; otherwise, failure information. </returns>
-		Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default);
+		/// <returns> A <see cref="Result{T}"/> containing the evaluation result if successful; otherwise, failure information. </returns>
+		Result<object> Evaluate(EvaluationContext ctx);
 	}
 }

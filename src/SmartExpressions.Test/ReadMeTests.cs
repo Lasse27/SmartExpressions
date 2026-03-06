@@ -18,7 +18,7 @@ namespace SmartExpressions.Test
 		public void Simple_Expression()
 		{
 			Expression expression = new Expression("Add(1, 1)");
-			Operation<object> operation = expression.Evaluate();
+			Result<object> operation = expression.Evaluate();
 
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
@@ -33,7 +33,7 @@ namespace SmartExpressions.Test
 		public void Simple_Nested_Expression()
 		{
 			Expression expression = new Expression("Add(1, MULT(5,5))");
-			Operation<object> operation = expression.Evaluate();
+			Result<object> operation = expression.Evaluate();
 
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
@@ -48,7 +48,7 @@ namespace SmartExpressions.Test
 		public void Simple_Expression_With_Whitespace()
 		{
 			Expression expression = new Expression("Add  (1   , MULT    (5,      5))");
-			Operation<object> operation = expression.Evaluate();
+			Result<object> operation = expression.Evaluate();
 
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
@@ -63,8 +63,8 @@ namespace SmartExpressions.Test
 		public void Expression_With_Identifier()
 		{
 			Expression expression = new Expression("Add(@{Key_1}, 25)");
-			_ = expression.Bind("Key_1", 66);
-			Operation<object> operation = expression.Evaluate();
+			_ = expression.RegisterBinding("Key_1", 66);
+			Result<object> operation = expression.Evaluate();
 
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
@@ -79,8 +79,8 @@ namespace SmartExpressions.Test
 		public void Expression_With_Rebound_Identifier()
 		{
 			Expression expression = new Expression("Add(@{Key_1}, 25)");
-			_ = expression.Bind("Key_1", 66);
-			Operation<object> operation = expression.Evaluate();
+			_ = expression.RegisterBinding("Key_1", 66);
+			Result<object> operation = expression.Evaluate();
 
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);
@@ -90,8 +90,8 @@ namespace SmartExpressions.Test
 			// Output
 			_outputHelper.WriteLine(operation.Value.ToString());
 
-			_ = expression.Bind("Key_1", 60);
-			Operation<object> operation2 = expression.Evaluate();
+			_ = expression.RegisterBinding("Key_1", 60);
+			Result<object> operation2 = expression.Evaluate();
 
 			// Assert
 			Assert.Equal(Status.Success, operation2.Status);
@@ -109,7 +109,7 @@ namespace SmartExpressions.Test
 			progress.ProgressChanged += (_, e) => _outputHelper.WriteLine(e);
 
 			Expression expression = new Expression("Add(SUB(2,1),MULT(5,5))");
-			Operation<object> operation = expression.Evaluate(progress);
+			Result<object> operation = expression.Evaluate(progress);
 
 			// Assert
 			Assert.Equal(Status.Success, operation.Status);

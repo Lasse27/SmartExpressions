@@ -1,4 +1,5 @@
 ﻿using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
@@ -12,34 +13,34 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			=> this.operands = operands;
 
 
-		public static Operation<ExpressionNode> Get(Parser parser)
+		public static Result<ExpressionNode> Get(Parser parser)
 		{
-			Operation<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
+			Result<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
 			if (operation.Status == Status.Failure)
 			{
-				return Operation<ExpressionNode>.Failure(operation.Message);
+				return Result<ExpressionNode>.Failure(operation.Message);
 			}
 
 			ExpressionNode node = new SumNode(operation.Value);
-			return Operation<ExpressionNode>.Success(node);
+			return Result<ExpressionNode>.Success(node);
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
 			double sum = 0;
 			for (int i = 0; i < this.operands.Count; i++)
 			{
 				ExpressionNode operand = this.operands[i];
-				Operation<object> raw = operand.Evaluate(evaluator);
-				Operation<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Sum" + i);
+				Result<object> raw = operand.Evaluate(ctx);
+				Result<double> dec = EvaluatorHelpers.ResolveDouble(raw, "Sum" + i);
 				if (dec.Status == Status.Failure)
 				{
-					return Operation<object>.Failure(dec.Message);
+					return Result<object>.Failure(dec.Message);
 				}
 				sum += dec.Value;
 			}
-			return Operation<object>.Success(sum);
+			return Result<object>.Success(sum);
 		}
 	}
 }

@@ -62,46 +62,46 @@ namespace SmartExpressions.Core.Parsing
 		public Token PeakAtNext() => this._input[this._pointer + 1];
 
 
-		public Operation Check(TokenType expected)
+		public Result Check(TokenType expected)
 		{
 			if (this.PointerIsAtEnd())
 			{
-				return Operation.Failure($"Unexpected end of parser input. Expected: {expected}.");
+				return Result.Failure($"Unexpected end of parser input. Expected: {expected}.");
 			}
 
 			Token current = this.PeakAtPointer();
 			if (current.Type != expected)
 			{
-				return Operation.Failure($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
+				return Result.Failure($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
 			}
 
 			this.AdvancePointer();
 
 			// Valid check
-			return Operation.Success();
+			return Result.Success();
 		}
 
 
-		public Operation<ExpressionNode> Run()
+		public Result<ExpressionNode> Run()
 		{
 			// Guard against stupidity
 			if (this._input.Count == 0)
 			{
-				return Operation<ExpressionNode>.Success(new NullNode());
+				return Result<ExpressionNode>.Success(new NullNode());
 			}
 
 			this.Reset();
-			Operation<ExpressionNode> result = this.ParseExpression();
+			Result<ExpressionNode> result = this.ParseExpression();
 			return result.Status != Status.Success
 				? result
-				: Operation<ExpressionNode>.Success(result.Value);
+				: Result<ExpressionNode>.Success(result.Value);
 		}
 
-		public Operation<ExpressionNode> ParseExpression()
+		public Result<ExpressionNode> ParseExpression()
 		{
 			if (this.PointerIsAtEnd())
 			{
-				return Operation<ExpressionNode>.Failure("Unexpected end of input.");
+				return Result<ExpressionNode>.Failure("Unexpected end of input.");
 			}
 
 			Token current = this.PeakAtPointer();
@@ -159,7 +159,7 @@ namespace SmartExpressions.Core.Parsing
 				TokenType.PiKeyword => PiNode.Get(this),
 
 				// Default
-				_ => Operation<ExpressionNode>.Failure($"Unknown token at position {this._pointer}."),
+				_ => Result<ExpressionNode>.Failure($"Unknown token at position {this._pointer}."),
 			};
 		}
 	}
