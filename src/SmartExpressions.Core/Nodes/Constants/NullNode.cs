@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
@@ -9,21 +9,19 @@ namespace SmartExpressions.Core.Nodes.Constants
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record NullNode : ExpressionNode
 	{
-		private const string Keyword = "NULL";
-
-		public static Operation<ExpressionNode> Get(Parser parser)
+		public static Result<ExpressionNode> Get(Parser parser)
 		{
 			parser.AdvancePointer();
-			return Operation<ExpressionNode>.Success(new NullNode());
+			return Result<ExpressionNode>.Success(new NullNode());
 		}
 
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
-			=> Operation<object>.Success(null);
+		public override Result<object> Evaluate(EvaluationContext ctx)
+			=> Result<object>.Success(null);
 
 		/// <inheritdoc/>
-		public override string GetKeyword() => Keyword;
+		public override string GetKeyword() => "null";
 
 		/// <inheritdoc/>
-		public override string ToString() => Keyword;
+		public override string ToString() => "null";
 	}
 }

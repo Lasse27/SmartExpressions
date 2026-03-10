@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
@@ -18,52 +18,52 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			=> this.Operand = operand;
 
 
-		public static Operation<ExpressionNode> Get(Parser parser)
+		public static Result<ExpressionNode> Get(Parser parser)
 		{
 			// Skip keyword NEG
 			parser.AdvancePointer();
 
 			// Check for left parenthesis
-			Operation check = parser.Check(TokenType.LParen);
+			Result check = parser.Check(TokenType.LParen);
 			if (check.Status == Status.Failure)
 			{
-				return Operation<ExpressionNode>.Failure(check.Message);
+				return Result<ExpressionNode>.Failure(check.Message);
 			}
 
 			// Get operand
-			Operation<ExpressionNode> operand = parser.ParseExpression();
+			Result<ExpressionNode> operand = parser.ParseExpression();
 			if (operand.Status == Status.Failure) { return operand; }
 
 			// Check for right parenthesis
 			check = parser.Check(TokenType.RParen);
 			if (check.Status == Status.Failure)
 			{
-				return Operation<ExpressionNode>.Failure(check.Message);
+				return Result<ExpressionNode>.Failure(check.Message);
 			}
 
 			// Build and return
 			ExpressionNode node = new NegativeNode(operand.Value);
-			return Operation<ExpressionNode>.Success(node);
+			return Result<ExpressionNode>.Success(node);
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
-			Operation<object> raw = this.Operand.Evaluate(evaluator, listener);
+			Result<object> raw = this.Operand.Evaluate(ctx);
 			if (raw.Status == Status.Failure)
 			{
 				return raw;
 			}
 
-			Operation<double> resolved = EvaluatorHelpers.ResolveDouble(raw, Keyword);
+			Result<double> resolved = ExpressionHelpers.ResolveNumeric(raw);
 			if (resolved.Status == Status.Failure)
 			{
-				return Operation<object>.Failure(resolved.Message);
+				return Result<object>.Failure(resolved.Message);
 			}
 
 			double negatived = resolved.Value * (-1);
-			listener?.Report($"{this} = {negatived}");
-			return Operation<object>.Success(negatived);
+			ctx.Listener?.Report($"{this} = {negatived}");
+			return Result<object>.Success(negatived);
 		}
 
 		/// <inheritdoc/>

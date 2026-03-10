@@ -38,13 +38,13 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(formula);
 			foreach (Binding binding in bindings)
 			{
-				_ = expression.Bind(binding.Key, binding.Value);
+				_ = expression.RegisterBinding(binding.Key, binding.Value);
 			}
 			_ = expression.Assemble();
 
 			Progress<string> progress = new Progress<string>();
 			progress.ProgressChanged += (s, e) => this._outputHelper.WriteLine(e);
-			Operation<object> result = expression.Evaluate(progress);
+			Result<object> result = expression.Evaluate(progress);
 			if (result.Status == Status.Failure)
 			{
 				this._outputHelper.WriteLine("Input: " + formula);
@@ -66,8 +66,8 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(this.Formula(1, 2, 3));
 			_ = expression.Assemble();
 
-			Operation<object> r1 = expression.Evaluate();
-			Operation<object> r2 = expression.Evaluate();
+			Result<object> r1 = expression.Evaluate();
+			Result<object> r2 = expression.Evaluate();
 
 			Assert.Equal(r1.Value, r2.Value);
 		}
@@ -547,12 +547,12 @@ namespace SmartExpressions.Test.Expressions
 
 			Expression expression = new Expression(
 				$"{this.FunctionName}(@{{A}},@{{B}},@{{C}})");
-			_ = expression.Bind("A", a);
-			_ = expression.Bind("B", b);
-			_ = expression.Bind("C", c);
+			_ = expression.RegisterBinding("A", a);
+			_ = expression.RegisterBinding("B", b);
+			_ = expression.RegisterBinding("C", c);
 			_ = expression.Assemble();
 
-			Operation<object> result = expression.Evaluate();
+			Result<object> result = expression.Evaluate();
 			Assert.Equal(Status.Success, result.Status);
 
 			double value = Convert.ToDouble(result.Value);

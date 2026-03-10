@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes
@@ -10,7 +10,7 @@ namespace SmartExpressions.Core.Nodes
 	public abstract record ExpressionNode : IEvaluable
 	{
 		/// <inheritdoc/>
-		public abstract Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default);
+		public abstract Result<object> Evaluate(EvaluationContext ctx);
 
 		/// <summary> Gets the related keyword for the node. </summary>
 		/// <returns> A <see cref="string"/> representing the nodes keyword. </returns>
