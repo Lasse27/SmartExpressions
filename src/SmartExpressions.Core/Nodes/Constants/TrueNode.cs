@@ -19,6 +19,9 @@ namespace SmartExpressions.Core.Nodes.Constants
 			=> Result<object>.Success(true);
 
 		/// <inheritdoc/>
-		public override string ToString() => bool.TrueString;
+		public override string GetKeyword() => Keyword;
+
+		/// <inheritdoc/>
+		public override string ToString() => Keyword;
 	}
 }

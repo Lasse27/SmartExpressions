@@ -35,5 +35,8 @@ namespace SmartExpressions.Core.Nodes
 
 		/// <inheritdoc/>
 		public override string ToString() => this.Key;
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => this.Key;
 	}
 }

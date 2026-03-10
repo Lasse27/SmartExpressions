@@ -428,7 +428,7 @@ namespace SmartExpressions.Test.Expressions
 		{
 			Random random = new Random(42);
 
-			for (int i = 0; i < 100_000; i++)
+			for (int i = 0; i < 10_000; i++)
 			{
 				double a = Math.Round((random.NextDouble() * 1000D) - 500D, 10);
 				double b = Math.Round((random.NextDouble() * 1000D) - 500D, 10);

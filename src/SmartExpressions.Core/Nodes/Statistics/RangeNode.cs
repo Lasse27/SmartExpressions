@@ -4,12 +4,13 @@ using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Statistics
 {
-	public record RangeNode : ExpressionNode
+	public record RangeNode : CompositeFunction
 	{
-		private readonly List<ExpressionNode> operands;
+		private const string Keyword = "RANGE";
 
-		public RangeNode(List<ExpressionNode> operands)
-			=> this.operands = operands;
+
+		/// <inheritDoc/>
+		public RangeNode(List<ExpressionNode> operands) : base(operands) { }
 
 
 		public static Result<ExpressionNode> Get(Parser parser)
@@ -27,9 +28,9 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		/// <inheritdoc/>
 		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
-			double min = double.MinValue;
-			double max = double.MaxValue;
-			for (int i = 0; i < this.operands.Count; i++)
+			double min = double.MaxValue;
+			double max = double.MinValue;
+			for (int i = 0; i < this.Operands.Count; i++)
 			{
 				ExpressionNode operand = this.operands[i];
 				Result<object> raw = operand.Evaluate(ctx);
@@ -50,5 +51,11 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			}
 			return Result<object>.Success(max - min);
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => base.ToString();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

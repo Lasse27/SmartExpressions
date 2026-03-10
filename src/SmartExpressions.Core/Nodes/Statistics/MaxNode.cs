@@ -4,12 +4,13 @@ using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Statistics
 {
-	public record MaxNode : ExpressionNode
+	public record MaxNode : CompositeFunction
 	{
-		private readonly List<ExpressionNode> operands;
+		private const string Keyword = "MAX";
 
-		public MaxNode(List<ExpressionNode> operands)
-			=> this.operands = operands;
+
+		/// <inheritDoc/>
+		public MaxNode(List<ExpressionNode> operands) : base(operands) { }
 
 
 		public static Result<ExpressionNode> Get(Parser parser)
@@ -29,7 +30,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
 			double max = double.MinValue;
-			for (int i = 0; i < this.operands.Count; i++)
+			for (int i = 0; i < this.Operands.Count; i++)
 			{
 				ExpressionNode operand = this.operands[i];
 				Result<object> raw = operand.Evaluate(ctx);
@@ -45,5 +46,11 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			}
 			return Result<object>.Success(max);
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => base.ToString();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

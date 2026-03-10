@@ -4,12 +4,12 @@ using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Nodes.Statistics
 {
-	public record AverageNode : ExpressionNode
+	public record AverageNode : CompositeFunction
 	{
-		private readonly List<ExpressionNode> operands;
+		private const string Keyword = "AVG";
 
-		public AverageNode(List<ExpressionNode> operands)
-			=> this.operands = operands;
+		/// <inheritDoc/>
+		public AverageNode(List<ExpressionNode> operands) : base(operands) { }
 
 		public static Result<ExpressionNode> Get(Parser parser)
 		{
@@ -28,7 +28,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
 			double sum = 0;
-			for (int i = 0; i < this.operands.Count; i++)
+			for (int i = 0; i < this.Operands.Count; i++)
 			{
 				ExpressionNode operand = this.operands[i];
 				Result<object> raw = operand.Evaluate(ctx);
@@ -41,5 +41,11 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			}
 			return Result<object>.Success(sum / this.operands.Count);
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => base.ToString();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

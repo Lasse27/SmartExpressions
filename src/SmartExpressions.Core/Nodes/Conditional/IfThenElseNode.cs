@@ -7,6 +7,8 @@ namespace SmartExpressions.Core.Nodes.Conditional
 {
 	public record IfThenElseNode : ExpressionNode
 	{
+		private const string Keyword = "IF";
+
 		public ExpressionNode Condition { get; set; }
 		public ExpressionNode Then { get; set; }
 		public ExpressionNode Else { get; set; }
@@ -110,5 +112,8 @@ namespace SmartExpressions.Core.Nodes.Conditional
 
 		/// <inheritdoc/>
 		public override string ToString() => $"IF({this.Condition}) THEN({this.Then}) ELSE({this.Else})";
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

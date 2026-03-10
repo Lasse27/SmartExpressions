@@ -55,5 +55,8 @@ namespace SmartExpressions.Core.Nodes
 
 		/// <inheritdoc/>
 		private new string GetDebuggerDisplay() => this.ToString();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => this.Value.ToString(CultureInfo.InvariantCulture);
 	}
 }

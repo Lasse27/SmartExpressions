@@ -20,6 +20,9 @@ namespace SmartExpressions.Core.Nodes.Constants
 			=> Result<object>.Success(Math.PI);
 
 		/// <inheritdoc/>
-		public override string ToString() => Math.PI.ToString(CultureInfo.InvariantCulture);
+		public override string GetKeyword() => Keyword;
+
+		/// <inheritdoc/>
+		public override string ToString() => Keyword;
 	}
 }
