@@ -6,6 +6,32 @@ namespace SmartExpressions.Core.Parsing
 {
 	public static partial class ParserHelpers
 	{
+		public static Result<ExpressionNode> ParseUnaryKeyword(Parser parser)
+		{
+			// Skip keyword
+			parser.AdvancePointer();
+
+			// Check for left parenthesis
+			Result check = parser.Check(TokenType.LParen);
+			if (check.Status == Status.Failure)
+			{
+				return Result<ExpressionNode>.Failure(check.Message);
+			}
+
+			// Get operand
+			Result<ExpressionNode> operand = parser.ParseExpression(); // points to next token
+			if (operand.Status == Status.Failure)
+			{
+				return Result<ExpressionNode>.Failure(operand.Message);
+			}
+
+			// Check for right parenthesis
+			check = parser.Check(TokenType.RParen);
+			return check.Status == Status.Failure
+				? Result<ExpressionNode>.Failure(check.Message)
+				: Result<ExpressionNode>.Success(operand.Value);
+		}
+
 		public static Result<BinaryOperand> ParseBinaryKeyword(Parser parser)
 		{
 			// Skip keyword

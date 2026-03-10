@@ -9,6 +9,7 @@ using SmartExpressions.Core.Nodes.Conditional;
 using SmartExpressions.Core.Nodes.Constants;
 using SmartExpressions.Core.Nodes.Logical;
 using SmartExpressions.Core.Nodes.Statistics;
+using SmartExpressions.Core.Nodes.Trigonometric;
 using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Parsing
@@ -38,6 +39,19 @@ namespace SmartExpressions.Core.Parsing
 				["root"] = RootNode.Get,
 				["pow"] = PowerNode.Get,
 				["mod"] = ModuloNode.Get,
+
+				// trigonometric
+				["sin"] = SinNode.Get,
+				["cos"] = CosNode.Get,
+				["tan"] = TanNode.Get,
+				["sinh"] = SinhNode.Get,
+				["cosh"] = CoshNode.Get,
+				["tanh"] = TanhNode.Get,
+				["asin"] = ASinNode.Get,
+				["acos"] = ACosNode.Get,
+				["atan"] = ATanNode.Get,
+				["rad"] = RadNode.Get,
+				["deg"] = DegreeNode.Get,
 
 				// Comparison
 				["eq"] = EqualNode.Get,

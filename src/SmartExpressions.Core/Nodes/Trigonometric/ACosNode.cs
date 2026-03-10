@@ -1,19 +1,17 @@
 ﻿using SmartExpressions.Core.Expressions;
-using SmartExpressions.Core.Lexing;
-using SmartExpressions.Core.Nodes.Trigonometric;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
-namespace SmartExpressions.Core.Nodes.Arithmetic
+namespace SmartExpressions.Core.Nodes.Trigonometric
 {
-	public record AbsoluteNode : ExpressionNode
+	public record ACosNode : ExpressionNode
 	{
-		private const string Keyword = "ABS";
+		private const string Keyword = "acos";
 
 		public ExpressionNode Operand { get; set; }
 
 		/// <inheritdoc/>
-		public AbsoluteNode(ExpressionNode operand) => this.Operand = operand;
+		public ACosNode(ExpressionNode operand) => this.Operand = operand;
 
 		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
 		/// <param name="parser"> The parser that is checked for the node. </param>
@@ -23,7 +21,7 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 			// Get operand
 			Result<ExpressionNode> operand = ParserHelpers.ParseUnaryKeyword(parser);
 			if (operand.Status == Status.Failure) { return operand; }
-			ExpressionNode node = new AbsoluteNode(operand.Value);
+			ExpressionNode node = new ACosNode(operand.Value);
 			return Result<ExpressionNode>.Success(node);
 		}
 
@@ -31,19 +29,13 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 		/// <inheritdoc/>
 		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
-			Result<object> raw = this.Operand.Evaluate(ctx);
-			if (raw.Status == Status.Failure)
-			{
-				return raw;
-			}
-
-			Result<double> resolved = ExpressionHelpers.ResolveNumeric(raw);
+			Result<double> resolved = ExpressionHelpers.ResolveNumeric(this.Operand.Evaluate(ctx));
 			if (resolved.Status == Status.Failure)
 			{
 				return Result<object>.Failure(resolved.Message);
 			}
 
-			double absolute = Math.Abs(resolved.Value);
+			double absolute = Math.Acos(resolved.Value);
 			ctx.Listener?.Report($"{this} = {absolute}");
 			return Result<object>.Success(absolute);
 		}
