@@ -29,27 +29,6 @@ namespace SmartExpressions.Test.Expressions
 		private string Formula(string left, string right) =>
 			$"{this.FunctionName}({left},{right})";
 
-		private new object EvaluateSuccess(string formula, params Binding[] bindings)
-		{
-			Expression expression = new Expression(formula);
-			foreach (Binding binding in bindings)
-			{
-				_ = expression.RegisterBinding(binding.Key, binding.Value);
-			}
-			_ = expression.Assemble();
-
-			Progress<string> progress = new Progress<string>();
-			progress.ProgressChanged += (s, e) => this._outputHelper.WriteLine(e);
-			Result<object> result = expression.Evaluate(progress);
-			if (result.Status == Status.Failure)
-			{
-				this._outputHelper.WriteLine("Input: " + formula);
-				this._outputHelper.WriteLine("Fail: " + result.Message);
-			}
-
-			Assert.Equal(Status.Success, result.Status);
-			return result.Value;
-		}
 
 
 		// -----------------------------------------------

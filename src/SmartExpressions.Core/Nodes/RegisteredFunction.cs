@@ -47,10 +47,9 @@ namespace SmartExpressions.Core.Nodes
 						return innerResult;
 					}
 
-					objs.Add(innerResult);
+					objs.Add(innerResult.Value);
 				}
-				object value = result.Invoke(objs);
-				return Result<object>.Success(value);
+				return result.Invoke(objs);
 			}
 			return Result<object>.Failure($"Can't evaluate unknown function '{this.GetKeyword()}'.");
 		}

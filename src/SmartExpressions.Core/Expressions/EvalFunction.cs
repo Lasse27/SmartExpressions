@@ -1,4 +1,6 @@
-﻿namespace SmartExpressions.Core.Expressions
+﻿using SmartExpressions.Core.Utility;
+
+namespace SmartExpressions.Core.Expressions
 {
-	public delegate object EvalFunction(List<object> args);
+	public delegate Result<object> EvalFunction(List<object> args);
 }
