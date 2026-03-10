@@ -182,6 +182,14 @@ namespace SmartExpressions.Core.Expressions
 			return this;
 		}
 
+		/// <summary> 
+		/// Registers a single function to the expression. Existing keys are overwritten. 
+		/// </summary>
+		/// <returns>
+		/// The current <see cref="Expression"/> instance for fluent configuration.
+		/// </returns>
+		/// <exception cref="ArgumentException"/>
+		/// <exception cref="ArgumentNullException"/>
 		public Expression RegisterFunction(string key, EvalFunction function)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
@@ -197,6 +205,13 @@ namespace SmartExpressions.Core.Expressions
 			return this;
 		}
 
+		/// <summary> 
+		/// Registers multiple functions to the expression. Existing keys are overwritten. 
+		/// </summary>
+		/// <returns>
+		/// The current <see cref="Expression"/> instance for fluent configuration.
+		/// </returns>
+		/// <exception cref="ArgumentNullException"/>
 		public Expression RegisterFunctions(IDictionary<string, EvalFunction> functions)
 		{
 			ArgumentNullException.ThrowIfNull(functions, nameof(functions));
