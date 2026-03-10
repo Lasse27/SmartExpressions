@@ -50,6 +50,8 @@ namespace SmartExpressions.Core.Parsing
 				["asin"] = ASinNode.Get,
 				["acos"] = ACosNode.Get,
 				["atan"] = ATanNode.Get,
+				["rad"] = RadNode.Get,
+				["deg"] = DegreeNode.Get,
 
 				// Comparison
 				["eq"] = EqualNode.Get,
