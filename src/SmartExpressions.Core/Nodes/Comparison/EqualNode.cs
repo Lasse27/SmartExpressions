@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
@@ -9,7 +8,7 @@ namespace SmartExpressions.Core.Nodes.Comparison
 {
 
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record EqualNode : TwoOperandFunction
+	public record EqualNode : BinaryFunction
 	{
 		private const string Keyword = "EQ";
 
@@ -21,7 +20,7 @@ namespace SmartExpressions.Core.Nodes.Comparison
 		/// <returns> A <see cref="Result{T}"/> object containing the parsed node or an error. </returns>
 		public static Result<ExpressionNode> Get(Parser parser)
 		{
-			Result<BinaryOperand> dualOperand = ParserHelpers.ParseDualOperandKeyword(parser);
+			Result<BinaryOperand> dualOperand = ParserHelpers.ParseBinaryKeyword(parser);
 			if (dualOperand.Status == Status.Failure)
 			{
 				return Result<ExpressionNode>.Failure(dualOperand.Message);

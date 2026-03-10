@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-using SmartExpressions.Core.Expressions;
+﻿using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Utility;
 using SmartExpressions.Test.Utility;
 

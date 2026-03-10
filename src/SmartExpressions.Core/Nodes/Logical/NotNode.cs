@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
@@ -60,7 +59,7 @@ namespace SmartExpressions.Core.Nodes.Logical
 				return raw;
 			}
 
-			Result<bool> resolved = EvaluatorHelpers.ResolveBoolean(raw, Keyword);
+			Result<bool> resolved = ExpressionHelpers.ResolveBoolean(raw);
 			if (resolved.Status == Status.Failure)
 			{
 				return Result<object>.Failure(resolved.Message);

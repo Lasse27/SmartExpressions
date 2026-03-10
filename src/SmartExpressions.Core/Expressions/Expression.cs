@@ -5,6 +5,8 @@ using SmartExpressions.Core.Utility;
 
 namespace SmartExpressions.Core.Expressions
 {
+
+
 	/// <summary> 
 	/// Represents a configurable and evaluatable expression based on a textual formula. 
 	/// </summary>
@@ -64,13 +66,15 @@ namespace SmartExpressions.Core.Expressions
 
 		#region Constructors
 
-		/// <summary> Initializes a new instance of the <see cref="Expression"/> class. </summary>
+		/// <summary> 
+		/// Initializes a new instance of the <see cref="Expression"/> class. 
+		/// </summary>
 		public Expression()
 		{
 			this.Formula = string.Empty;
 			this.Settings = new ExpressionSettings();
-			this.Bindings = new Dictionary<string, object>(5); // assume 5 items
-			this.Functions = new Dictionary<string, EvalFunction>(5); // assume 5 items
+			this.Bindings = new Dictionary<string, object>(5, StringComparer.OrdinalIgnoreCase); // assume 5 items
+			this.Functions = new Dictionary<string, EvalFunction>(5, StringComparer.OrdinalIgnoreCase); // assume 5 items
 
 			this._tokens = [];
 			this._root = null;
@@ -78,7 +82,9 @@ namespace SmartExpressions.Core.Expressions
 			this._isParsed = false;
 		}
 
-		/// <summary> Initializes a new instance of the <see cref="Expression"/> class. </summary>
+		/// <summary> 
+		/// Initializes a new instance of the <see cref="Expression"/> class. 
+		/// </summary>
 		/// <exception cref="ArgumentNullException"/>
 		public Expression(string formula) : this()
 		{
@@ -86,21 +92,20 @@ namespace SmartExpressions.Core.Expressions
 			this.Formula = formula;
 		}
 
-		/// <summary> Initializes a new instance of the <see cref="Expression"/> class. </summary>
+		/// <summary> 
+		/// Initializes a new instance of the <see cref="Expression"/> class. 
+		/// </summary>
 		/// <exception cref="ArgumentNullException"/>
 		public Expression(ExpressionSettings settings) : this()
-		{
-			ArgumentNullException.ThrowIfNull(settings, nameof(settings));
+			=> this.Settings = settings;
 
-			this.Settings = settings;
-		}
-
-		/// <summary> Initializes a new instance of the <see cref="Expression"/> class. </summary>
+		/// <summary> 
+		/// Initializes a new instance of the <see cref="Expression"/> class. 
+		/// </summary>
 		/// <exception cref="ArgumentNullException"/>
 		public Expression(string formula, ExpressionSettings settings) : this()
 		{
 			ArgumentNullException.ThrowIfNull(formula, nameof(formula));
-			ArgumentNullException.ThrowIfNull(settings, nameof(settings));
 
 			this.Formula = formula;
 			this.Settings = settings;
@@ -109,8 +114,12 @@ namespace SmartExpressions.Core.Expressions
 		#endregion
 
 
-		/// <summary> Sets the formula of the expression and resets tokenization and parsing state. </summary>
-		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
+		/// <summary> 
+		/// Sets the formula of the expression and resets tokenization and parsing state. 
+		/// </summary>
+		/// <returns>
+		/// The current <see cref="Expression"/> instance for fluent configuration.
+		/// </returns>
 		/// <exception cref="ArgumentNullException"> Thrown if <paramref name="formula"/> is <see langword="null"/>. </exception>
 		public Expression SetFormula(string formula)
 		{
@@ -123,29 +132,14 @@ namespace SmartExpressions.Core.Expressions
 		}
 
 
-		/// <summary> Binds multiple parameters to the expression. Existing keys are overwritten. </summary>
-		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
-		/// <exception cref="ArgumentNullException"/>
-		public Expression RegisterBindings(IDictionary<string, object> bindings)
-		{
-			ArgumentNullException.ThrowIfNull(bindings, nameof(bindings));
-			foreach (KeyValuePair<string, object> parameter in bindings)
-			{
-				if (this.Bindings.TryGetValue(parameter.Key, out object? _))
-				{
-					this.Bindings[parameter.Key] = parameter.Value;
-				}
-				else
-				{
-					this.Bindings.Add(parameter.Key, parameter.Value);
-				}
-			}
-			return this;
-		}
+		#region [ Registration ]
 
-
-		/// <summary> Binds a single parameter to the expression. Existing keys are overwritten. </summary>
-		/// <returns>The current <see cref="Expression"/> instance for fluent configuration.</returns>
+		/// <summary> 
+		/// Registers a single parameter to the expression. Existing keys are overwritten. 
+		/// </summary>
+		/// <returns>
+		/// The current <see cref="Expression"/> instance for fluent configuration.
+		/// </returns>
 		/// <exception cref="ArgumentException"/>
 		/// <exception cref="ArgumentNullException"/>
 		public Expression RegisterBinding(string key, object value)
@@ -164,6 +158,66 @@ namespace SmartExpressions.Core.Expressions
 			return this;
 		}
 
+		/// <summary> 
+		/// Registers multiple parameters to the expression. Existing keys are overwritten. 
+		/// </summary>
+		/// <returns>
+		/// The current <see cref="Expression"/> instance for fluent configuration.
+		/// </returns>
+		/// <exception cref="ArgumentNullException"/>
+		public Expression RegisterBindings(IDictionary<string, object> bindings)
+		{
+			ArgumentNullException.ThrowIfNull(bindings, nameof(bindings));
+			foreach (KeyValuePair<string, object> parameter in bindings)
+			{
+				if (this.Bindings.TryGetValue(parameter.Key, out object? _))
+				{
+					this.Bindings[parameter.Key] = parameter.Value;
+				}
+				else
+				{
+					this.Bindings.Add(parameter.Key, parameter.Value);
+				}
+			}
+			return this;
+		}
+
+		public Expression RegisterFunction(string key, EvalFunction function)
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
+			ArgumentNullException.ThrowIfNull(function, nameof(function));
+			if (this.Functions.TryGetValue(key, out EvalFunction? _))
+			{
+				this.Functions[key] = function;
+			}
+			else
+			{
+				this.Functions.Add(key, function);
+			}
+			return this;
+		}
+
+		public Expression RegisterFunctions(IDictionary<string, EvalFunction> functions)
+		{
+			ArgumentNullException.ThrowIfNull(functions, nameof(functions));
+			foreach (KeyValuePair<string, EvalFunction> func in functions)
+			{
+				if (this.Functions.TryGetValue(func.Key, out EvalFunction? _))
+				{
+					this.Functions[func.Key] = func.Value;
+				}
+				else
+				{
+					this.Functions.Add(func.Key, func.Value);
+				}
+			}
+			return this;
+		}
+
+		#endregion
+
+
+		#region [ Initialization and Creation ]
 
 		/// <summary> Tokenizes the current formula into a sequence of <see cref="Token"/> instances. </summary>
 		/// <returns> A <see cref="Result"/> indicating whether tokenization succeeded. </returns>
@@ -240,6 +294,8 @@ namespace SmartExpressions.Core.Expressions
 			return Result.Success();
 		}
 
+		#endregion
+
 
 		/// <inheritdoc/>
 		public Result<object> Evaluate(IProgress<string>? listener = default)
@@ -272,7 +328,4 @@ namespace SmartExpressions.Core.Expressions
 			}
 		}
 	}
-
-
-	public delegate object EvalFunction(List<object> args);
 }

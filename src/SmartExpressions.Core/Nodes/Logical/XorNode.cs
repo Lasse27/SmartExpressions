@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
@@ -8,7 +7,7 @@ using SmartExpressions.Core.Utility;
 namespace SmartExpressions.Core.Nodes.Logical
 {
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record XorNode : TwoOperandFunction
+	public record XorNode : BinaryFunction
 	{
 		private const string Keyword = "XOR";
 
@@ -20,7 +19,7 @@ namespace SmartExpressions.Core.Nodes.Logical
 		/// <returns> A <see cref="Result{T}"/> object containing the parsed node or an error. </returns>
 		public static Result<ExpressionNode> Get(Parser parser)
 		{
-			Result<BinaryOperand> dualOperand = ParserHelpers.ParseDualOperandKeyword(parser);
+			Result<BinaryOperand> dualOperand = ParserHelpers.ParseBinaryKeyword(parser);
 			if (dualOperand.Status == Status.Failure)
 			{
 				return Result<ExpressionNode>.Failure(dualOperand.Message);
@@ -37,14 +36,14 @@ namespace SmartExpressions.Core.Nodes.Logical
 			Result<object> rawLeft = this.Left.Evaluate(ctx);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
 
-			Result<bool> resolvedLeft = EvaluatorHelpers.ResolveBoolean(rawLeft, Keyword);
+			Result<bool> resolvedLeft = ExpressionHelpers.ResolveBoolean(rawLeft);
 			if (resolvedLeft.Status == Status.Failure) { return Result<object>.Failure(resolvedLeft.Message); }
 
 			// Right operand
 			Result<object> rawRight = this.Right.Evaluate(ctx);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
-			Result<bool> resolvedRight = EvaluatorHelpers.ResolveBoolean(rawRight, Keyword);
+			Result<bool> resolvedRight = ExpressionHelpers.ResolveBoolean(rawRight);
 			if (resolvedRight.Status == Status.Failure) { return Result<object>.Failure(resolvedRight.Message); }
 
 			// XOR and return

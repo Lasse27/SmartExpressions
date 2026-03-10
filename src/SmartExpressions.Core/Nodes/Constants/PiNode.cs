@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 
-using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;

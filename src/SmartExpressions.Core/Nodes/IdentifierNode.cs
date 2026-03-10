@@ -1,5 +1,4 @@
-﻿using SmartExpressions.Core.Evaluation;
-using SmartExpressions.Core.Expressions;
+﻿using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;

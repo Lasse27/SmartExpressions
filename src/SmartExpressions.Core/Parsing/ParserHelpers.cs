@@ -6,7 +6,7 @@ namespace SmartExpressions.Core.Parsing
 {
 	public static partial class ParserHelpers
 	{
-		public static Result<BinaryOperand> ParseDualOperandKeyword(Parser parser)
+		public static Result<BinaryOperand> ParseBinaryKeyword(Parser parser)
 		{
 			// Skip keyword
 			parser.AdvancePointer();
@@ -41,15 +41,12 @@ namespace SmartExpressions.Core.Parsing
 
 			// Check for right parenthesis
 			check = parser.Check(TokenType.RParen);
-			if (check.Status == Status.Failure)
-			{
-				return Result<BinaryOperand>.Failure(check.Message);
-			}
-
-			return Result<BinaryOperand>.Success(new(left.Value, right.Value));
+			return check.Status == Status.Failure
+				? Result<BinaryOperand>.Failure(check.Message)
+				: Result<BinaryOperand>.Success(new(left.Value, right.Value));
 		}
 
-		public static Result<List<ExpressionNode>> ParseNCountOperandKeyword(Parser parser)
+		public static Result<List<ExpressionNode>> ParseNCountKeyword(Parser parser)
 		{
 			// Skip keyword
 			parser.AdvancePointer();
@@ -71,12 +68,9 @@ namespace SmartExpressions.Core.Parsing
 
 			// Check right parenthesis
 			check = parser.Check(TokenType.RParen);
-			if (check.Status == Status.Failure)
-			{
-				return Result<List<ExpressionNode>>.Failure(check.Message);
-			}
-
-			return Result<List<ExpressionNode>>.Success(operands);
+			return check.Status == Status.Failure
+				? Result<List<ExpressionNode>>.Failure(check.Message)
+				: Result<List<ExpressionNode>>.Success(operands);
 		}
 
 		public static Result ParseAndAddOperands(Parser parser, List<ExpressionNode> operands)

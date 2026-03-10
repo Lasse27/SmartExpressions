@@ -141,7 +141,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			List<Token> tokens = Tokenize(" OR( @{TEMP_1} , @{TRUE} ) ");
 			Assert.Equal(6, tokens.Count);
-			Assert.Equal(TokenType.OrKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.Keyword, tokens[0].Type);
 			Assert.Equal(TokenType.LParen, tokens[1].Type);
 			Assert.Equal(TokenType.Identifier, tokens[2].Type);
 			Assert.Equal(TokenType.Comma, tokens[3].Type);
@@ -175,7 +175,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_Finds_Keyword_With_Number_And_Number_Correctly()
 		{
 			List<Token> tokens = Tokenize("ADD(125,123.0)");
-			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.Keyword, tokens[0].Type);
 			Assert.Equal(TokenType.LParen, tokens[1].Type);
 			Assert.Equal(TokenType.Numeric, tokens[2].Type);
 			Assert.Equal(TokenType.Comma, tokens[3].Type);
@@ -191,7 +191,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_Finds_Keyword_With_Identifier_And_Number_Correctly()
 		{
 			List<Token> tokens = Tokenize("ADD(@{Identifier_BE1_123},123.0)");
-			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.Keyword, tokens[0].Type);
 			Assert.Equal(TokenType.LParen, tokens[1].Type);
 			Assert.Equal(TokenType.Identifier, tokens[2].Type);
 			Assert.Equal(TokenType.Comma, tokens[3].Type);
@@ -207,7 +207,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_Finds_Keyword_With_Identifier_And_Identifier_Correctly()
 		{
 			List<Token> tokens = Tokenize("ADD(@{Identifier_BE1_123},@{Identifier_BE1_123})");
-			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.Keyword, tokens[0].Type);
 			Assert.Equal(TokenType.LParen, tokens[1].Type);
 			Assert.Equal(TokenType.Identifier, tokens[2].Type);
 			Assert.Equal(TokenType.Comma, tokens[3].Type);
@@ -223,10 +223,10 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_Finds_Keyword_With_Keyword_And_Keyword_Correctly()
 		{
 			List<Token> tokens = Tokenize("ADD(ADD(1,1),MULT(1,1))");
-			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.Keyword, tokens[0].Type);
 			Assert.Equal(TokenType.LParen, tokens[1].Type);
 
-			Assert.Equal(TokenType.AddKeyWord, tokens[2].Type);
+			Assert.Equal(TokenType.Keyword, tokens[2].Type);
 			Assert.Equal(TokenType.LParen, tokens[3].Type);
 			Assert.Equal(TokenType.Numeric, tokens[4].Type);
 			Assert.Equal(TokenType.Comma, tokens[5].Type);
@@ -235,7 +235,7 @@ namespace SmartExpressions.Test.Lexing
 
 			Assert.Equal(TokenType.Comma, tokens[8].Type);
 
-			Assert.Equal(TokenType.MultKeyWord, tokens[9].Type);
+			Assert.Equal(TokenType.Keyword, tokens[9].Type);
 			Assert.Equal(TokenType.LParen, tokens[10].Type);
 			Assert.Equal(TokenType.Numeric, tokens[11].Type);
 			Assert.Equal(TokenType.Comma, tokens[12].Type);
@@ -253,10 +253,10 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_Finds_Keyword_With_Keyword_And_Identifier_Correctly()
 		{
 			List<Token> tokens = Tokenize("ADD(ADD(1,1),@{KEY})");
-			Assert.Equal(TokenType.AddKeyWord, tokens[0].Type);
+			Assert.Equal(TokenType.Keyword, tokens[0].Type);
 			Assert.Equal(TokenType.LParen, tokens[1].Type);
 
-			Assert.Equal(TokenType.AddKeyWord, tokens[2].Type);
+			Assert.Equal(TokenType.Keyword, tokens[2].Type);
 			Assert.Equal(TokenType.LParen, tokens[3].Type);
 			Assert.Equal(TokenType.Numeric, tokens[4].Type);
 			Assert.Equal(TokenType.Comma, tokens[5].Type);

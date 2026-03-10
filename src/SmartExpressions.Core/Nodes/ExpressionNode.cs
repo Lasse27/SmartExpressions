@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Utility;
 

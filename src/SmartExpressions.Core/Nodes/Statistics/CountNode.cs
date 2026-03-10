@@ -1,5 +1,4 @@
-﻿using SmartExpressions.Core.Evaluation;
-using SmartExpressions.Core.Expressions;
+﻿using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
@@ -15,7 +14,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 
 		public static Result<ExpressionNode> Get(Parser parser)
 		{
-			Result<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
+			Result<List<ExpressionNode>> operation = ParserHelpers.ParseNCountKeyword(parser);
 			if (operation.Status == Status.Failure)
 			{
 				return Result<ExpressionNode>.Failure(operation.Message);

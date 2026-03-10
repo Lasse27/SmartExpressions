@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 
 using Microsoft.VSDiagnostics;
 

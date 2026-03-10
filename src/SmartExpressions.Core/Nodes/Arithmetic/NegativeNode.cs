@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
@@ -56,7 +55,7 @@ namespace SmartExpressions.Core.Nodes.Arithmetic
 				return raw;
 			}
 
-			Result<double> resolved = EvaluatorHelpers.ResolveDouble(raw, Keyword);
+			Result<double> resolved = ExpressionHelpers.ResolveNumeric(raw);
 			if (resolved.Status == Status.Failure)
 			{
 				return Result<object>.Failure(resolved.Message);

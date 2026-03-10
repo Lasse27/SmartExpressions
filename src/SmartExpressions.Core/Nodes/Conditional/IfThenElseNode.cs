@@ -1,5 +1,4 @@
-﻿using SmartExpressions.Core.Evaluation;
-using SmartExpressions.Core.Expressions;
+﻿using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
@@ -19,12 +18,12 @@ namespace SmartExpressions.Core.Nodes.Conditional
 			this.Else = @else;
 		}
 
-		public static Result<ExpressionNode> Parse(Parser parser)
+		public static Result<ExpressionNode> Get(Parser parser)
 		{
 			/*
 			 * IF
 			 */
-			Result check = parser.Check(TokenType.IfKeyWord);
+			Result check = parser.Check(TokenType.Keyword);
 			if (check.Status == Status.Failure)
 			{
 				return Result<ExpressionNode>.Failure(check.Message);
@@ -68,7 +67,7 @@ namespace SmartExpressions.Core.Nodes.Conditional
 			 * ELSE
 			 */
 
-			check = parser.Check(TokenType.ElseKeyword);
+			check = parser.Check(TokenType.Keyword);
 			if (check.Status == Status.Failure)
 			{
 				return Result<ExpressionNode>.Failure(check.Message);
@@ -99,7 +98,7 @@ namespace SmartExpressions.Core.Nodes.Conditional
 		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
 			Result<object> result = this.Condition.Evaluate(ctx);
-			Result<bool> condition = EvaluatorHelpers.ResolveBoolean(result, "IF");
+			Result<bool> condition = ExpressionHelpers.ResolveBoolean(result);
 			if (condition.Status == Status.Failure) { return Result<object>.Failure(condition.Message); }
 
 			// Handle then else
