@@ -25,5 +25,8 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		}
 
 		public override Result<object> Evaluate(EvaluationContext ctx) => throw new NotImplementedException();
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

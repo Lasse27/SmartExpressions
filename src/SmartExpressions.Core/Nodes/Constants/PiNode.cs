@@ -10,6 +10,8 @@ namespace SmartExpressions.Core.Nodes.Constants
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record PiNode : ExpressionNode
 	{
+		private const string Keyword = "e";
+
 		public static Result<ExpressionNode> Get(Parser parser)
 		{
 			parser.AdvancePointer();

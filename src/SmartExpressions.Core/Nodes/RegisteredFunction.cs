@@ -56,6 +56,6 @@ namespace SmartExpressions.Core.Nodes
 
 		/// <summary> Gets the related keyword for the node. </summary>
 		/// <returns> A <see cref="string"/> representing the nodes keyword. </returns>
-		public string GetKeyword() => this.key;
+		public override string GetKeyword() => this.key;
 	}
 }

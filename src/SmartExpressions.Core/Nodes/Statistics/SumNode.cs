@@ -30,7 +30,7 @@ namespace SmartExpressions.Core.Nodes.Statistics
 			double sum = 0;
 			for (int i = 0; i < this.Operands.Count; i++)
 			{
-				ExpressionNode operand = this.operands[i];
+				ExpressionNode operand = this.Operands[i];
 				Result<object> raw = operand.Evaluate(ctx);
 				Result<double> dec = ExpressionHelpers.ResolveNumeric(raw);
 				if (dec.Status == Status.Failure)

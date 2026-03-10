@@ -27,6 +27,9 @@ namespace SmartExpressions.Core.Nodes.Statistics
 
 		/// <inheritdoc/>
 		public override Result<object> Evaluate(EvaluationContext ctx)
-			=> Result<object>.Success(this.operands.Count);
+			=> Result<object>.Success(this.Operands.Count);
+
+		/// <inheritdoc/>
+		public override string GetKeyword() => Keyword;
 	}
 }

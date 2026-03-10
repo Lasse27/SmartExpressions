@@ -12,6 +12,10 @@ namespace SmartExpressions.Core.Nodes
 		/// <inheritdoc/>
 		public abstract Result<object> Evaluate(EvaluationContext ctx);
 
+		/// <summary> Gets the related keyword for the node. </summary>
+		/// <returns> A <see cref="string"/> representing the nodes keyword. </returns>
+		public abstract string GetKeyword();
+
 		/// <inheritdoc/>
 		protected string GetDebuggerDisplay() => this.ToString();
 

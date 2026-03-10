@@ -8,9 +8,7 @@ namespace SmartExpressions.Core.Nodes
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public abstract record BinaryFunction(ExpressionNode Left, ExpressionNode Right) : ExpressionNode
 	{
-		/// <summary> Gets the related keyword for the node. </summary>
-		/// <returns> A <see cref="string"/> representing the nodes keyword. </returns>
-		public abstract string GetKeyword();
+
 
 		/// <inheritdoc/>
 		public override string ToString() => $"{this.GetKeyword()}({this.Left}, {this.Right})";
