@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Frozen;
+using System.Runtime.CompilerServices;
 
 using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Nodes;
@@ -14,17 +15,72 @@ namespace SmartExpressions.Core.Parsing
 {
 	public class Parser
 	{
+		private static readonly FrozenDictionary<string, Func<Parser, Result<ExpressionNode>>> buildInFactories;
+
+		static Parser()
+		{
+			Dictionary<string, Func<Parser, Result<ExpressionNode>>> dict = new()
+			{
+				// Constants
+				["e"] = EulerNode.Get,
+				["pi"] = PiNode.Get,
+				["true"] = TrueNode.Get,
+				["false"] = FalseNode.Get,
+				["null"] = NullNode.Get,
+
+				// Arithmetic
+				["add"] = AddNode.Get,
+				["sub"] = SubtractNode.Get,
+				["mult"] = MultiplyNode.Get,
+				["div"] = DivideNode.Get,
+				["abs"] = AbsoluteNode.Get,
+				["neg"] = NegativeNode.Get,
+				["root"] = RootNode.Get,
+				["pow"] = PowerNode.Get,
+				["mod"] = ModuloNode.Get,
+
+				// Comparison
+				["eq"] = EqualNode.Get,
+				["neq"] = NotEqualNode.Get,
+				["gt"] = GreaterThanNode.Get,
+				["gte"] = GreaterThanEqualNode.Get,
+				["lt"] = LessThanNode.Get,
+				["lte"] = LessThanEqualNode.Get,
+
+				// Conditional
+				["if"] = IfThenElseNode.Get,
+
+				// Logical
+				["and"] = AndNode.Get,
+				["nand"] = NandNode.Get,
+				["nor"] = NorNode.Get,
+				["not"] = NotNode.Get,
+				["or"] = OrNode.Get,
+				["xnor"] = XnorNode.Get,
+				["xor"] = XorNode.Get,
+
+				// Statistics
+				["avg"] = AverageNode.Get,
+				["count"] = CountNode.Get,
+				["max"] = MaxNode.Get,
+				["min"] = MinNode.Get,
+				["range"] = RangeNode.Get,
+				["std"] = StandardDNode.Get,
+				["sum"] = SumNode.Get,
+			};
+			buildInFactories = dict.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+		}
+
 		internal readonly List<Token> _input;
-		internal ExpressionNode _root;
 		internal int _pointer;
 		internal int _length;
+
 
 
 		public Parser(List<Token> input)
 		{
 			ArgumentNullException.ThrowIfNull(input);
 			this._input = input;
-			this._root = null;
 			this._length = this._input.Count;
 			this._pointer = 0;
 		}
@@ -32,7 +88,6 @@ namespace SmartExpressions.Core.Parsing
 
 		public void Reset()
 		{
-			this._root = null;
 			this._length = this._input.Count;
 			this._pointer = 0;
 		}
@@ -62,46 +117,46 @@ namespace SmartExpressions.Core.Parsing
 		public Token PeakAtNext() => this._input[this._pointer + 1];
 
 
-		public Operation Check(TokenType expected)
+		public Result Check(TokenType expected)
 		{
 			if (this.PointerIsAtEnd())
 			{
-				return Operation.Failure($"Unexpected end of parser input. Expected: {expected}.");
+				return Result.Failure($"Unexpected end of parser input. Expected: {expected}.");
 			}
 
 			Token current = this.PeakAtPointer();
 			if (current.Type != expected)
 			{
-				return Operation.Failure($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
+				return Result.Failure($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
 			}
 
 			this.AdvancePointer();
 
 			// Valid check
-			return Operation.Success();
+			return Result.Success();
 		}
 
 
-		public Operation<ExpressionNode> Run()
+		public Result<ExpressionNode> Run()
 		{
 			// Guard against stupidity
 			if (this._input.Count == 0)
 			{
-				return Operation<ExpressionNode>.Success(new NullNode());
+				return Result<ExpressionNode>.Success(new NullNode());
 			}
 
 			this.Reset();
-			Operation<ExpressionNode> result = this.ParseExpression();
+			Result<ExpressionNode> result = this.ParseExpression();
 			return result.Status != Status.Success
 				? result
-				: Operation<ExpressionNode>.Success(result.Value);
+				: Result<ExpressionNode>.Success(result.Value);
 		}
 
-		public Operation<ExpressionNode> ParseExpression()
+		public Result<ExpressionNode> ParseExpression()
 		{
 			if (this.PointerIsAtEnd())
 			{
-				return Operation<ExpressionNode>.Failure("Unexpected end of input.");
+				return Result<ExpressionNode>.Failure("Unexpected end of input.");
 			}
 
 			Token current = this.PeakAtPointer();
@@ -109,58 +164,25 @@ namespace SmartExpressions.Core.Parsing
 			{
 				TokenType.Numeric => NumericNode.Get(this),
 				TokenType.Identifier => IdentifierNode.Get(this),
-
-				// Conditional keywords
-				TokenType.IfKeyWord => IfThenElseNode.Parse(this),
-
-				// Arithmetic keywords
-				TokenType.AbsKeyword => AbsoluteNode.Get(this),
-				TokenType.AddKeyWord => AddNode.Get(this),
-				TokenType.DivKeyWord => DivideNode.Get(this),
-				TokenType.ModKeyWord => ModuloNode.Get(this),
-				TokenType.MultKeyWord => MultiplyNode.Get(this),
-				TokenType.NegKeyWord => NegativeNode.Get(this),
-				TokenType.PowerKeyWord => PowerNode.Get(this),
-				TokenType.RootKeyWord => RootNode.Get(this),
-				TokenType.SubKeyWord => SubtractNode.Get(this),
-				TokenType.RandKeyWord => RandomNode.Get(this),
-
-				// Logical keywords
-				TokenType.AndKeyWord => AndNode.Get(this),
-				TokenType.OrKeyWord => OrNode.Get(this),
-				TokenType.NandKeyWord => NandNode.Get(this),
-				TokenType.NorKeyWord => NorNode.Get(this),
-				TokenType.NotKeyWord => NotNode.Get(this),
-				TokenType.XnorKeyWord => XnorNode.Get(this),
-				TokenType.XorKeyWord => XorNode.Get(this),
-
-				// Comparison keywords
-				TokenType.EqualKeyWord => EqualNode.Get(this),
-				TokenType.NotEqualKeyWord => NotEqualNode.Get(this),
-				TokenType.LessThanKeyWord => LessThanNode.Get(this),
-				TokenType.LessThanEqualKeyWord => LessThanEqualNode.Get(this),
-				TokenType.GreaterThanKeyWord => GreaterThanNode.Get(this),
-				TokenType.GreaterThanEqualKeyWord => GreaterThanEqualNode.Get(this),
-
-				// Statistic keywords
-				TokenType.SumKeyWord => SumNode.Get(this),
-				TokenType.AvgKeyWord => AverageNode.Get(this),
-				TokenType.StDKeyWord => StandardDNode.Get(this),
-				TokenType.CountKeyWord => CountNode.Get(this),
-				TokenType.MinKeyWord => MinNode.Get(this),
-				TokenType.MaxKeyWord => MaxNode.Get(this),
-				TokenType.RangeKeyWord => RangeNode.Get(this),
-
-				// Constants
-				TokenType.NullKeyword => NullNode.Get(this),
-				TokenType.TrueKeyword => TrueNode.Get(this),
-				TokenType.FalseKeyword => FalseNode.Get(this),
-				TokenType.EulerKeyword => EulerNode.Get(this),
-				TokenType.PiKeyword => PiNode.Get(this),
+				TokenType.Keyword => this.ResolveKeywordToken(),
 
 				// Default
-				_ => Operation<ExpressionNode>.Failure($"Unknown token at position {this._pointer}."),
+				_ => Result<ExpressionNode>.Failure($"Unexpected token at token-position {this._pointer}."),
 			};
+		}
+
+		private Result<ExpressionNode> ResolveKeywordToken()
+		{
+			Token token = this.PeakAtPointer();
+
+			// function is built in - run respective factory
+			if (buildInFactories.TryGetValue(token.Lexeme, out Func<Parser, Result<ExpressionNode>>? value))
+			{
+				return value.Invoke(this);
+			}
+
+			// function is not built in - assume registered and try to resolve that
+			return RegisteredFunction.Get(this);
 		}
 	}
 }

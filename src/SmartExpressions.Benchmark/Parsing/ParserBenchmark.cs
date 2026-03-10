@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 
 using Microsoft.VSDiagnostics;
 
@@ -74,7 +71,7 @@ namespace SmartExpressions.Benchmark.Parsing
 
 		private static List<Token> Lex(string input)
 		{
-			Operation<List<	Token>> result = new Lexer(input).Run();
+			Result<List<	Token>> result = new Lexer(input).Run();
 			return result.Status != Status.Success
 				? throw new InvalidOperationException($"Lexer failed for '{input}': {result.Message}")
 				: result.Value;
@@ -85,68 +82,68 @@ namespace SmartExpressions.Benchmark.Parsing
 		// ------------------------------------------------------------------ //
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Single_Numeric()
+		public Result<ExpressionNode> Parse_Single_Numeric()
 			=> new Parser(this._tokensSingleNumeric).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Single_Decimal()
+		public Result<ExpressionNode> Parse_Single_Decimal()
 			=> new Parser(this._tokensSingleDecimal).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Single_Bool()
+		public Result<ExpressionNode> Parse_Single_Bool()
 			=> new Parser(this._tokensSingleBool).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Single_Null()
+		public Result<ExpressionNode> Parse_Single_Null()
 			=> new Parser(this._tokensSingleNull).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Single_Constant()
+		public Result<ExpressionNode> Parse_Single_Constant()
 			=> new Parser(this._tokensSingleConstant).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Single_Identifier()
+		public Result<ExpressionNode> Parse_Single_Identifier()
 			=> new Parser(this._tokensSingleIdentifier).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Arithmetic_Flat()
+		public Result<ExpressionNode> Parse_Arithmetic_Flat()
 			=> new Parser(this._tokensArithmeticFlat).Run();
 
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Arithmetic_Nested()
+		public Result<ExpressionNode> Parse_Arithmetic_Nested()
 			=> new Parser(this._tokensArithmeticNested).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Arithmetic_Deep()
+		public Result<ExpressionNode> Parse_Arithmetic_Deep()
 			=> new Parser(this._tokensArithmeticDeep).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Comparison_Flat()
+		public Result<ExpressionNode> Parse_Comparison_Flat()
 			=> new Parser(this._tokensComparisonFlat).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Logical_Flat()
+		public Result<ExpressionNode> Parse_Logical_Flat()
 			=> new Parser(this._tokensLogicalFlat).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Logical_Nested()
+		public Result<ExpressionNode> Parse_Logical_Nested()
 			=> new Parser(this._tokensLogicalNested).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_If_Simple()
+		public Result<ExpressionNode> Parse_If_Simple()
 			=> new Parser(this._tokensIfSimple).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_If_Nested()
+		public Result<ExpressionNode> Parse_If_Nested()
 			=> new Parser(this._tokensIfNested).Run();
 
 		[Benchmark(Baseline = true)]
-		public Operation<ExpressionNode> Parse_Mixed()
+		public Result<ExpressionNode> Parse_Mixed()
 			=> new Parser(this._tokensMixed).Run();
 
 		[Benchmark]
-		public Operation<ExpressionNode> Parse_Long()
+		public Result<ExpressionNode> Parse_Long()
 			=> new Parser(this._tokensLong).Run();
 	}
 }

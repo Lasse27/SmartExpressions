@@ -15,56 +15,56 @@ namespace SmartExpressions.Benchmark.Utility
 		// -------------------------
 
 		[Benchmark]
-		public Operation<SmallClass> Ok_SmallClass()
-			=> Operation<SmallClass>.Success(_smallInstance);
+		public Result<SmallClass> Ok_SmallClass()
+			=> Result<SmallClass>.Success(_smallInstance);
 
 		[Benchmark]
-		public Operation<SmallClass> Ok_SmallClass_Null()
-			=> Operation<SmallClass>.Success(null);
+		public Result<SmallClass> Ok_SmallClass_Null()
+			=> Result<SmallClass>.Success(null);
 
 		[Benchmark]
-		public Operation<SmallClass> Fail_SmallClass()
-			=> Operation<SmallClass>.Failure("error");
+		public Result<SmallClass> Fail_SmallClass()
+			=> Result<SmallClass>.Failure("error");
 
 		// -------------------------
 		// Large reference type
 		// -------------------------
 
 		[Benchmark]
-		public Operation<LargeClass> Ok_LargeClass()
-			=> Operation<LargeClass>.Success(_largeInstance);
+		public Result<LargeClass> Ok_LargeClass()
+			=> Result<LargeClass>.Success(_largeInstance);
 
 		[Benchmark]
-		public Operation<LargeClass> Fail_LargeClass()
-			=> Operation<LargeClass>.Failure("error");
+		public Result<LargeClass> Fail_LargeClass()
+			=> Result<LargeClass>.Failure("error");
 
 		// -------------------------
 		// Direct constructor comparison
 		// -------------------------
 
 		[Benchmark]
-		public Operation<SmallClass> DirectCtor_SmallClass()
-			=> new Operation<SmallClass>(Status.Success, _smallInstance);
+		public Result<SmallClass> DirectCtor_SmallClass()
+			=> new Result<SmallClass>(Status.Success, _smallInstance);
 
 		[Benchmark]
-		public Operation<SmallClass> DirectCtor_Fail_SmallClass()
-			=> new Operation<SmallClass>(Status.Failure, null, "error");
+		public Result<SmallClass> DirectCtor_Fail_SmallClass()
+			=> new Result<SmallClass>(Status.Failure, null, "error");
 
 		[Benchmark]
-		public Operation Ok_NonGeneric()
-			=> Operation.Success();
+		public Result Ok_NonGeneric()
+			=> Result.Success();
 
 		[Benchmark]
-		public Operation Fail_NonGeneric()
-			=> Operation.Failure("error");
+		public Result Fail_NonGeneric()
+			=> Result.Failure("error");
 
 		[Benchmark]
-		public Operation<int> Ok_Generic()
-			=> Operation<int>.Success(42);
+		public Result<int> Ok_Generic()
+			=> Result<int>.Success(42);
 
 		[Benchmark]
-		public Operation<int> Fail_Generic()
-			=> Operation<int>.Failure("error");
+		public Result<int> Fail_Generic()
+			=> Result<int>.Failure("error");
 	}
 
 	public sealed class SmallClass(int value)

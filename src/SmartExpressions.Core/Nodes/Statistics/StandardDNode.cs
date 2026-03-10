@@ -1,4 +1,4 @@
-﻿using SmartExpressions.Core.Evaluation;
+﻿using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
@@ -12,22 +12,19 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		public StandardDNode(List<ExpressionNode> operands) : base(operands) { }
 
 
-		public static Operation<ExpressionNode> Get(Parser parser)
+		public static Result<ExpressionNode> Get(Parser parser)
 		{
-			Operation<List<ExpressionNode>> operation = ParserHelpers.ParseNCountOperandKeyword(parser);
+			Result<List<ExpressionNode>> operation = ParserHelpers.ParseNCountKeyword(parser);
 			if (operation.Status == Status.Failure)
 			{
-				return Operation<ExpressionNode>.Failure(operation.Message);
+				return Result<ExpressionNode>.Failure(operation.Message);
 			}
 
 			ExpressionNode node = new StandardDNode(operation.Value);
-			return Operation<ExpressionNode>.Success(node);
+			return Result<ExpressionNode>.Success(node);
 		}
 
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string>? listener = default) => throw new NotImplementedException();
-
-		/// <inheritdoc/>
-		public override string ToString() => base.ToString();
+		public override Result<object> Evaluate(EvaluationContext ctx) => throw new NotImplementedException();
 
 		/// <inheritdoc/>
 		public override string GetKeyword() => Keyword;

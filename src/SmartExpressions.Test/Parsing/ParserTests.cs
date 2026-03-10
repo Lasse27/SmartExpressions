@@ -16,10 +16,10 @@ namespace SmartExpressions.Test.Parsing
 		//  Helper – Lex + Parse in einem Schritt
 		// ------------------------------------------------------------------ //
 
-		private static Operation<ExpressionNode> Parse(string input)
+		private static Result<ExpressionNode> Parse(string input)
 		{
 			Lexer lexer = new Lexer(input);
-			Operation<List<Token>> lexResult = lexer.Run();
+			Result<List<Token>> lexResult = lexer.Run();
 			Assert.True(lexResult.Status == Status.Success, $"Lexer failed: {lexResult.Message}");
 
 			Parser parser = new Parser(lexResult.Value);
@@ -28,14 +28,14 @@ namespace SmartExpressions.Test.Parsing
 
 		private static ExpressionNode ParseSuccess(string input)
 		{
-			Operation<ExpressionNode> result = Parse(input);
+			Result<ExpressionNode> result = Parse(input);
 			Assert.True(result.Status == Status.Success, $"Parser failed: {result.Message}");
 			return result.Value;
 		}
 
 		private static void ParseFailure(string input)
 		{
-			Operation<ExpressionNode> result = Parse(input);
+			Result<ExpressionNode> result = Parse(input);
 			Assert.True(result.Status == Status.Failure, "Expected parser failure but got success.");
 		}
 
@@ -389,7 +389,7 @@ namespace SmartExpressions.Test.Parsing
 		{
 			// Empty token list → NullNode per Run() guard
 			Parser parser = new Parser(new List<Token>());
-			Operation<ExpressionNode> result = parser.Run();
+			Result<ExpressionNode> result = parser.Run();
 			Assert.True(result.Status == Status.Success);
 			_ = Assert.IsType<NullNode>(result.Value);
 		}

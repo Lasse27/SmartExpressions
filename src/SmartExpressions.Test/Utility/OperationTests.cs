@@ -7,7 +7,7 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Ok_Should_Create_Successful_Result()
 		{
-			Operation result = Operation.Success();
+			Result result = Result.Success();
 
 			Assert.Equal(Status.Success, result.Status);
 			Assert.Empty(result.Message);
@@ -16,7 +16,7 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Fail_Should_Create_Failed_Result_With_Message()
 		{
-			Operation result = Operation.Failure("error");
+			Result result = Result.Failure("error");
 
 			Assert.Equal(Status.Failure, result.Status);
 			Assert.Equal("error", result.Message);
@@ -25,8 +25,8 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Equality_Should_Work_For_Identical_Values()
 		{
-			Operation r1 = Operation.Failure("error");
-			Operation r2 = Operation.Failure("error");
+			Result r1 = Result.Failure("error");
+			Result r2 = Result.Failure("error");
 
 			Assert.Equal(r1, r2);
 			Assert.True(r1.Equals(r2));
@@ -36,8 +36,8 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Equality_Should_Detect_Differences()
 		{
-			Operation r1 = Operation.Failure("error1");
-			Operation r2 = Operation.Failure("error2");
+			Result r1 = Result.Failure("error1");
+			Result r2 = Result.Failure("error2");
 
 			Assert.NotEqual(r1, r2);
 			Assert.True(r1 != r2);
@@ -46,7 +46,7 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Default_Instance_Should_Be_Failed_With_Default_Values()
 		{
-			Operation result = default;
+			Result result = default;
 
 			Assert.Equal(Status.Failure, result.Status);
 			Assert.Null(result.Message);
@@ -60,7 +60,7 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Ok_Should_Create_Successful_Result_With_Value()
 		{
-			Operation<int> result = Operation<int>.Success(42);
+			Result<int> result = Result<int>.Success(42);
 
 			Assert.Equal(Status.Success, result.Status);
 			Assert.Equal(42, result.Value);
@@ -70,7 +70,7 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Ok_Should_Allow_Null_For_Reference_Type()
 		{
-			Operation<string> result = Operation<string>.Success(null);
+			Result<string> result = Result<string>.Success(null);
 
 			Assert.Equal(Status.Success, result.Status);
 			Assert.Empty(result.Message);
@@ -80,7 +80,7 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Fail_Should_Create_Failed_Result_Without_Value()
 		{
-			Operation<int> result = Operation<int>.Failure("error");
+			Result<int> result = Result<int>.Failure("error");
 
 			Assert.Equal(Status.Failure, result.Status);
 			Assert.Equal(default, result.Value);
@@ -91,8 +91,8 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Equality_Should_Work_For_Generic_Type()
 		{
-			Operation<int> r1 = Operation<int>.Success(10);
-			Operation<int> r2 = Operation<int>.Success(10);
+			Result<int> r1 = Result<int>.Success(10);
+			Result<int> r2 = Result<int>.Success(10);
 
 			Assert.Equal(r1, r2);
 			Assert.True(r1 == r2);
@@ -101,8 +101,8 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Equality_Should_Detect_Different_Value()
 		{
-			Operation<int> r1 = Operation<int>.Success(10);
-			Operation<int> r2 = Operation<int>.Success(20);
+			Result<int> r1 = Result<int>.Success(10);
+			Result<int> r2 = Result<int>.Success(20);
 
 			Assert.NotEqual(r1, r2);
 			Assert.True(r1 != r2);
@@ -111,8 +111,8 @@ namespace SmartExpressions.Test.Utility
 		[Fact]
 		public void Equality_Should_Detect_Different_Success_State()
 		{
-			Operation<int> r1 = Operation<int>.Success(10);
-			Operation<int> r2 = Operation<int>.Failure("error");
+			Result<int> r1 = Result<int>.Success(10);
+			Result<int> r2 = Result<int>.Failure("error");
 
 			Assert.NotEqual(r1, r2);
 		}

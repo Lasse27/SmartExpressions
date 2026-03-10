@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-using SmartExpressions.Core.Evaluation;
+using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
@@ -16,40 +16,40 @@ namespace SmartExpressions.Core.Nodes.Logical
 
 		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
 		/// <param name="parser"> The parser that is checked for the node. </param>
-		/// <returns> A <see cref="Operation{T}"/> object containing the parsed node or an error. </returns>
-		public static Operation<ExpressionNode> Get(Parser parser)
+		/// <returns> A <see cref="Result{T}"/> object containing the parsed node or an error. </returns>
+		public static Result<ExpressionNode> Get(Parser parser)
 		{
-			Operation<DoubleOperand> dualOperand = ParserHelpers.ParseDualOperandKeyword(parser);
+			Result<BinaryOperand> dualOperand = ParserHelpers.ParseBinaryKeyword(parser);
 			if (dualOperand.Status == Status.Failure)
 			{
-				return Operation<ExpressionNode>.Failure(dualOperand.Message);
+				return Result<ExpressionNode>.Failure(dualOperand.Message);
 			}
 
 			ExpressionNode node = new XnorNode(dualOperand.Value.Left, dualOperand.Value.Right);
-			return Operation<ExpressionNode>.Success(node);
+			return Result<ExpressionNode>.Success(node);
 		}
 
 		/// <inheritdoc/>
-		public override Operation<object> Evaluate(Evaluator evaluator, IProgress<string> listener = default)
+		public override Result<object> Evaluate(EvaluationContext ctx)
 		{
 			// Left operand
-			Operation<object> rawLeft = this.Left.Evaluate(evaluator, listener);
+			Result<object> rawLeft = this.Left.Evaluate(ctx);
 			if (rawLeft.Status == Status.Failure) { return rawLeft; }
 
-			Operation<bool> resolvedLeft = EvaluatorHelpers.ResolveBoolean(rawLeft, Keyword);
-			if (resolvedLeft.Status == Status.Failure) { return Operation<object>.Failure(resolvedLeft.Message); }
+			Result<bool> resolvedLeft = ExpressionHelpers.ResolveBoolean(rawLeft);
+			if (resolvedLeft.Status == Status.Failure) { return Result<object>.Failure(resolvedLeft.Message); }
 
 			// Right operand
-			Operation<object> rawRight = this.Right.Evaluate(evaluator, listener);
+			Result<object> rawRight = this.Right.Evaluate(ctx);
 			if (rawRight.Status == Status.Failure) { return rawRight; }
 
-			Operation<bool> resolvedRight = EvaluatorHelpers.ResolveBoolean(rawRight, Keyword);
-			if (resolvedRight.Status == Status.Failure) { return Operation<object>.Failure(resolvedRight.Message); }
+			Result<bool> resolvedRight = ExpressionHelpers.ResolveBoolean(rawRight);
+			if (resolvedRight.Status == Status.Failure) { return Result<object>.Failure(resolvedRight.Message); }
 
 			// XNOR and return
 			bool value = (resolvedLeft.Value && !resolvedRight.Value) || (!resolvedLeft.Value && resolvedRight.Value);
-			listener?.Report($"{this} = {!value}");
-			return Operation<object>.Success(!value);
+			ctx.Listener?.Report($"{this} = {!value}");
+			return Result<object>.Success(!value);
 		}
 
 		/// <inheritdoc/>

@@ -15,7 +15,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_SingleBracket_Returns_Correct_Token_Type(string input, TokenType expectedType)
 		{
 			Lexer tokenizer = new Lexer(input);
-			Operation<List<Token>> result = tokenizer.Run();
+			Result<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 
 			List<Token> tokens = result.Value;
@@ -31,7 +31,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_MultiBracket_Returns_Correct_Token_Type(string input, TokenType expectedType)
 		{
 			Lexer tokenizer = new Lexer(input);
-			Operation<List<Token>> result = tokenizer.Run();
+			Result<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 
 			List<Token> tokens = result.Value;
@@ -57,7 +57,7 @@ namespace SmartExpressions.Test.Lexing
 		public void Run_SingleBracket_Returns_Correct_Position(string input, int position)
 		{
 			Lexer tokenizer = new Lexer(input);
-			Operation<List<Token>> result = tokenizer.Run();
+			Result<List<Token>> result = tokenizer.Run();
 			Assert.Equal(Status.Success, result.Status);
 
 			List<Token> tokens = result.Value;
