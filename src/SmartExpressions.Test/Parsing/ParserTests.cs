@@ -57,7 +57,7 @@ namespace SmartExpressions.Test.Parsing
 		{
 			ExpressionNode node = ParseSuccess("3.14");
 			NumericNode numeric = Assert.IsType<NumericNode>(node);
-			Assert.Equal<decimal>((decimal)3.14, numeric.Value);
+			Assert.Equal(3.14, numeric.Value);
 		}
 
 		[Fact]
