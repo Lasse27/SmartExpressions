@@ -24,6 +24,7 @@ namespace SmartExpressions.Core.Parsing
 			{
 				// Constants
 				["e"] = EulerNode.Get,
+				["tau"] = TauNode.Get,
 				["pi"] = PiNode.Get,
 				["true"] = TrueNode.Get,
 				["false"] = FalseNode.Get,

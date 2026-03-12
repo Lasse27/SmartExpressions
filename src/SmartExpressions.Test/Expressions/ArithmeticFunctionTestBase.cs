@@ -202,13 +202,13 @@ namespace SmartExpressions.Test.Expressions
 		[Fact]
 		public void BinaryFunction_Constant_And_Integer()
 		{
-			if (!this.IsValidInput(Math.PI, 1))
+			if (!this.IsValidInput(Math.Tau, 1))
 			{
 				return;
 			}
 
-			double value = (double)this.EvaluateSuccess(this.Formula("PI", "1"));
-			Assert.Equal(this.Compute(Math.PI, 1m), value, 10);
+			double value = (double)this.EvaluateSuccess(this.Formula("TAU", "1"));
+			Assert.Equal(this.Compute(Math.Tau, 1m), value, 10);
 		}
 
 

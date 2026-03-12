@@ -132,5 +132,15 @@ namespace SmartExpressions.Test.Expressions
 			double value = (double)this.EvaluateSuccess(formula);
 			Assert.Equal(output, value, 10);
 		}
+
+		[Theory]
+		[InlineData("if (true) { TAU } elif (false) { 2 } else { 3}", Math.Tau)]
+		[InlineData("if (false) { 1 } elif (true) { TAU } else { 3 }", Math.Tau)]
+		[InlineData("if (false) { 1 } elif (false) { 2 } else { TAU }", Math.Tau)]
+		public void IfElifElse_With_TAU_Constant(string formula, double output)
+		{
+			double value = (double)this.EvaluateSuccess(formula);
+			Assert.Equal(output, value, 10);
+		}
 	}
 }

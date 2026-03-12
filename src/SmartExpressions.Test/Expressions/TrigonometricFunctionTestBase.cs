@@ -144,6 +144,18 @@ namespace SmartExpressions.Test.Expressions
 			Assert.Equal(this.Compute(Math.E), value, 10);
 		}
 
+		[Fact]
+		public void UnaryFunction_With_TAU_Constant()
+		{
+			if (!this.IsValidInput(Math.Tau))
+			{
+				return;
+			}
+
+			double value = (double)this.EvaluateSuccess(this.Formula("TAU"));
+			Assert.Equal(this.Compute(Math.Tau), value, 10);
+		}
+
 
 		// -----------------------------------------------
 		// Identifier node type

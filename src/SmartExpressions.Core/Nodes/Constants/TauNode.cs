@@ -1,5 +1,9 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 using SmartExpressions.Core.Expressions;
 using SmartExpressions.Core.Parsing;
@@ -9,7 +13,7 @@ namespace SmartExpressions.Core.Nodes.Constants
 {
 	/// <inheritdoc/>
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	public record EulerNode : ExpressionNode
+	public record TauNode : ExpressionNode
 	{
 		private const string Keyword = "e";
 
@@ -19,12 +23,12 @@ namespace SmartExpressions.Core.Nodes.Constants
 		public static NodeResult Get(Parser parser)
 		{
 			parser.AdvancePointer();
-			return NodeResult.Ok(new EulerNode());
+			return NodeResult.Ok(new TauNode());
 		}
 
 		/// <inheritdoc/>
 		public override EvaluationResult Evaluate(EvaluationContext ctx)
-			=> EvaluationResult.Ok(ctx.CurrentPath, Math.E);
+			=> EvaluationResult.Ok(ctx.CurrentPath, Math.Tau);
 
 		/// <inheritdoc/>
 		public override string ToString() => Keyword;
