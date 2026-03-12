@@ -347,9 +347,9 @@ namespace SmartExpressions.Test.Parsing
 			// if(true) { 1 } else { 2 }
 			ExpressionNode node = ParseSuccess("if(true) { 1 } else { 2 }");
 
-			IfThenElseNode ifNode = Assert.IsType<IfThenElseNode>(node);
-			Assert.IsType<TrueNode>(ifNode.Condition);
-			Assert.Equal(1, Assert.IsType<NumericNode>(ifNode.Then).Value);
+			IfElifElseNode ifNode = Assert.IsType<IfElifElseNode>(node);
+			Assert.IsType<TrueNode>(ifNode.Blocks[0].Condition);
+			Assert.Equal(1, Assert.IsType<NumericNode>(ifNode.Blocks[0].Expression).Value);
 			Assert.Equal(2, Assert.IsType<NumericNode>(ifNode.Else).Value);
 		}
 
@@ -359,11 +359,11 @@ namespace SmartExpressions.Test.Parsing
 			// if(eq(1, 1)) { true } else { false }
 			ExpressionNode node = ParseSuccess("if(eq(1, 1)) { true } else { false }");
 
-			IfThenElseNode ifNode = Assert.IsType<IfThenElseNode>(node);
-			EqualNode eq = Assert.IsType<EqualNode>(ifNode.Condition);
+			IfElifElseNode ifNode = Assert.IsType<IfElifElseNode>(node);
+			EqualNode eq = Assert.IsType<EqualNode>(ifNode.Blocks[0].Condition);
 			Assert.Equal(1, Assert.IsType<NumericNode>(eq.Left).Value);
 			Assert.Equal(1, Assert.IsType<NumericNode>(eq.Right).Value);
-			Assert.IsType<TrueNode>(ifNode.Then);
+			Assert.IsType<TrueNode>(ifNode.Blocks[0].Expression);
 			Assert.IsType<FalseNode>(ifNode.Else);
 		}
 
@@ -373,9 +373,9 @@ namespace SmartExpressions.Test.Parsing
 			// if(true) { add(1, 2) } else { sub(5, 3) }
 			ExpressionNode node = ParseSuccess("if(true) { add(1, 2) } else { sub(5, 3) }");
 
-			IfThenElseNode ifNode = Assert.IsType<IfThenElseNode>(node);
-			Assert.IsType<TrueNode>(ifNode.Condition);
-			Assert.IsType<AddNode>(ifNode.Then);
+			IfElifElseNode ifNode = Assert.IsType<IfElifElseNode>(node);
+			Assert.IsType<TrueNode>(ifNode.Blocks[0].Condition);
+			Assert.IsType<AddNode>(ifNode.Blocks[0].Expression);
 			Assert.IsType<SubtractNode>(ifNode.Else);
 		}
 

@@ -62,7 +62,7 @@ namespace SmartExpressions.Core.Parsing
 				["lte"] = LessThanEqualNode.Get,
 
 				// Conditional
-				["if"] = IfThenElseNode.Get,
+				["if"] = IfElifElseNode.Get,
 
 				// Logical
 				["and"] = AndNode.Get,
