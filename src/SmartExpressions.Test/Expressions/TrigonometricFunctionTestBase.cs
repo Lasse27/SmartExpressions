@@ -32,10 +32,10 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(this.Formula("1"));
 			_ = expression.Assemble();
 
-			Result<object> r1 = expression.Evaluate();
-			Result<object> r2 = expression.Evaluate();
+			EvaluationResult r1 = expression.Evaluate();
+			EvaluationResult r2 = expression.Evaluate();
 
-			Assert.Equal(r1.Value, r2.Value);
+			Assert.Equal(r1.GetValue(), r2.GetValue());
 		}
 
 
@@ -276,11 +276,10 @@ namespace SmartExpressions.Test.Expressions
 			_ = expression.RegisterBinding("A", input);
 			_ = expression.Assemble();
 
-			Result<object> result = expression.Evaluate();
+			EvaluationResult result = expression.Evaluate();
 
-			Assert.Equal(Status.Success, result.Status);
-			_ = Assert.IsType<double>(result.Value);
-			Assert.Equal(this.Compute(d), (double)result.Value, 10);
+			_ = Assert.IsType<double>(result.GetValue());
+			Assert.Equal(this.Compute(d), (double)result.GetValue(), 10);
 		}
 
 		[Fact]

@@ -16,15 +16,15 @@ namespace SmartExpressions.Benchmark.Utility
 
 		[Benchmark]
 		public Result<SmallClass> Ok_SmallClass()
-			=> Result<SmallClass>.Success(_smallInstance);
+			=> Result<SmallClass>.Ok(_smallInstance);
 
 		[Benchmark]
 		public Result<SmallClass> Ok_SmallClass_Null()
-			=> Result<SmallClass>.Success(null);
+			=> Result<SmallClass>.Ok(null);
 
 		[Benchmark]
 		public Result<SmallClass> Fail_SmallClass()
-			=> Result<SmallClass>.Failure("error");
+			=> Result<SmallClass>.Fail("error");
 
 		// -------------------------
 		// Large reference type
@@ -32,11 +32,11 @@ namespace SmartExpressions.Benchmark.Utility
 
 		[Benchmark]
 		public Result<LargeClass> Ok_LargeClass()
-			=> Result<LargeClass>.Success(_largeInstance);
+			=> Result<LargeClass>.Ok(_largeInstance);
 
 		[Benchmark]
 		public Result<LargeClass> Fail_LargeClass()
-			=> Result<LargeClass>.Failure("error");
+			=> Result<LargeClass>.Fail("error");
 
 		// -------------------------
 		// Direct constructor comparison
@@ -44,27 +44,27 @@ namespace SmartExpressions.Benchmark.Utility
 
 		[Benchmark]
 		public Result<SmallClass> DirectCtor_SmallClass()
-			=> new Result<SmallClass>(Status.Success, _smallInstance);
+			=> new Result<SmallClass>(Status.Ok, _smallInstance);
 
 		[Benchmark]
 		public Result<SmallClass> DirectCtor_Fail_SmallClass()
-			=> new Result<SmallClass>(Status.Failure, null, "error");
+			=> new Result<SmallClass>(Status.Fail, null, "error");
 
 		[Benchmark]
 		public Result Ok_NonGeneric()
-			=> Result.Success();
+			=> Result.Ok();
 
 		[Benchmark]
 		public Result Fail_NonGeneric()
-			=> Result.Failure("error");
+			=> Result.Fail("error");
 
 		[Benchmark]
 		public Result<int> Ok_Generic()
-			=> Result<int>.Success(42);
+			=> Result<int>.Ok(42);
 
 		[Benchmark]
 		public Result<int> Fail_Generic()
-			=> Result<int>.Failure("error");
+			=> Result<int>.Fail("error");
 	}
 
 	public sealed class SmallClass(int value)

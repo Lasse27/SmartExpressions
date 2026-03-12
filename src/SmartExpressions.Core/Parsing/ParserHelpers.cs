@@ -6,30 +6,30 @@ namespace SmartExpressions.Core.Parsing
 {
 	public static partial class ParserHelpers
 	{
-		public static Result<ExpressionNode> ParseUnaryKeyword(Parser parser)
+		public static NodeResult ParseUnaryKeyword(Parser parser)
 		{
 			// Skip keyword
 			parser.AdvancePointer();
 
 			// Check for left parenthesis
 			Result check = parser.Check(TokenType.LParen);
-			if (check.Status == Status.Failure)
+			if (check.Status == Status.Fail)
 			{
-				return Result<ExpressionNode>.Failure(check.Message);
+				return NodeResult.Fail(check.Message);
 			}
 
 			// Get operand
-			Result<ExpressionNode> operand = parser.ParseExpression(); // points to next token
-			if (operand.Status == Status.Failure)
+			NodeResult operand = parser.ParseExpression(); // points to next token
+			if (operand.IsFail())
 			{
-				return Result<ExpressionNode>.Failure(operand.Message);
+				return NodeResult.Fail(operand.GetMessage());
 			}
 
 			// Check for right parenthesis
 			check = parser.Check(TokenType.RParen);
-			return check.Status == Status.Failure
-				? Result<ExpressionNode>.Failure(check.Message)
-				: Result<ExpressionNode>.Success(operand.Value);
+			return check.Status == Status.Fail
+				? NodeResult.Fail(check.Message)
+				: NodeResult.Ok(operand.GetValue());
 		}
 
 		public static Result<BinaryOperand> ParseBinaryKeyword(Parser parser)
@@ -39,37 +39,37 @@ namespace SmartExpressions.Core.Parsing
 
 			// Check for left parenthesis
 			Result check = parser.Check(TokenType.LParen);
-			if (check.Status == Status.Failure)
+			if (check.Status == Status.Fail)
 			{
-				return Result<BinaryOperand>.Failure(check.Message);
+				return Result<BinaryOperand>.Fail(check.Message);
 			}
 
 			// Get operand
-			Result<ExpressionNode> left = parser.ParseExpression(); // points to next token
-			if (left.Status == Status.Failure)
+			NodeResult left = parser.ParseExpression(); // points to next token
+			if (left.IsFail())
 			{
-				return Result<BinaryOperand>.Failure(left.Message);
+				return Result<BinaryOperand>.Fail(left.GetMessage());
 			}
 
 			// Check for comma
 			check = parser.Check(TokenType.Comma);
-			if (check.Status == Status.Failure)
+			if (check.Status == Status.Fail)
 			{
-				return Result<BinaryOperand>.Failure(check.Message);
+				return Result<BinaryOperand>.Fail(check.Message);
 			}
 
 			// Get operand
-			Result<ExpressionNode> right = parser.ParseExpression(); // points to next token
-			if (right.Status == Status.Failure)
+			NodeResult right = parser.ParseExpression(); // points to next token
+			if (right.IsFail())
 			{
-				return Result<BinaryOperand>.Failure(right.Message);
+				return Result<BinaryOperand>.Fail(right.GetMessage());
 			}
 
 			// Check for right parenthesis
 			check = parser.Check(TokenType.RParen);
-			return check.Status == Status.Failure
-				? Result<BinaryOperand>.Failure(check.Message)
-				: Result<BinaryOperand>.Success(new(left.Value, right.Value));
+			return check.Status == Status.Fail
+				? Result<BinaryOperand>.Fail(check.Message)
+				: Result<BinaryOperand>.Ok(new(left.GetValue(), right.GetValue()));
 		}
 
 		public static Result<List<ExpressionNode>> ParseNCountKeyword(Parser parser)
@@ -79,45 +79,45 @@ namespace SmartExpressions.Core.Parsing
 
 			// Check for left parenthesis
 			Result check = parser.Check(TokenType.LParen);
-			if (check.Status == Status.Failure)
+			if (check.Status == Status.Fail)
 			{
-				return Result<List<ExpressionNode>>.Failure(check.Message);
+				return Result<List<ExpressionNode>>.Fail(check.Message);
 			}
 
 			// Gather all operands separated by commas
 			List<ExpressionNode> operands = new List<ExpressionNode>(2);
 			Result operandParsing = ParseAndAddOperands(parser, operands);
-			if (operandParsing.Status == Status.Failure)
+			if (operandParsing.Status == Status.Fail)
 			{
-				return Result<List<ExpressionNode>>.Failure(check.Message);
+				return Result<List<ExpressionNode>>.Fail(check.Message);
 			}
 
 			// Check right parenthesis
 			check = parser.Check(TokenType.RParen);
-			return check.Status == Status.Failure
-				? Result<List<ExpressionNode>>.Failure(check.Message)
-				: Result<List<ExpressionNode>>.Success(operands);
+			return check.Status == Status.Fail
+				? Result<List<ExpressionNode>>.Fail(check.Message)
+				: Result<List<ExpressionNode>>.Ok(operands);
 		}
 
 		public static Result ParseAndAddOperands(Parser parser, List<ExpressionNode> operands)
 		{
 			// Get operand
-			Result<ExpressionNode> expr = parser.ParseExpression();
-			if (expr.Status == Status.Failure) { return Result.Failure(expr.Message); }
-			operands.Add(expr.Value); // Parse value
+			NodeResult expr = parser.ParseExpression();
+			if (expr.IsFail()) { return Result.Fail(expr.GetMessage()); }
+			operands.Add(expr.GetValue()); // Parse value
 
 			// Recurse if comma
 			Result check = parser.Check(TokenType.Comma);
-			if (check.Status == Status.Success)
+			if (check.Status == Status.Ok)
 			{
 				// Call recursively
 				Result recurseAdd = ParseAndAddOperands(parser, operands);
-				if (recurseAdd.Status == Status.Failure)
+				if (recurseAdd.Status == Status.Fail)
 				{
 					return recurseAdd;
 				}
 			}
-			return Result.Success();
+			return Result.Ok();
 		}
 	}
 }

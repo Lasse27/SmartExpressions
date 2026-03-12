@@ -44,15 +44,14 @@ namespace SmartExpressions.Test.Expressions
 
 			Progress<string> progress = new Progress<string>();
 			progress.ProgressChanged += (s, e) => this._outputHelper.WriteLine(e);
-			Result<object> result = expression.Evaluate(progress);
-			if (result.Status == Status.Failure)
+			EvaluationResult result = expression.Evaluate(progress);
+			if (result.IsFail())
 			{
 				this._outputHelper.WriteLine("Input: " + formula);
-				this._outputHelper.WriteLine("Fail: " + result.Message);
+				this._outputHelper.WriteLine("Fail: " + result.GetMessage());
 			}
 
-			Assert.Equal(Status.Success, result.Status);
-			return result.Value;
+			return result.GetValue();
 		}
 
 
@@ -66,10 +65,10 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(this.Formula(1, 2, 3));
 			_ = expression.Assemble();
 
-			Result<object> r1 = expression.Evaluate();
-			Result<object> r2 = expression.Evaluate();
+			EvaluationResult r1 = expression.Evaluate();
+			EvaluationResult r2 = expression.Evaluate();
 
-			Assert.Equal(r1.Value, r2.Value);
+			Assert.Equal(r1.GetValue(), r2.GetValue());
 		}
 
 
@@ -552,10 +551,9 @@ namespace SmartExpressions.Test.Expressions
 			_ = expression.RegisterBinding("C", c);
 			_ = expression.Assemble();
 
-			Result<object> result = expression.Evaluate();
-			Assert.Equal(Status.Success, result.Status);
+			EvaluationResult result = expression.Evaluate();
 
-			double value = Convert.ToDouble(result.Value);
+			double value = Convert.ToDouble(result.GetValue());
 			Assert.Equal(this.Compute(operands), value);
 		}
 

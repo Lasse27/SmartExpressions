@@ -12,7 +12,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			Lexer tokenizer = new Lexer(input);
 			Result<List<Token>> result = tokenizer.Run();
-			Assert.Equal(Status.Success, result.Status);
+			Assert.Equal(Status.Ok, result.Status);
 			return result.Value;
 		}
 
@@ -20,7 +20,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			Lexer tokenizer = new Lexer(input);
 			Result<List<Token>> result = tokenizer.Run();
-			Assert.Equal(Status.Failure, result.Status);
+			Assert.Equal(Status.Fail, result.Status);
 			return result.Message;
 		}
 
@@ -33,7 +33,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			Lexer tokenizer = new Lexer("");
 			Result<List<Token>> result = tokenizer.Run();
-			Assert.Equal(Status.Success, result.Status);
+			Assert.Equal(Status.Ok, result.Status);
 			Assert.Empty(result.Value);
 		}
 
@@ -42,7 +42,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			Lexer tokenizer = new Lexer("   \t\n");
 			Result<List<Token>> result = tokenizer.Run();
-			Assert.Equal(Status.Success, result.Status);
+			Assert.Equal(Status.Ok, result.Status);
 			Assert.Empty(result.Value);
 		}
 

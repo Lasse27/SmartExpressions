@@ -143,7 +143,7 @@ public void Simple_Expression()
 	Operation<object> operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Success, operation.Status);
+	Assert.Equal(Status.Ok, operation.Status);
 	Assert.NotNull(operation.Value);
 	Assert.Equal(2D, operation.Value);
 
@@ -162,7 +162,7 @@ public void Simple_Nested_Expression()
 	Operation<object> operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Success, operation.Status);
+	Assert.Equal(Status.Ok, operation.Status);
 	Assert.NotNull(operation.Value);
 	Assert.Equal(26D, operation.Value);
 
@@ -181,7 +181,7 @@ public void Simple_Expression_With_Whitespace()
 	Operation<object> operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Success, operation.Status);
+	Assert.Equal(Status.Ok, operation.Status);
 	Assert.NotNull(operation.Value);
 	Assert.Equal(26D, operation.Value);
 
@@ -210,7 +210,7 @@ public void Expression_With_Identifier()
 	Operation<object> operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Success, operation.Status);
+	Assert.Equal(Status.Ok, operation.Status);
 	Assert.NotNull(operation.Value);
 	Assert.Equal(91D, operation.Value);
 
@@ -230,7 +230,7 @@ public void Expression_With_Rebound_Identifier()
 	Operation<object> operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Success, operation.Status);
+	Assert.Equal(Status.Ok, operation.Status);
 	Assert.NotNull(operation.Value);
 	Assert.Equal(91D, operation.Value);
 
@@ -241,7 +241,7 @@ public void Expression_With_Rebound_Identifier()
 	Operation<object> operation2 = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Success, operation2.Status);
+	Assert.Equal(Status.Ok, operation2.Status);
 	Assert.NotNull(operation.Value);
 	Assert.Equal(85D, operation2.Value);
 
@@ -276,7 +276,7 @@ public void Simple_Expression_With_Progress()
 	Operation<object> operation = expression.Evaluate(progress);
 
 	// Assert
-	Assert.Equal(Status.Success, operation.Status);
+	Assert.Equal(Status.Ok, operation.Status);
 	Assert.NotNull(operation.Value);
 	Assert.Equal(26D, operation.Value);
 

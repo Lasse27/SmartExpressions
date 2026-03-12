@@ -16,45 +16,42 @@ namespace SmartExpressions.Test
 		public void Simple_Expression()
 		{
 			Expression expression = new Expression("Add(1, 1)");
-			Result<object> operation = expression.Evaluate();
+			EvaluationResult operation = expression.Evaluate();
 
 			// Assert
-			Assert.Equal(Status.Success, operation.Status);
-			Assert.NotNull(operation.Value);
-			Assert.Equal(2D, operation.Value);
+			Assert.NotNull(operation.GetValue());
+			Assert.Equal(2D, operation.GetValue());
 
 			// Output
-			_outputHelper.WriteLine(operation.Value.ToString());
+			_outputHelper.WriteLine(operation.GetValue().ToString());
 		}
 
 		[Fact]
 		public void Simple_Nested_Expression()
 		{
 			Expression expression = new Expression("Add(1, MULT(5,5))");
-			Result<object> operation = expression.Evaluate();
+			EvaluationResult operation = expression.Evaluate();
 
 			// Assert
-			Assert.Equal(Status.Success, operation.Status);
-			Assert.NotNull(operation.Value);
-			Assert.Equal(26D, operation.Value);
+			Assert.NotNull(operation.GetValue());
+			Assert.Equal(26D, operation.GetValue());
 
 			// Output
-			_outputHelper.WriteLine(operation.Value.ToString());
+			_outputHelper.WriteLine(operation.GetValue().ToString());
 		}
 
 		[Fact]
 		public void Simple_Expression_With_Whitespace()
 		{
 			Expression expression = new Expression("Add  (1   , MULT    (5,      5))");
-			Result<object> operation = expression.Evaluate();
+			EvaluationResult operation = expression.Evaluate();
 
 			// Assert
-			Assert.Equal(Status.Success, operation.Status);
-			Assert.NotNull(operation.Value);
-			Assert.Equal(26D, operation.Value);
+			Assert.NotNull(operation.GetValue());
+			Assert.Equal(26D, operation.GetValue());
 
 			// Output
-			_outputHelper.WriteLine(operation.Value.ToString());
+			_outputHelper.WriteLine(operation.GetValue().ToString());
 		}
 
 		[Fact]
@@ -62,15 +59,14 @@ namespace SmartExpressions.Test
 		{
 			Expression expression = new Expression("Add(@{Key_1}, 25)");
 			_ = expression.RegisterBinding("Key_1", 66);
-			Result<object> operation = expression.Evaluate();
+			EvaluationResult operation = expression.Evaluate();
 
 			// Assert
-			Assert.Equal(Status.Success, operation.Status);
-			Assert.NotNull(operation.Value);
-			Assert.Equal(91D, operation.Value);
+			Assert.NotNull(operation.GetValue());
+			Assert.Equal(91D, operation.GetValue());
 
 			// Output
-			_outputHelper.WriteLine(operation.Value.ToString());
+			_outputHelper.WriteLine(operation.GetValue().ToString());
 		}
 
 		[Fact]
@@ -78,26 +74,24 @@ namespace SmartExpressions.Test
 		{
 			Expression expression = new Expression("Add(@{Key_1}, 25)");
 			_ = expression.RegisterBinding("Key_1", 66);
-			Result<object> operation = expression.Evaluate();
+			EvaluationResult operation = expression.Evaluate();
 
 			// Assert
-			Assert.Equal(Status.Success, operation.Status);
-			Assert.NotNull(operation.Value);
-			Assert.Equal(91D, operation.Value);
+			Assert.NotNull(operation.GetValue());
+			Assert.Equal(91D, operation.GetValue());
 
 			// Output
-			_outputHelper.WriteLine(operation.Value.ToString());
+			_outputHelper.WriteLine(operation.GetValue().ToString());
 
 			_ = expression.RegisterBinding("Key_1", 60);
-			Result<object> operation2 = expression.Evaluate();
+			EvaluationResult operation2 = expression.Evaluate();
 
 			// Assert
-			Assert.Equal(Status.Success, operation2.Status);
-			Assert.NotNull(operation.Value);
-			Assert.Equal(85D, operation2.Value);
+			Assert.NotNull(operation.GetValue());
+			Assert.Equal(85D, operation2.GetValue());
 
 			// Output
-			_outputHelper.WriteLine(operation2.Value.ToString());
+			_outputHelper.WriteLine(operation2.GetValue().ToString());
 		}
 
 		[Fact]
@@ -107,15 +101,14 @@ namespace SmartExpressions.Test
 			progress.ProgressChanged += (_, e) => _outputHelper.WriteLine(e);
 
 			Expression expression = new Expression("Add(SUB(2,1),MULT(5,5))");
-			Result<object> operation = expression.Evaluate(progress);
+			EvaluationResult operation = expression.Evaluate(progress);
 
 			// Assert
-			Assert.Equal(Status.Success, operation.Status);
-			Assert.NotNull(operation.Value);
-			Assert.Equal(26D, operation.Value);
+			Assert.NotNull(operation.GetValue());
+			Assert.Equal(26D, operation.GetValue());
 
 			// Output
-			_outputHelper.WriteLine(operation.Value.ToString());
+			_outputHelper.WriteLine(operation.GetValue().ToString());
 
 			// Console output
 			// SUB(2, 1) = 1

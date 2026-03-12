@@ -22,15 +22,14 @@ namespace SmartExpressions.Test.Utility
 
 			Progress<string> progress = new Progress<string>();
 			progress.ProgressChanged += (s, e) => this._outputHelper.WriteLine(e);
-			Result<object> result = expression.Evaluate(progress);
-			if (result.Status == Status.Failure)
+			EvaluationResult result = expression.Evaluate(progress);
+			if (result.IsFail())
 			{
 				this._outputHelper.WriteLine("Input: " + formula);
-				this._outputHelper.WriteLine("Fail: " + result.Message);
+				this._outputHelper.WriteLine("Fail: " + result.GetMessage());
 			}
 
-			Assert.Equal(Status.Success, result.Status);
-			return result.Value;
+			return result.GetValue();
 		}
 	}
 }

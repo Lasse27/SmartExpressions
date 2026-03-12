@@ -12,14 +12,18 @@ namespace SmartExpressions.Core.Nodes.Constants
 	{
 		private const string Keyword = "pi";
 
-		public static Result<ExpressionNode> Get(Parser parser)
+
+		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
+		/// <param name="parser"> The parser that is checked for the node. </param>
+		/// <returns> A <see cref="NodeResult"/> object containing the parsed node or an error. </returns>
+		public static NodeResult Get(Parser parser)
 		{
 			parser.AdvancePointer();
-			return Result<ExpressionNode>.Success(new PiNode());
+			return NodeResult.Ok(new PiNode());
 		}
 
-		public override Result<object> Evaluate(EvaluationContext ctx)
-			=> Result<object>.Success(Math.PI);
+		public override EvaluationResult Evaluate(EvaluationContext ctx)
+			=> EvaluationResult.Ok(ctx.CurrentPath, Math.PI);
 
 		/// <inheritdoc/>
 		public override string GetKeyword() => Keyword;

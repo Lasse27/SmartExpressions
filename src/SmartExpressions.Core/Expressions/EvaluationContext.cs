@@ -13,6 +13,15 @@ namespace SmartExpressions.Core.Expressions
 		/// </summary>
 		public ExpressionSettings Settings { get; }
 
+		/// <summary>
+		/// Gets the current branch stack as strings.
+		/// </summary>
+		public Stack<string> BranchStack { get; }
+
+		/// <summary>Aktueller Pfad als String, z.B. "if/elif#1/if"</summary>
+		public string CurrentPath =>
+			this.BranchStack.Count == 0 ? string.Empty : string.Join("/", this.BranchStack.Reverse());
+
 		/// <summary> 
 		/// Gets or sets the identifiers registered for the evaluation. 
 		/// </summary>
@@ -36,6 +45,7 @@ namespace SmartExpressions.Core.Expressions
 		{
 			this.Settings = new ExpressionSettings();
 			this.Identifiers = [];
+			this.BranchStack = new Stack<string>();
 			this.Functions = new Dictionary<string, EvalFunction>(StringComparer.OrdinalIgnoreCase);
 			this.Listener = null;
 		}
@@ -53,6 +63,7 @@ namespace SmartExpressions.Core.Expressions
 			this.Identifiers = identifiers;
 			this.Functions = functions;
 			this.Listener = listener;
+			this.BranchStack = new Stack<string>();
 		}
 
 

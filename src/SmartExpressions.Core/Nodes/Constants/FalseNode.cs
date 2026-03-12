@@ -9,14 +9,18 @@ namespace SmartExpressions.Core.Nodes.Constants
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record FalseNode : ExpressionNode
 	{
-		public static Result<ExpressionNode> Get(Parser parser)
+
+		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
+		/// <param name="parser"> The parser that is checked for the node. </param>
+		/// <returns> A <see cref="NodeResult"/> object containing the parsed node or an error. </returns>
+		public static NodeResult Get(Parser parser)
 		{
 			parser.AdvancePointer();
-			return Result<ExpressionNode>.Success(new FalseNode());
+			return NodeResult.Ok(new FalseNode());
 		}
 
-		public override Result<object> Evaluate(EvaluationContext ctx)
-			=> Result<object>.Success(false);
+		public override EvaluationResult Evaluate(EvaluationContext ctx)
+			=> EvaluationResult.Ok(ctx.CurrentPath, false);
 
 		/// <inheritdoc/>
 		public override string GetKeyword() => bool.FalseString;

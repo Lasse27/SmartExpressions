@@ -10,7 +10,7 @@ namespace SmartExpressions.Core.Nodes
 	public abstract record ExpressionNode : IEvaluable
 	{
 		/// <inheritdoc/>
-		public abstract Result<object> Evaluate(EvaluationContext ctx);
+		public abstract EvaluationResult Evaluate(EvaluationContext ctx);
 
 		/// <summary> Gets the related keyword for the node. </summary>
 		/// <returns> A <see cref="string"/> representing the nodes keyword. </returns>

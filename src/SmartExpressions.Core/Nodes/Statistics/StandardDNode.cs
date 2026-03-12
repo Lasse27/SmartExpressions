@@ -12,19 +12,22 @@ namespace SmartExpressions.Core.Nodes.Statistics
 		public StandardDNode(List<ExpressionNode> operands) : base(operands) { }
 
 
-		public static Result<ExpressionNode> Get(Parser parser)
+		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
+		/// <param name="parser"> The parser that is checked for the node. </param>
+		/// <returns> A <see cref="NodeResult"/> object containing the parsed node or an error. </returns>
+		public static NodeResult Get(Parser parser)
 		{
 			Result<List<ExpressionNode>> operation = ParserHelpers.ParseNCountKeyword(parser);
-			if (operation.Status == Status.Failure)
+			if (operation.Status == Status.Fail)
 			{
-				return Result<ExpressionNode>.Failure(operation.Message);
+				return NodeResult.Fail(operation.Message);
 			}
 
 			ExpressionNode node = new StandardDNode(operation.Value);
-			return Result<ExpressionNode>.Success(node);
+			return NodeResult.Ok(node);
 		}
 
-		public override Result<object> Evaluate(EvaluationContext ctx) => throw new NotImplementedException();
+		public override EvaluationResult Evaluate(EvaluationContext ctx) => throw new NotImplementedException();
 
 		/// <inheritdoc/>
 		public override string GetKeyword() => Keyword;
