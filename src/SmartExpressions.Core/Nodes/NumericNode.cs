@@ -11,7 +11,7 @@ namespace SmartExpressions.Core.Nodes
 	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 	public record NumericNode : ExpressionNode
 	{
-		public decimal Value { get; private set; }
+		public double Value { get; private set; }
 
 		public NumericNode() => this.Value = 0;
 
@@ -36,7 +36,7 @@ namespace SmartExpressions.Core.Nodes
 
 		private Result TrySetValue(int pointer, string value)
 		{
-			if (!decimal.TryParse(value, CultureInfo.InvariantCulture, out decimal val))
+			if (!double.TryParse(value, CultureInfo.InvariantCulture, out double val))
 			{
 				return Result.Failure($"Unparsable numeric value at token position {pointer}.");
 			}
@@ -47,6 +47,7 @@ namespace SmartExpressions.Core.Nodes
 			return Result.Success();
 		}
 
+		/// <inheritdoc/>
 		public override Result<object> Evaluate(EvaluationContext ctx)
 			=> Result<object>.Success(this.Value);
 
