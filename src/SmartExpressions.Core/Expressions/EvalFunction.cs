@@ -2,5 +2,5 @@
 
 namespace SmartExpressions.Core.Expressions
 {
-	public delegate Result<object> EvalFunction(List<object> args);
+	public delegate EvaluationResult EvalFunction(List<object> args);
 }

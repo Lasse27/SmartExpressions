@@ -16,7 +16,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			Lexer tokenizer = new Lexer(input);
 			Result<List<Token>> result = tokenizer.Run();
-			Assert.Equal(Status.Success, result.Status);
+			Assert.Equal(Status.Ok, result.Status);
 
 			List<Token> tokens = result.Value;
 			_ = Assert.Single(tokens);
@@ -32,7 +32,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			Lexer tokenizer = new Lexer(input);
 			Result<List<Token>> result = tokenizer.Run();
-			Assert.Equal(Status.Success, result.Status);
+			Assert.Equal(Status.Ok, result.Status);
 
 			List<Token> tokens = result.Value;
 			foreach (Token token in tokens)
@@ -58,7 +58,7 @@ namespace SmartExpressions.Test.Lexing
 		{
 			Lexer tokenizer = new Lexer(input);
 			Result<List<Token>> result = tokenizer.Run();
-			Assert.Equal(Status.Success, result.Status);
+			Assert.Equal(Status.Ok, result.Status);
 
 			List<Token> tokens = result.Value;
 			_ = Assert.Single(tokens);

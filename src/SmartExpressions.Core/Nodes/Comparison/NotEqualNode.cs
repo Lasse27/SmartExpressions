@@ -14,48 +14,49 @@ namespace SmartExpressions.Core.Nodes.Comparison
 		/// <inheritdoc/>
 		public NotEqualNode(ExpressionNode left, ExpressionNode right) : base(left, right) { }
 
+
 		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
 		/// <param name="parser"> The parser that is checked for the node. </param>
-		/// <returns> A <see cref="Result{T}"/> object containing the parsed node or an error. </returns>
-		public static Result<ExpressionNode> Get(Parser parser)
+		/// <returns> A <see cref="NodeResult"/> object containing the parsed node or an error. </returns>
+		public static NodeResult Get(Parser parser)
 		{
 			Result<BinaryOperand> dualOperand = ParserHelpers.ParseBinaryKeyword(parser);
-			if (dualOperand.Status == Status.Failure)
+			if (dualOperand.Status == Status.Fail)
 			{
-				return Result<ExpressionNode>.Failure(dualOperand.Message);
+				return NodeResult.Fail(dualOperand.Message);
 			}
 
 			ExpressionNode node = new NotEqualNode(dualOperand.Value.Left, dualOperand.Value.Right);
-			return Result<ExpressionNode>.Success(node);
+			return NodeResult.Ok(node);
 		}
 
 		/// <inheritdoc/>
-		public override Result<object> Evaluate(EvaluationContext ctx)
+		public override EvaluationResult Evaluate(EvaluationContext ctx)
 		{
-			Result<object> rawLeft = this.Left.Evaluate(ctx);
-			if (rawLeft.Status == Status.Failure) { return rawLeft; }
+			EvaluationResult rawLeft = this.Left.Evaluate(ctx);
+			if (rawLeft.IsFail()) { return rawLeft; }
 
-			Result<object> rawRight = this.Right.Evaluate(ctx);
-			if (rawRight.Status == Status.Failure) { return rawRight; }
+			EvaluationResult rawRight = this.Right.Evaluate(ctx);
+			if (rawRight.IsFail()) { return rawRight; }
 
 			// Handle nulls
-			if (rawLeft.Value == null)
+			if (rawLeft._value == null)
 			{
-				return rawRight.Value == null
-					? Result<object>.Success(false)
-					: Result<object>.Success(true);
+				return rawRight._value == null
+					? EvaluationResult.Ok(ctx.CurrentPath, false)
+					: EvaluationResult.Ok(ctx.CurrentPath, true);
 			}
-			if (rawRight.Value == null)
+			if (rawRight._value == null)
 			{
-				return rawLeft.Value == null
-					? Result<object>.Success(false)
-					: Result<object>.Success(true);
+				return rawLeft._value == null
+					? EvaluationResult.Ok(ctx.CurrentPath, false)
+					: EvaluationResult.Ok(ctx.CurrentPath, true);
 			}
 
 			// Handle and progress 
-			bool value = !rawLeft.Value.Equals(rawRight.Value);
+			bool value = !rawLeft.GetValue().Equals(rawRight.GetValue());
 			ctx.Listener?.Report($"{this} = {value}");
-			return Result<object>.Success(value);
+			return EvaluationResult.Ok(ctx.CurrentPath, value);
 		}
 
 		/// <inheritdoc/>

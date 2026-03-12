@@ -3,24 +3,24 @@
 
 	public readonly record struct Result(Status Status, string Message = "") : IEquatable<Result>
 	{
-		public static Result Success() => new Result(Status.Success);
+		public static Result Ok() => new Result(Status.Ok);
 
-		public static Result Failure(string message) => new Result(Status.Failure, message);
+		public static Result Fail(string message) => new Result(Status.Fail, message);
 	}
 
 
 
 	public readonly record struct Result<T>(Status Status, T Value, string Message = "") : IEquatable<Result<T>>
 	{
-		public static Result<T> Success(T value) => new Result<T>(Status.Success, value);
+		public static Result<T> Ok(T value) => new Result<T>(Status.Ok, value);
 
-		public static Result<T> Failure(string message = "") => new Result<T>(Status.Failure, default, message);
+		public static Result<T> Fail(string message = "") => new Result<T>(Status.Fail, default, message);
 	}
 
 	public enum Status
 	{
-		Failure,
+		Fail,
 		Pending,
-		Success,
+		Ok,
 	}
 }

@@ -16,11 +16,11 @@ namespace SmartExpressions.Test.Parsing
 		//  Helper – Lex + Parse in einem Schritt
 		// ------------------------------------------------------------------ //
 
-		private static Result<ExpressionNode> Parse(string input)
+		private static NodeResult Parse(string input)
 		{
 			Lexer lexer = new Lexer(input);
 			Result<List<Token>> lexResult = lexer.Run();
-			Assert.True(lexResult.Status == Status.Success, $"Lexer failed: {lexResult.Message}");
+			Assert.True(lexResult.Status == Status.Ok, $"Lexer failed: {lexResult.Message}");
 
 			Parser parser = new Parser(lexResult.Value);
 			return parser.Run();
@@ -28,15 +28,15 @@ namespace SmartExpressions.Test.Parsing
 
 		private static ExpressionNode ParseSuccess(string input)
 		{
-			Result<ExpressionNode> result = Parse(input);
-			Assert.True(result.Status == Status.Success, $"Parser failed: {result.Message}");
-			return result.Value;
+			NodeResult result = Parse(input);
+			Assert.True(result.IsOk(), $"Parser failed: {result.GetMessage()}");
+			return result.GetValue();
 		}
 
 		private static void ParseFailure(string input)
 		{
-			Result<ExpressionNode> result = Parse(input);
-			Assert.True(result.Status == Status.Failure, "Expected parser failure but got success.");
+			NodeResult result = Parse(input);
+			Assert.True(result.IsFail(), "Expected parser failure but got success.");
 		}
 
 
@@ -389,9 +389,9 @@ namespace SmartExpressions.Test.Parsing
 		{
 			// Empty token list → NullNode per Run() guard
 			Parser parser = new Parser(new List<Token>());
-			Result<ExpressionNode> result = parser.Run();
-			Assert.True(result.Status == Status.Success);
-			_ = Assert.IsType<NullNode>(result.Value);
+			NodeResult result = parser.Run();
+			Assert.True(result.IsOk());
+			_ = Assert.IsType<NullNode>(result.GetValue());
 		}
 
 		[Fact]

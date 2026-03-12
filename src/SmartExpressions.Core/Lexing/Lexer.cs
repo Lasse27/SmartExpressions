@@ -72,7 +72,7 @@ namespace SmartExpressions.Core.Lexing
 			// Guard against stupidity
 			if (string.IsNullOrWhiteSpace(this._input))
 			{
-				return Result<List<Token>>.Success(new List<Token>());
+				return Result<List<Token>>.Ok(new List<Token>());
 			}
 
 			this.ResetTokenizer();
@@ -87,13 +87,13 @@ namespace SmartExpressions.Core.Lexing
 
 				// find and add token -> if not found return failure
 				Result triState = this.AddTokenByPointer();
-				if (triState.Status != Status.Success)
+				if (triState.Status != Status.Ok)
 				{
-					return Result<List<Token>>.Failure(triState.Message);
+					return Result<List<Token>>.Fail(triState.Message);
 				}
 			}
 
-			return Result<List<Token>>.Success(this._tokens);
+			return Result<List<Token>>.Ok(this._tokens);
 		}
 
 		#endregion
@@ -110,22 +110,22 @@ namespace SmartExpressions.Core.Lexing
 				case Characters.LPAREN:
 					this.AddToken(new Token(TokenType.LParen, this._pointer, "("));
 					this.AdvancePointer();
-					return Result.Success();
+					return Result.Ok();
 
 				case Characters.RPAREN:
 					this.AddToken(new Token(TokenType.RParen, this._pointer, ")"));
 					this.AdvancePointer();
-					return Result.Success();
+					return Result.Ok();
 
 				case Characters.LBRACE:
 					this.AddToken(new Token(TokenType.LBrace, this._pointer, "{"));
 					this.AdvancePointer();
-					return Result.Success();
+					return Result.Ok();
 
 				case Characters.RBRACE:
 					this.AddToken(new Token(TokenType.RBrace, this._pointer, "}"));
 					this.AdvancePointer();
-					return Result.Success();
+					return Result.Ok();
 
 				/* 
 				* Delimiter tokens
@@ -133,7 +133,7 @@ namespace SmartExpressions.Core.Lexing
 				case Characters.COMMA:
 					this.AddToken(new Token(TokenType.Comma, this._pointer, ","));
 					this.AdvancePointer();
-					return Result.Success();
+					return Result.Ok();
 
 
 				/* 
@@ -154,11 +154,11 @@ namespace SmartExpressions.Core.Lexing
 			this.AdvancePointer(); // Skip @
 			if (this.PointerIsAtEnd())
 			{
-				return Result.Failure($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.LBRACE}'.");
+				return Result.Fail($"Unexpected end of input at index {this._pointer}. Expected: '{Characters.LBRACE}'.");
 			}
 			else if (this.PeakAtPointer() != Characters.LBRACE)
 			{
-				return Result.Failure($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
+				return Result.Fail($"Unexpected character at index {this._pointer}. Expected: '{Characters.LBRACE}'. Actual: '{this.PeakAtPointer()}'.");
 			}
 
 			this.AdvancePointer(); // Skip {
@@ -171,20 +171,20 @@ namespace SmartExpressions.Core.Lexing
 
 			if (this.PointerIsAtEnd())
 			{
-				return Result.Failure($"Unclosed identifier starting at index {entryP}.");
+				return Result.Fail($"Unclosed identifier starting at index {entryP}.");
 			}
 
 			string identifier = this._input.Substring(identifierStart, this._pointer - identifierStart);
 			if (string.IsNullOrWhiteSpace(identifier))
 			{
-				return Result.Failure($"Empty identifier at index {entryP}.");
+				return Result.Fail($"Empty identifier at index {entryP}.");
 			}
 
 			this.AdvancePointer(); // Skip }
 			this.AddToken(new Token(TokenType.Identifier, entryP, identifier));
 
 			// Added
-			return Result.Success();
+			return Result.Ok();
 		}
 
 		private Result HandleNonDelimitedToken(char c)
@@ -202,7 +202,7 @@ namespace SmartExpressions.Core.Lexing
 			}
 
 			// If none found, return failure
-			return Result.Failure($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
+			return Result.Fail($"Unexpected character at index {this._pointer}. Actual: '{c}'.");
 		}
 
 		private Result AddKeyWordToken()
@@ -216,7 +216,7 @@ namespace SmartExpressions.Core.Lexing
 
 			string word = this._input.Substring(entryPointer, this._pointer - entryPointer);
 			this.AddToken(new Token(TokenType.Keyword, entryPointer, word));
-			return Result.Success();
+			return Result.Ok();
 		}
 
 		private Result AddNumericToken()
@@ -229,7 +229,7 @@ namespace SmartExpressions.Core.Lexing
 
 			string number = this._input.Substring(entryPointer, this._pointer - entryPointer);
 			this.AddToken(new Token(TokenType.Numeric, entryPointer, number));
-			return Result.Success();
+			return Result.Ok();
 		}
 	}
 }

@@ -19,10 +19,25 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression("if (true) { 1 } elif (eq(1,1)) { 2 } else { 0 }");
 			_ = expression.Assemble();
 
-			Result<object> r1 = expression.Evaluate();
-			Result<object> r2 = expression.Evaluate();
+			EvaluationResult r1 = expression.Evaluate();
+			EvaluationResult r2 = expression.Evaluate();
 
-			Assert.Equal(r1.Value, r2.Value);
+			Assert.Equal(r1.GetValue(), r2.GetValue());
+		}
+
+		[Fact]
+		public void IfElifElse_Evaluate_BranchId_Is_Deterministic()
+		{
+			Expression expression = new Expression("if (true) { 1 } elif (eq(1,1)) { 2 } else { 0 }");
+			_ = expression.Assemble();
+
+			EvaluationResult r1 = expression.Evaluate();
+			EvaluationResult r2 = expression.Evaluate();
+
+			_outputHelper.WriteLine(r1.GetBranchId());
+			_outputHelper.WriteLine(r2.GetBranchId());
+
+			Assert.Equal(r1.GetBranchId(), r2.GetBranchId());
 		}
 
 
@@ -113,6 +128,16 @@ namespace SmartExpressions.Test.Expressions
 		[InlineData("if (false) { 1 } elif (true) { E } else { 3 }", Math.E)]
 		[InlineData("if (false) { 1 } elif (false) { 2 } else { E }", Math.E)]
 		public void IfElifElse_With_E_Constant(string formula, double output)
+		{
+			double value = (double)this.EvaluateSuccess(formula);
+			Assert.Equal(output, value, 10);
+		}
+
+		[Theory]
+		[InlineData("if (true) { TAU } elif (false) { 2 } else { 3}", Math.Tau)]
+		[InlineData("if (false) { 1 } elif (true) { TAU } else { 3 }", Math.Tau)]
+		[InlineData("if (false) { 1 } elif (false) { 2 } else { TAU }", Math.Tau)]
+		public void IfElifElse_With_TAU_Constant(string formula, double output)
 		{
 			double value = (double)this.EvaluateSuccess(formula);
 			Assert.Equal(output, value, 10);

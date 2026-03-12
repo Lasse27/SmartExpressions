@@ -16,14 +16,15 @@ namespace SmartExpressions.Core.Parsing
 {
 	public class Parser
 	{
-		private static readonly FrozenDictionary<string, Func<Parser, Result<ExpressionNode>>> buildInFactories;
+		private static readonly FrozenDictionary<string, Func<Parser, NodeResult>> buildInFactories;
 
 		static Parser()
 		{
-			Dictionary<string, Func<Parser, Result<ExpressionNode>>> dict = new()
+			Dictionary<string, Func<Parser, NodeResult>> dict = new()
 			{
 				// Constants
 				["e"] = EulerNode.Get,
+				["tau"] = TauNode.Get,
 				["pi"] = PiNode.Get,
 				["true"] = TrueNode.Get,
 				["false"] = FalseNode.Get,
@@ -135,42 +136,40 @@ namespace SmartExpressions.Core.Parsing
 		{
 			if (this.PointerIsAtEnd())
 			{
-				return Result.Failure($"Unexpected end of parser input. Expected: {expected}.");
+				return Result.Fail($"Unexpected end of parser input. Expected: {expected}.");
 			}
 
 			Token current = this.PeakAtPointer();
 			if (current.Type != expected)
 			{
-				return Result.Failure($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
+				return Result.Fail($"Expected {expected} at index {current.Position} of parser input. Actual: {current.Type}.");
 			}
 
 			this.AdvancePointer();
 
 			// Valid check
-			return Result.Success();
+			return Result.Ok();
 		}
 
 
-		public Result<ExpressionNode> Run()
+		public NodeResult Run()
 		{
 			// Guard against stupidity
 			if (this._input.Count == 0)
 			{
-				return Result<ExpressionNode>.Success(new NullNode());
+				return NodeResult.Ok(new NullNode());
 			}
 
 			this.Reset();
-			Result<ExpressionNode> result = this.ParseExpression();
-			return result.Status != Status.Success
-				? result
-				: Result<ExpressionNode>.Success(result.Value);
+			NodeResult result = this.ParseExpression();
+			return result;
 		}
 
-		public Result<ExpressionNode> ParseExpression()
+		public NodeResult ParseExpression()
 		{
 			if (this.PointerIsAtEnd())
 			{
-				return Result<ExpressionNode>.Failure("Unexpected end of input.");
+				return NodeResult.Fail("Unexpected end of input.");
 			}
 
 			Token current = this.PeakAtPointer();
@@ -181,16 +180,16 @@ namespace SmartExpressions.Core.Parsing
 				TokenType.Keyword => this.ResolveKeywordToken(),
 
 				// Default
-				_ => Result<ExpressionNode>.Failure($"Unexpected token at token-position {this._pointer}."),
+				_ => NodeResult.Fail($"Unexpected token at token-position {this._pointer}."),
 			};
 		}
 
-		private Result<ExpressionNode> ResolveKeywordToken()
+		private NodeResult ResolveKeywordToken()
 		{
 			Token token = this.PeakAtPointer();
 
 			// function is built in - run respective factory
-			if (buildInFactories.TryGetValue(token.Lexeme, out Func<Parser, Result<ExpressionNode>>? value))
+			if (buildInFactories.TryGetValue(token.Lexeme, out Func<Parser, NodeResult>? value))
 			{
 				return value.Invoke(this);
 			}

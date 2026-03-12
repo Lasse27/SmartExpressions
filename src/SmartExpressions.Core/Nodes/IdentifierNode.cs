@@ -13,24 +13,24 @@ namespace SmartExpressions.Core.Nodes
 		public IdentifierNode(string key) => this.Key = key;
 
 
-		public static Result<ExpressionNode> Get(Parser parser)
+		public static NodeResult Get(Parser parser)
 		{
 			Token current = parser.PeakAtPointer();
 			parser.AdvancePointer();
-			return Result<ExpressionNode>.Success(new IdentifierNode(current.Lexeme));
+			return NodeResult.Ok(new IdentifierNode(current.Lexeme));
 		}
 
 		/// <inheritdoc/>
-		public override Result<object> Evaluate(EvaluationContext ctx)
+		public override EvaluationResult Evaluate(EvaluationContext ctx)
 		{
 			if (ctx.Identifiers.TryGetValue(this.Key, out object? value))
 			{
 				ctx.Listener?.Report($"{this.Key} = {value}");
-				return Result<object>.Success(value);
+				return EvaluationResult.Ok(ctx.CurrentPath, value);
 			}
 
 			// Not registered => user error
-			return Result<object>.Failure($"Unregistered key '{this.Key}' in expression. Make sure to bind the key before evaluating.");
+			return EvaluationResult.Fail($"Unregistered key '{this.Key}' in expression. Make sure to bind the key before evaluating.");
 		}
 
 		/// <inheritdoc/>

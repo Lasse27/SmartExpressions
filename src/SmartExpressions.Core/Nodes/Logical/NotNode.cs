@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 
 using SmartExpressions.Core.Expressions;
-using SmartExpressions.Core.Lexing;
 using SmartExpressions.Core.Parsing;
 using SmartExpressions.Core.Utility;
 
@@ -20,55 +19,32 @@ namespace SmartExpressions.Core.Nodes.Logical
 
 		/// <summary> Gets the node from the current position of the parser and updates the parser position. </summary>
 		/// <param name="parser"> The parser that is checked for the node. </param>
-		/// <returns> A <see cref="Result{T}"/> object containing the parsed node or an error. </returns>
-		public static Result<ExpressionNode> Get(Parser parser)
+		/// <returns> A <see cref="NodeResult"/> object containing the parsed node or an error. </returns>
+		public static NodeResult Get(Parser parser)
 		{
-			// Skip keyword ABS
-			parser.AdvancePointer();
-
-			// Check for left parenthesis
-			Result check = parser.Check(TokenType.LParen);
-			if (check.Status == Status.Failure)
-			{
-				return Result<ExpressionNode>.Failure(check.Message);
-			}
-
-			// Get operand
-			Result<ExpressionNode> operand = parser.ParseExpression();
-			if (operand.Status == Status.Failure) { return operand; }
-
-			// Check for right parenthesis
-			check = parser.Check(TokenType.RParen);
-			if (check.Status == Status.Failure)
-			{
-				return Result<ExpressionNode>.Failure(check.Message);
-			}
-
-			// Build and return
-			ExpressionNode node = new NotNode(operand.Value);
-			return Result<ExpressionNode>.Success(node);
+			NodeResult operand = ParserHelpers.ParseUnaryKeyword(parser);
+			if (operand.IsFail()) { return operand; }
+			ExpressionNode node = new NotNode(operand.GetValue());
+			return NodeResult.Ok(node);
 		}
 
 
 		/// <inheritdoc/>
-		public override Result<object> Evaluate(EvaluationContext ctx)
+		public override EvaluationResult Evaluate(EvaluationContext ctx)
 		{
-			Result<object> raw = this.Operand.Evaluate(ctx);
-			if (raw.Status == Status.Failure)
-			{
-				return raw;
-			}
+			EvaluationResult raw = this.Operand.Evaluate(ctx);
+			if (raw.IsFail()) { return raw; }
 
 			Result<bool> resolved = ExpressionHelpers.ResolveBoolean(raw);
-			if (resolved.Status == Status.Failure)
+			if (resolved.Status == Status.Fail)
 			{
-				return Result<object>.Failure(resolved.Message);
+				return EvaluationResult.Fail(resolved.Message);
 			}
 
 			// NOT and return
 			bool value = !resolved.Value;
 			ctx.Listener?.Report($"{this} = {value}");
-			return Result<object>.Success(value);
+			return EvaluationResult.Ok(ctx.CurrentPath, value);
 		}
 
 		/// <inheritdoc/>

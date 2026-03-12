@@ -64,15 +64,15 @@ namespace SmartExpressions.Benchmark.Expressions
 		// ------------------------------------------------
 
 		[Benchmark]
-		public Result<object> Evaluate_Simple() 
+		public EvaluationResult Evaluate_Simple() 
 			=> this._simpleExpression.Evaluate();
 
 		[Benchmark]
-		public Result<object> Evaluate_Nested() 
+		public EvaluationResult Evaluate_Nested() 
 			=> this._nestedExpression.Evaluate();
 
 		[Benchmark]
-		public Result<object> Evaluate_With_Identifiers() 
+		public EvaluationResult Evaluate_With_Identifiers() 
 			=> this._identifierExpression.Evaluate();
 
 		// ------------------------------------------------
@@ -80,7 +80,7 @@ namespace SmartExpressions.Benchmark.Expressions
 		// ------------------------------------------------
 
 		[Benchmark]
-		public Result<object> Assemble_And_Evaluate_Simple()
+		public EvaluationResult Assemble_And_Evaluate_Simple()
 		{
 			Expression expr = new Expression(SimpleFormula);
 			_ = expr.Assemble();
@@ -88,7 +88,7 @@ namespace SmartExpressions.Benchmark.Expressions
 		}
 
 		[Benchmark]
-		public Result<object> Assemble_And_Evaluate_Nested()
+		public EvaluationResult Assemble_And_Evaluate_Nested()
 		{
 			Expression expr = new Expression(NestedFormula);
 			_ = expr.Assemble();

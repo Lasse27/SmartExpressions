@@ -240,12 +240,12 @@ namespace SmartExpressions.Core.Expressions
 		{
 			if (this._isTokenized)
 			{
-				return Result<List<Token>>.Success(this._tokens);
+				return Result<List<Token>>.Ok(this._tokens);
 			}
 
 			Lexer lexer = new Lexer(this.Formula);
 			Result<List<Token>> tokenization = lexer.Run();
-			if (tokenization.Status != Status.Success)
+			if (tokenization.Status != Status.Ok)
 			{
 				return tokenization;
 			}
@@ -258,27 +258,27 @@ namespace SmartExpressions.Core.Expressions
 
 		/// <summary> Parses the previously generated tokens into an internal expression representation. </summary>
 		/// <returns> A <see cref="Result"/> indicating whether parsing succeeded. </returns>
-		public Result<ExpressionNode> Parse()
+		public NodeResult Parse()
 		{
 			if (!this._isTokenized)
 			{
-				return Result<ExpressionNode>.Failure("Expression wasn't tokenized. Remember to call tokenization before parsing expression.");
+				return NodeResult.Fail("Expression wasn't tokenized. Remember to call tokenization before parsing expression.");
 			}
 
 			if (this._isParsed)
 			{
-				return Result<ExpressionNode>.Success(this._root!);
+				return NodeResult.Ok(this._root!);
 			}
 
 			Parser parser = new Parser(this._tokens);
-			Result<ExpressionNode> parsing = parser.Run();
-			if (parsing.Status != Status.Success)
+			NodeResult parsing = parser.Run();
+			if (parsing.IsFail())
 			{
 				return parsing;
 			}
 
 			// Parse
-			this._root = parsing.Value;
+			this._root = parsing.GetValue();
 			this._isParsed = true;
 			return parsing;
 		}
@@ -291,42 +291,42 @@ namespace SmartExpressions.Core.Expressions
 			if (!this._isTokenized)
 			{
 				Result<List<Token>> tokens = this.Tokenize();
-				if (tokens.Status != Status.Success)
+				if (tokens.Status != Status.Ok)
 				{
-					return Result.Failure(tokens.Message);
+					return Result.Fail(tokens.Message);
 				}
 			}
 
 			if (!this._isParsed)
 			{
-				Result<ExpressionNode> parses = this.Parse();
-				if (parses.Status != Status.Success)
+				NodeResult parses = this.Parse();
+				if (parses.IsFail())
 				{
-					return Result.Failure(parses.Message);
+					return Result.Fail(parses.GetMessage());
 				}
 			}
 
-			return Result.Success();
+			return Result.Ok();
 		}
 
 		#endregion
 
 
 		/// <inheritdoc/>
-		public Result<object> Evaluate(IProgress<string>? listener = default)
+		public EvaluationResult Evaluate(IProgress<string>? listener = default)
 		{
 			if (this.Settings.AssembleOnEvaluation)
 			{
 				Result preconfiguration = this.Assemble();
-				if (preconfiguration.Status != Status.Success)
+				if (preconfiguration.Status != Status.Ok)
 				{
-					return Result<object>.Failure(preconfiguration.Message);
+					return EvaluationResult.Fail(preconfiguration.Message);
 				}
 			}
 
 			if (!this.IsAssembled)
 			{
-				return Result<object>.Failure(
+				return EvaluationResult.Fail(
 					"Expression was not assembled. " +
 					"Remember to tokenize and parse the expression " +
 					"if AssembleOnEvaluation is disabled.");

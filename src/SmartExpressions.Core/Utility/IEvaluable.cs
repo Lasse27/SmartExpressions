@@ -5,7 +5,7 @@ namespace SmartExpressions.Core.Utility
 	internal interface IEvaluable
 	{
 		/// <summary> Evaluates the object and returns the computed result. </summary>
-		/// <returns> A <see cref="Result{T}"/> containing the evaluation result if successful; otherwise, failure information. </returns>
-		Result<object> Evaluate(EvaluationContext ctx);
+		/// <returns> A <see cref="EvaluationResult"/> containing the evaluation result if successful; otherwise, failure information. </returns>
+		EvaluationResult Evaluate(EvaluationContext ctx);
 	}
 }

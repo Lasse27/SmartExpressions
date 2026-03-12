@@ -41,10 +41,10 @@ namespace SmartExpressions.Test.Expressions
 			Expression expression = new Expression(this.Formula("2", "3"));
 			_ = expression.Assemble();
 
-			Result<object> r1 = expression.Evaluate();
-			Result<object> r2 = expression.Evaluate();
+			EvaluationResult r1 = expression.Evaluate();
+			EvaluationResult r2 = expression.Evaluate();
 
-			Assert.Equal(r1.Value, r2.Value);
+			Assert.Equal(r1.GetValue(), r2.GetValue());
 		}
 
 
@@ -202,13 +202,13 @@ namespace SmartExpressions.Test.Expressions
 		[Fact]
 		public void BinaryFunction_Constant_And_Integer()
 		{
-			if (!this.IsValidInput(Math.PI, 1))
+			if (!this.IsValidInput(Math.Tau, 1))
 			{
 				return;
 			}
 
-			double value = (double)this.EvaluateSuccess(this.Formula("PI", "1"));
-			Assert.Equal(this.Compute(Math.PI, 1m), value, 10);
+			double value = (double)this.EvaluateSuccess(this.Formula("TAU", "1"));
+			Assert.Equal(this.Compute(Math.Tau, 1m), value, 10);
 		}
 
 
@@ -416,11 +416,10 @@ namespace SmartExpressions.Test.Expressions
 			_ = expression.RegisterBinding("B", right);
 			_ = expression.Assemble();
 
-			Result<object> result = expression.Evaluate();
+			EvaluationResult result = expression.Evaluate();
 
-			Assert.Equal(Status.Success, result.Status);
-			_ = Assert.IsType<double>(result.Value);
-			Assert.Equal(this.Compute(l, r), result.Value);
+			_ = Assert.IsType<double>(result.GetValue());
+			Assert.Equal(this.Compute(l, r), result.GetValue());
 		}
 
 		[Fact]

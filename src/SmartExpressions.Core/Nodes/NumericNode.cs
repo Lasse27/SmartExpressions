@@ -16,21 +16,21 @@ namespace SmartExpressions.Core.Nodes
 		public NumericNode() => this.Value = 0;
 
 
-		public static Result<ExpressionNode> Get(Parser parser)
+		public static NodeResult Get(Parser parser)
 		{
 			Token current = parser.PeakAtPointer();
 
 			NumericNode node = new NumericNode();
 			Result set = node.TrySetValue(parser._pointer, current.Lexeme);
 
-			if (set.Status == Status.Failure)
+			if (set.Status == Status.Fail)
 			{
-				return Result<ExpressionNode>.Failure(set.Message);
+				return NodeResult.Fail(set.Message);
 			}
 			else
 			{
 				parser.AdvancePointer();
-				return Result<ExpressionNode>.Success(node);
+				return NodeResult.Ok(node);
 			}
 		}
 
@@ -38,18 +38,18 @@ namespace SmartExpressions.Core.Nodes
 		{
 			if (!double.TryParse(value, CultureInfo.InvariantCulture, out double val))
 			{
-				return Result.Failure($"Unparsable numeric value at token position {pointer}.");
+				return Result.Fail($"Unparsable numeric value at token position {pointer}.");
 			}
 
 			this.Value = val;
 
 			// Valid
-			return Result.Success();
+			return Result.Ok();
 		}
 
 		/// <inheritdoc/>
-		public override Result<object> Evaluate(EvaluationContext ctx)
-			=> Result<object>.Success(this.Value);
+		public override EvaluationResult Evaluate(EvaluationContext ctx)
+			=> EvaluationResult.Ok(ctx.CurrentPath, this.Value);
 
 		/// <inheritdoc/>
 		public override string ToString() => this.Value.ToString(CultureInfo.InvariantCulture);

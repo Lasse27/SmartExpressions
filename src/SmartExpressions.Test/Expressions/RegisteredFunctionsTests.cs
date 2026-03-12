@@ -18,26 +18,26 @@ namespace SmartExpressions.Test.Expressions
 			_ = expression.RegisterFunction("func_sin", objects =>
 			{
 				Result<double> result = ExpressionHelpers.ResolveNumeric(objects[0]);
-				if (result.Status == Status.Failure)
+				if (result.Status == Status.Fail)
 				{
-					return Result<object>.Failure("Unable to resolve 'func_sin'. " + result.Message);
+					return EvaluationResult.Fail("Unable to resolve 'func_sin'. " + result.Message);
 				}
 				double value = result.Value;
-				return Result<object>.Success(Math.Sin(value));
+				return EvaluationResult.Ok("", Math.Sin(value));
 			});
 
 
 			Progress<string> listener = new Progress<string>();
 			listener.ProgressChanged += (_, e) => this._outputHelper.WriteLine(e);
-			Result<object> result = expression.Evaluate(listener);
-			if (result.Status == Status.Failure)
+			EvaluationResult result = expression.Evaluate(listener);
+			if (result.IsFail())
 			{
-				this._outputHelper.WriteLine(result.Message);
-				throw new Exception(result.Message);
+				this._outputHelper.WriteLine(result.GetMessage());
+				throw new Exception(result.GetMessage());
 			}
 
-			Assert.Equal(Status.Success, result.Status);
-			Assert.Equal(Math.Sin(23), result.Value);
+			Assert.True(result.IsOk());
+			Assert.Equal(Math.Sin(23), result.GetValue());
 		}
 
 		[Fact]
@@ -49,38 +49,37 @@ namespace SmartExpressions.Test.Expressions
 			_ = expression.RegisterFunction("func_sin", objects =>
 			{
 				Result<double> result = ExpressionHelpers.ResolveNumeric(objects[0]);
-				if (result.Status == Status.Failure)
+				if (result.Status == Status.Fail)
 				{
-					return Result<object>.Failure("Unable to resolve 'func_sin'. " + result.Message);
+					return EvaluationResult.Fail("Unable to resolve 'func_sin'. " + result.Message);
 				}
 				double value = result.Value;
-				return Result<object>.Success(Math.Sin(value));
+				return EvaluationResult.Ok("", Math.Sin(value));
 			});
 
 
 			_ = expression.RegisterFunction("func_cos", objects =>
 			{
 				Result<double> result = ExpressionHelpers.ResolveNumeric(objects[0]);
-				if (result.Status == Status.Failure)
+				if (result.Status == Status.Fail)
 				{
-					return Result<object>.Failure("Unable to resolve 'func_cos'. " + result.Message);
+					return EvaluationResult.Fail("Unable to resolve 'func_cos'. " + result.Message);
 				}
 				double value = result.Value;
-				return Result<object>.Success(Math.Cos(value));
+				return EvaluationResult.Ok("", Math.Cos(value));
 			});
 
 
 			Progress<string> listener = new Progress<string>();
 			listener.ProgressChanged += (_, e) => this._outputHelper.WriteLine(e);
-			Result<object> result = expression.Evaluate(listener);
-			if (result.Status == Status.Failure)
+			EvaluationResult result = expression.Evaluate(listener);
+			if (result.IsFail())
 			{
-				this._outputHelper.WriteLine(result.Message);
-				throw new Exception(result.Message);
+				this._outputHelper.WriteLine(result.GetMessage());
+				throw new Exception(result.GetMessage());
 			}
 
-			Assert.Equal(Status.Success, result.Status);
-			Assert.Equal(Math.Sin(Math.Cos(23)), result.Value);
+			Assert.Equal(Math.Sin(Math.Cos(23)), result.GetValue());
 		}
 
 		[Fact]
@@ -92,39 +91,38 @@ namespace SmartExpressions.Test.Expressions
 			_ = expression.RegisterFunction("func_sin", objects =>
 			{
 				Result<double> result = ExpressionHelpers.ResolveNumeric(objects[0]);
-				if (result.Status == Status.Failure)
+				if (result.Status == Status.Fail)
 				{
-					return Result<object>.Failure("Unable to resolve 'func_sin'. " + result.Message);
+					return EvaluationResult.Fail("Unable to resolve 'func_sin'. " + result.Message);
 				}
 				double value = result.Value;
-				return Result<object>.Success(Math.Sin(value));
+				return EvaluationResult.Ok("", Math.Sin(value));
 			});
 
 
 			_ = expression.RegisterFunction("func_cos", objects =>
 			{
 				Result<double> result = ExpressionHelpers.ResolveNumeric(objects[0]);
-				if (result.Status == Status.Failure)
+				if (result.Status == Status.Fail)
 				{
-					return Result<object>.Failure("Unable to resolve 'func_cos'. " + result.Message);
+					return EvaluationResult.Fail("Unable to resolve 'func_cos'. " + result.Message);
 				}
 				double value = result.Value;
-				return Result<object>.Success(Math.Cos(value));
+				return EvaluationResult.Ok("", Math.Cos(value));
 			});
 
-			expression.RegisterBinding("VALUE_1", Math.PI);
+			_ = expression.RegisterBinding("VALUE_1", Math.PI);
 
 			Progress<string> listener = new Progress<string>();
 			listener.ProgressChanged += (_, e) => this._outputHelper.WriteLine(e);
-			Result<object> result = expression.Evaluate(listener);
-			if (result.Status == Status.Failure)
+			EvaluationResult result = expression.Evaluate(listener);
+			if (result.IsFail())
 			{
-				this._outputHelper.WriteLine(result.Message);
-				throw new Exception(result.Message);
+				this._outputHelper.WriteLine(result.GetMessage());
+				throw new Exception(result.GetMessage());
 			}
 
-			Assert.Equal(Status.Success, result.Status);
-			Assert.Equal(Math.Sin(Math.Cos(Math.PI)), result.Value);
+			Assert.Equal(Math.Sin(Math.Cos(Math.PI)), result.GetValue());
 		}
 	}
 }
