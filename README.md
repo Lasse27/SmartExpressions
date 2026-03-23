@@ -4,132 +4,155 @@
 
 SmartExpressions is a .NET-based framework for parsing and evaluating expressions. It provides a custom expression parser and evaluator supporting arithmetic, logical, and comparison operators, as well as variables, constants, and nested expressions. The library is designed for applications that require dynamic runtime calculation and interpretation of expressions.
 
-> The project was originally made for personal use but I decided to make it public. Anybody who wants to make use of it, can do so. Although I want to exclaim that this project is still in the works.
+> The project was originally made for personal use but I decided to make it public. Although I want to exclaim that this project is still in the works.
 
 ## Functionality
 The evaluation ultimately consists of a parser and a lexer/tokenizer. The lexer determines the tokens from the input string using statically registered values. The tokens are then checked with the parser and subsequently converted into an AST (abstract syntax tree).
 
-Both follow the EBNF listed below during the analysis.
-
-### EBNF
-```
-expression      ::= if_expr | logical_expr | arithmetic_expr | statistic_expr | primary_expr
-```
-
-```
-if_expr         ::= "if" "(" expression ")" "{" expression "}" "else" "{" expression "}"
-```
-
-```
-logical_expr    ::= and_expr | or_expr | not_expr | xor_expr | nand_expr | nor_expr | xnor_expr | comparison_expr
-and_expr        ::= "AND"  "(" expression "," expression ")"
-or_expr         ::= "OR"   "(" expression "," expression ")"
-not_expr        ::= "NOT"  "(" expression ")"
-xor_expr        ::= "XOR"  "(" expression "," expression ")"
-nand_expr       ::= "NAND" "(" expression "," expression ")"
-nor_expr        ::= "NOR"  "(" expression "," expression ")"
-xnor_expr       ::= "XNOR" "(" expression "," expression ")"
-```
-
-```
-comparison_expr ::= eq_expr | neq_expr | lt_expr | gt_expr | lte_expr | gte_expr
-eq_expr         ::= "EQ"  "(" expression "," expression ")"
-neq_expr        ::= "NEQ" "(" expression "," expression ")"
-lt_expr         ::= "LT"  "(" expression "," expression ")"
-gt_expr         ::= "GT"  "(" expression "," expression ")"
-lte_expr        ::= "LTE" "(" expression "," expression ")"
-gte_expr        ::= "GTE" "(" expression "," expression ")"
-```
-
-```
-arithmetic_expr ::= add_expr | sub_expr | mult_expr | div_expr | mod_expr | pow_expr | sqrt_expr | abs_expr | neg_expr
-add_expr        ::= "ADD"  "(" expression "," expression ")"
-sub_expr        ::= "SUB"  "(" expression "," expression ")"
-mult_expr       ::= "MULT" "(" expression "," expression ")"
-div_expr        ::= "DIV"  "(" expression "," expression ")"
-mod_expr        ::= "MOD"  "(" expression "," expression ")"
-pow_expr        ::= "POW"  "(" expression "," expression ")"
-sqrt_expr       ::= "ROOT" "(" expression "," expression ")"
-abs_expr        ::= "ABS"  "(" expression ")"
-neg_expr        ::= "NEG"  "(" expression ")"
-```
-
-```
-primary         ::= constant | boolean | number | identifier | null
-constant        ::= "pi" | "e"
-boolean         ::= "true" | "false"
-null            ::= "null"
-number          ::= (-)? DIGIT+ ("." DIGIT+)?
-identifier      ::= "@{" LETTER (LETTER | DIGIT | "_")* "}"
-DIGIT           ::= "0".."9"
-LETTER          ::= "a".."z" | "A".."Z"
-```
-
 In general, the evaluation is quite lenient with incorrect types and/or null values.
-For example, a `True` in a `LessThan (LT)` comparison is evaluated as 1.
+For example, a `True` in a `LessThan (LT)` comparison is handled as 1.
 
 This results in the following functions:
 
-### Conditional 
+<h3>Conditional functions</h3>
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+      <th>Example/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>if</td>
+      <td>Evaluates a condition and returns one expression if true, otherwise another</td>
+      <td>
+	  	<code>
+			if( eq(1,1) ) 
+			{ 
+				add(2,3) 
+			} 
+			elif ( eq(1,2) )
+			{
+				mult(1,9)
+			}
+			else 
+			{ 
+				sub(5,2) 
+			}
+		</code>
+	  </td>
+    </tr>
+  </tbody>
+</table>
 
-| Function    | Format                                              | Example/s                                    | 
-| ----------- | --------------------------------------------------- | -------------------------------------------- |
-| If		  | `if(expression) { expression } else { expression }` | `if(EQ(1,1)) { ADD(2,3) } else { SUB(5,2) }` | 
+<h3>Logical functions</h3>
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+      <th>Example/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>and</td><td>Returns true if both expressions evaluate to true</td><td><code>and(true, false)</code></td></tr>
+    <tr><td>or</td><td>Returns true if at least one expression evaluates to true</td><td><code>or(true, false)</code></td></tr>
+    <tr><td>not</td><td>Inverts the boolean value of the expression</td><td><code>not(false)</code></td></tr>
+    <tr><td>xor</td><td>Returns true if exactly one expression is true</td><td><code>xor(true, false)</code></td></tr>
+    <tr><td>nand</td><td>Returns false only if both expressions are true</td><td><code>nand(true, true)</code></td></tr>
+    <tr><td>nor</td><td>Returns true only if both expressions are false</td><td><code>nor(false, false)</code></td></tr>
+    <tr><td>xnor</td><td>Returns true if both expressions have the same boolean value</td><td><code>xnor(true, false)</code></td></tr>
+  </tbody>
+</table>
 
+<h3>Comparison functions</h3>
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+      <th>Example/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>eq</td><td>Checks if two expressions are equal</td><td><code>eq(5,5)</code></td></tr>
+    <tr><td>neq</td><td>Checks if two expressions are not equal</td><td><code>neq(5,3)</code></td></tr>
+    <tr><td>lt</td><td>Checks if the first expression is less than the second</td><td><code>lt(2,5)</code></td></tr>
+    <tr><td>gt</td><td>Checks if the first expression is greater than the second</td><td><code>gt(10,3)</code></td></tr>
+    <tr><td>lte</td><td>Checks if the first expression is less than or equal to the second</td><td><code>lte(3,3)</code></td></tr>
+    <tr><td>gte</td><td>Checks if the first expression is greater than or equal to the second</td><td><code>gte(4,2)</code></td></tr>
+  </tbody>
+</table>
 
-### Logical
+<h3>Arithmetic functions</h3>
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+      <th>Example/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>add</td><td>Returns the sum of two expressions</td><td><code>add(2,3)</code></td></tr>
+    <tr><td>sub</td><td>Returns the difference of two expressions</td><td><code>sub(5,2)</code></td></tr>
+    <tr><td>mult</td><td>Returns the product of two expressions</td><td><code>mult(3,4)</code></td></tr>
+    <tr><td>div</td><td>Returns the quotient of two expressions</td><td><code>div(10,2)</code></td></tr>
+    <tr><td>mod</td><td>Returns the remainder of a division</td><td><code>mod(10,3)</code></td></tr>
+    <tr><td>pow</td><td>Raises the first expression to the power of the second</td><td><code>pow(2,3)</code></td></tr>
+    <tr><td>root</td><td>Computes the nth root of a number</td><td><code>root(16,2)</code></td></tr>
+    <tr><td>abs</td><td>Returns the absolute (non-negative) value</td><td><code>abs(-5)</code></td></tr>
+    <tr><td>neg</td><td>Negates the value (multiplies by -1)</td><td><code>neg(7)</code></td></tr>
+    <tr><td>rand</td><td>Generates a random number within the given range</td><td><code>rand(2,10)</code></td></tr>
+  </tbody>
+</table>
 
-| Function    | Format                                              | Example/s                                    | 
-| ----------- | --------------------------------------------------- | -------------------------------------------- |
-| AND         | `AND(expression, expression)`                       | `AND(true, false)`                           | 
-| OR          | `OR(expression, expression)`                        | `OR(true, false)`                            | 
-| NOT         | `NOT(expression)`                                   | `NOT(false)`                                 | 
-| XOR         | `XOR(expression, expression)`                       | `XOR(true, false)`                           | 
-| NAND        | `NAND(expression, expression)`                      | `NAND(true, true)`                           | 
-| NOR         | `NOR(expression, expression)`                       | `NOR(false, false)`                          | 
-| XNOR        | `XNOR(expression, expression)`                      | `XNOR(true, false)`                          | 
+<h3>Trigonometric functions</h3>
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+      <th>Example/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>sin</td><td>Returns the sine of an angle (in radians)</td><td><code>sin(0)</code></td></tr>
+    <tr><td>cos</td><td>Returns the cosine of an angle (in radians)</td><td><code>cos(0)</code></td></tr>
+    <tr><td>tan</td><td>Returns the tangent of an angle (in radians)</td><td><code>tan(0)</code></td></tr>
+    <tr><td>sinh</td><td>Returns the hyperbolic sine of a value</td><td><code>sinh(1)</code></td></tr>
+    <tr><td>cosh</td><td>Returns the hyperbolic cosine of a value</td><td><code>cosh(1)</code></td></tr>
+    <tr><td>tanh</td><td>Returns the hyperbolic tangent of a value</td><td><code>tanh(1)</code></td></tr>
+    <tr><td>asin</td><td>Returns the inverse sine (arcsine) of a value, result in radians</td><td><code>asin(0.5)</code></td></tr>
+    <tr><td>acos</td><td>Returns the inverse cosine (arccosine) of a value, result in radians</td><td><code>acos(0.5)</code></td></tr>
+    <tr><td>atan</td><td>Returns the inverse tangent (arctangent) of a value, result in radians</td><td><code>atan(1)</code></td></tr>
+    <tr><td>rad</td><td>Converts the given value (in degree) to its radians counterpart. </td><td><code>rad(360)</code></td></tr>
+    <tr><td>deg</td><td>Converts the given value (in radians) to its degree counterpart.</td><td><code>deg(3.14)</code></td></tr>
+  </tbody>
+</table>
 
-
-### Comparison
-
-| Function    | Format                                              | Example/s                                    | 
-| ----------- | --------------------------------------------------- | -------------------------------------------- |
-| EQ          | `EQ(expression, expression)`                        | `EQ(5,5)`                                    | 
-| NEQ         | `NEQ(expression, expression)`                       | `NEQ(5,3)`                                   | 
-| LT          | `LT(expression, expression)`                        | `LT(2,5)`                                    | 
-| GT          | `GT(expression, expression)`                        | `GT(10,3)`                                   | 
-| LTE         | `LTE(expression, expression)`                       | `LTE(3,3)`                                   | 
-| GTE         | `GTE(expression, expression)`                       | `GTE(4,2)`                                   | 
-
-
-### Arithmetic
-
-| Function    | Format                                              | Example/s                                    | 
-| ----------- | --------------------------------------------------- | -------------------------------------------- |
-| ADD         | `ADD(expression, expression)`                       | `ADD(2,3)`                                   | 
-| SUB         | `SUB(expression, expression)`                       | `SUB(5,2)`                                   | 
-| MULT        | `MULT(expression, expression)`                      | `MULT(3,4)`                                  | 
-| DIV         | `DIV(expression, expression)`                       | `DIV(10,2)`                                  | 
-| MOD         | `MOD(expression, expression)`                       | `MOD(10,3)`                                  | 
-| POW         | `POW(expression, expression)`                       | `POW(2,3)`                                   | 
-| ROOT        | `ROOT(expression, expression)`                      | `ROOT(16,2)`                                 | 
-| ABS         | `ABS(expression)`                                   | `ABS(-5)`                                    | 
-| NEG         | `NEG(expression)`                                   | `NEG(7)`                                     | 
-| RAND        | `RAND(expression, expression)`                      | `RAND(2,10)`                                 | 
-
-
-### Keys and constants
-
-| Function    | Format                                              | Example/s                                    | 
-| ----------- | --------------------------------------------------- | -------------------------------------------- |
-| PI		  | `PI`                                                | `PI`                                         |
-| E			  | `E`                                                 | `E`                                          |
-| TRUE        | `TRUE`                                              | `TRUE`                                       |
-| FALSE       | `FALSE`                                             | `FALSE`                                      |
-| NULL        | `null`                                              | `null`                                       |
-| 1..9..100.. | `(-)? DIGIT+ ("." DIGIT+)?`                         | `42`, `-3.14`                                | 
-| Identifier  | `@{LETTER(LETTER | DIGIT | _)*}`					| `@{myVar_1}`								   |
-
+<h3>Keys and constants</h3>
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+      <th>Example/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>pi</td><td>Mathematical constant π (~3.14159)</td><td><code>pi</code></td></tr>
+    <tr><td>e</td><td>Euler's number (~2.71828)</td><td><code>e</code></td></tr>
+    <tr><td>tau</td><td>the ratio of a circle's circumference to its radius (~6.283185)</td><td><code>tau</code></td></tr>
+    <tr><td>true</td><td>Boolean constant representing true</td><td><code>true</code></td></tr>
+    <tr><td>false</td><td>Boolean constant representing false</td><td><code>false</code></td></tr>
+    <tr><td>null</td><td>Represents the absence of a value</td><td><code>null</code></td></tr>
+    <tr><td>1..9..100..</td><td>Numeric literal (integer or floating point, optionally negative)</td><td><code>42</code>, <code>-3.14</code></td></tr>
+    <tr><td>Identifier</td><td>Variable reference using a named identifier</td><td><code>@{myVar_1}</code></td></tr>
+  </tbody>
+</table>
 
 ## Usage
 
@@ -139,16 +162,15 @@ An example expression looks like this:
 [Fact]
 public void Simple_Expression()
 {
-	Expression expression = new Expression("Add(1, 1)");
-	Operation<object> operation = expression.Evaluate();
+	Expression expression = new Expression("add(1, 1)");
+	EvaluationResult operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Ok, operation.Status);
-	Assert.NotNull(operation.Value);
-	Assert.Equal(2D, operation.Value);
+	Assert.NotNull(operation.GetValue());
+	Assert.Equal(2D, operation.GetValue());
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString()); // 2
+	_outputHelper.WriteLine(operation.GetValue().ToString()); // 2.0D
 }
 ```
 
@@ -158,35 +180,32 @@ Function calls can be nested arbitrarily:
 [Fact]
 public void Simple_Nested_Expression()
 {
-	Expression expression = new Expression("Add(1, MULT(5,5))");
-	Operation<object> operation = expression.Evaluate();
+	Expression expression = new Expression("add(1, mult(5,5))");
+	EvaluationResult operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Ok, operation.Status);
-	Assert.NotNull(operation.Value);
-	Assert.Equal(26D, operation.Value);
+	Assert.NotNull(operation.GetValue());
+	Assert.Equal(26D, operation.GetValue());
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString()); // 26
+	_outputHelper.WriteLine(operation.GetValue().ToString()); // 26.0D
 }
 ```
 
 Expressions are not affected by spaces and line breaks:
 
 ```csharp
-[Fact]
 public void Simple_Expression_With_Whitespace()
 {
-	Expression expression = new Expression("Add  (1   , MULT    (5,      5))");
-	Operation<object> operation = expression.Evaluate();
+	Expression expression = new Expression("add  (1   , mult    (5,      5))");
+	EvaluationResult operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Ok, operation.Status);
-	Assert.NotNull(operation.Value);
-	Assert.Equal(26D, operation.Value);
+	Assert.NotNull(operation.GetValue());
+	Assert.Equal(26D, operation.GetValue());
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString()); // 26
+	_outputHelper.WriteLine(operation.GetValue().ToString()); // 26.0D
 }
 ```
 
@@ -205,49 +224,45 @@ Identifiers are the way to integrate your own values into expressions. To do thi
 [Fact]
 public void Expression_With_Identifier()
 {
-	Expression expression = new Expression("Add(@{Key_1}, 25)");
-	_ = expression.Bind("Key_1", 66);
-	Operation<object> operation = expression.Evaluate();
+	Expression expression = new Expression("add(@{Key_1}, 25)");
+	_ = expression.RegisterBinding("Key_1", 66);
+	EvaluationResult operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Ok, operation.Status);
-	Assert.NotNull(operation.Value);
-	Assert.Equal(91D, operation.Value);
+	Assert.NotNull(operation.GetValue());
+	Assert.Equal(91D, operation.GetValue());
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString()); // 91
+	_outputHelper.WriteLine(operation.GetValue().ToString()); // 91.0D
 }
 ```
 
 Rebinding parameters with the same key overwrites the values of the bound key.
 
-```
+```csharp
 [Fact]
 public void Expression_With_Rebound_Identifier()
 {
-	Expression expression = new Expression("Add(@{Key_1}, 25)");
-	_ = expression.Bind("Key_1", 66);
-	Operation<object> operation = expression.Evaluate();
+	Expression expression = new Expression("add(@{Key_1}, 25)");
+	_ = expression.RegisterBinding("Key_1", 66);
+	EvaluationResult operation = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Ok, operation.Status);
-	Assert.NotNull(operation.Value);
-	Assert.Equal(91D, operation.Value);
+	Assert.NotNull(operation.GetValue());
+	Assert.Equal(91D, operation.GetValue());
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString());
+	_outputHelper.WriteLine(operation.GetValue().ToString()); // 91.0D
 
-	_ = expression.Bind("Key_1", 60);
-	Operation<object> operation2 = expression.Evaluate();
+	_ = expression.RegisterBinding("Key_1", 60);
+	EvaluationResult operation2 = expression.Evaluate();
 
 	// Assert
-	Assert.Equal(Status.Ok, operation2.Status);
-	Assert.NotNull(operation.Value);
-	Assert.Equal(85D, operation2.Value);
+	Assert.NotNull(operation.GetValue());
+	Assert.Equal(85D, operation2.GetValue());
 
 	// Output
-	_outputHelper.WriteLine(operation2.Value.ToString()); // 85
-}
+	_outputHelper.WriteLine(operation2.GetValue().ToString()); // 85.0D
 }
 ```
 
@@ -272,16 +287,15 @@ public void Simple_Expression_With_Progress()
 	Progress<string> progress = new Progress<string>();
 	progress.ProgressChanged += (_, e) => _outputHelper.WriteLine(e);
 
-	Expression expression = new Expression("Add(SUB(2,1),MULT(5,5))");
-	Operation<object> operation = expression.Evaluate(progress);
+	Expression expression = new Expression("add(sub(2,1),mult(5,5))");
+	EvaluationResult operation = expression.Evaluate(progress);
 
 	// Assert
-	Assert.Equal(Status.Ok, operation.Status);
-	Assert.NotNull(operation.Value);
-	Assert.Equal(26D, operation.Value);
+	Assert.NotNull(operation.GetValue());
+	Assert.Equal(26D, operation.GetValue());
 
 	// Output
-	_outputHelper.WriteLine(operation.Value.ToString());
+	_outputHelper.WriteLine(operation.GetValue().ToString());
 
 	// Console output
 	// SUB(2, 1) = 1
