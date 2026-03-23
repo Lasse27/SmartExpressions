@@ -29,18 +29,18 @@ This results in the following functions:
       <td>Evaluates a condition and returns one expression if true, otherwise another</td>
       <td>
 	  	<code>
-			if( eq(1,1) ) 
-			{ 
-				add(2,3) 
-			} 
-			elif ( eq(1,2) )
-			{
-				mult(1,9)
-			}
-			else 
-			{ 
-				sub(5,2) 
-			}
+if( eq(1,1) ) 
+{ 
+	add(2,3) 
+} 
+elif ( eq(1,2) )
+{
+	mult(1,9)
+}
+else 
+{ 
+	sub(5,2) 
+}
 		</code>
 	  </td>
     </tr>
